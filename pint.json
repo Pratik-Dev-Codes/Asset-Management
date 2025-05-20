@@ -1,0 +1,12 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "no_unused_imports": false,
+        "not_operator_with_space": false,
+        "trailing_comma_in_multiline": {
+            "elements": [
+                "arrays"
+            ]
+        }
+    }
+}

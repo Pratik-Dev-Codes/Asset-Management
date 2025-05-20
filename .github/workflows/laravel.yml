@@ -61,9 +61,10 @@ jobs:
         DB_DATABASE: laravel_testing
         DB_USERNAME: root
         DB_PASSWORD: password
+        MEMORY_LIMIT: -1
       run: |
-        php artisan migrate:fresh --seed
-        php artisan test
+        php -d memory_limit=-1 artisan migrate:fresh --seed
+        php -d memory_limit=-1 artisan test --debug
 
   laravel-code-style:
     name: Check & fix styling
