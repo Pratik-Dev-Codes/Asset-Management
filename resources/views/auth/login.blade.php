@@ -6,8 +6,8 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <h2><i class="fas fa-sign-in-alt me-2"></i> Welcome Back</h2>
-                <p class="mb-0">Please login to continue</p>
+                <h2><i class="fas fa-sign-in-alt me-2"></i> Welcome to {{ config('app.name') }}</h2>
+                <p class="mb-0">Please login to access the asset management system</p>
             </div>
             <div class="auth-body">
                 @if (session('status'))

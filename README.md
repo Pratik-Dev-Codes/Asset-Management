@@ -1,6 +1,12 @@
-# Asset Management System
+# Asset Management System For NEEPCO LTD
 
-A comprehensive asset management system built with Laravel 10, designed to help organizations track and manage their physical and digital assets efficiently.
+[![GitHub repo](https://img.shields.io/badge/Repository-Asset--Management--System--For--NEEPCO--LTD-blue?logo=github)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD)
+
+A comprehensive asset management system built with Laravel 10, specifically designed for NEEPCO (North Eastern Electric Power Corporation Limited) to track and manage their physical and digital assets efficiently.
+
+## About NEEPCO
+
+North Eastern Electric Power Corporation Limited (NEEPCO) is a Miniratna Category-I Central Public Sector Enterprise under the Ministry of Power, Government of India. It was established to plan, promote, investigate, survey, design, construct, generate, operate, and maintain power stations in the North Eastern Region of India.
 
 ## Features
 

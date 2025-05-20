@@ -22,9 +22,12 @@ const resolveComponent = (name) => {
     return page;
 };
 
+// Set app name in global scope
+window.appName = 'Asset Management System For NEEPCO LTD';
+
 // Create the Inertia app
 createInertiaApp({
-    title: (title) => `${title} - NEEPCO Asset Management`,
+    title: (title) => title ? `${title} - ${window.appName}` : window.appName,
     resolve: resolveComponent,
     setup({ el, App, props }) {
         createRoot(el).render(
