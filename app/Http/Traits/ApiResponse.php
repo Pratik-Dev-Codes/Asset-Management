@@ -11,10 +11,7 @@ trait ApiResponse
     /**
      * Send a success response.
      *
-     * @param mixed $data
-     * @param string $message
-     * @param int $statusCode
-     * @return \Illuminate\Http\JsonResponse
+     * @param  mixed  $data
      */
     protected function success($data = null, string $message = 'Success', int $statusCode = Response::HTTP_OK): JsonResponse
     {
@@ -30,11 +27,7 @@ trait ApiResponse
     /**
      * Send an error response.
      *
-     * @param string $message
-     * @param int $statusCode
-     * @param array $errors
-     * @param mixed $data
-     * @return \Illuminate\Http\JsonResponse
+     * @param  mixed  $data
      */
     protected function error(string $message = 'Error', int $statusCode = Response::HTTP_BAD_REQUEST, array $errors = [], $data = null): JsonResponse
     {
@@ -43,7 +36,7 @@ trait ApiResponse
             'message' => $message,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -56,9 +49,6 @@ trait ApiResponse
 
     /**
      * Send a not found response.
-     *
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function notFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -67,9 +57,6 @@ trait ApiResponse
 
     /**
      * Send an unauthorized response.
-     *
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -78,9 +65,6 @@ trait ApiResponse
 
     /**
      * Send a forbidden response.
-     *
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function forbidden(string $message = 'Forbidden'): JsonResponse
     {
@@ -89,10 +73,6 @@ trait ApiResponse
 
     /**
      * Send a validation error response.
-     *
-     * @param array $errors
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function validationError(array $errors, string $message = 'Validation failed'): JsonResponse
     {
@@ -102,9 +82,7 @@ trait ApiResponse
     /**
      * Send a created response.
      *
-     * @param mixed $data
-     * @param string $message
-     * @return \Illuminate\Http\JsonResponse
+     * @param  mixed  $data
      */
     protected function created($data = null, string $message = 'Resource created successfully'): JsonResponse
     {
@@ -113,8 +91,6 @@ trait ApiResponse
 
     /**
      * Send a no content response.
-     *
-     * @return \Illuminate\Http\Response
      */
     protected function noContent(): Response
     {
@@ -124,10 +100,7 @@ trait ApiResponse
     /**
      * Send a paginated response.
      *
-     * @param mixed $resource
-     * @param string $message
-     * @param int $statusCode
-     * @return \Illuminate\Http\JsonResponse
+     * @param  mixed  $resource
      */
     protected function paginate($resource, string $message = 'Success', int $statusCode = Response::HTTP_OK): JsonResponse
     {

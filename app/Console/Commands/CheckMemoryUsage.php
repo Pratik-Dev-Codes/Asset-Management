@@ -2,14 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Traits\MonitorsMemoryUsage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use App\Traits\MonitorsMemoryUsage;
 
 class CheckMemoryUsage extends Command
 {
     use MonitorsMemoryUsage;
-    
+
     /**
      * The name and signature of the console command.
      *
@@ -34,22 +34,22 @@ class CheckMemoryUsage extends Command
         $memory = memory_get_usage(true);
         $peak = memory_get_peak_usage(true);
         $limit = $this->getMemoryLimitInBytes();
-        
+
         $memoryPercent = ($memory / $limit) * 100;
         $peakPercent = ($peak / $limit) * 100;
-        
+
         $data = [
             'current_memory' => $this->formatBytes($memory),
             'peak_memory' => $this->formatBytes($peak),
             'memory_limit' => $this->formatBytes($limit),
-            'current_percent' => round($memoryPercent, 2) . '%',
-            'peak_percent' => round($peakPercent, 2) . '%',
+            'current_percent' => round($memoryPercent, 2).'%',
+            'peak_percent' => round($peakPercent, 2).'%',
             'timestamp' => now()->toDateTimeString(),
         ];
-        
+
         // Log the memory usage
         Log::info('Memory usage check', $data);
-        
+
         // Display in console
         $this->table(
             ['Metric', 'Value'],
@@ -62,7 +62,7 @@ class CheckMemoryUsage extends Command
                 ['Time', $data['timestamp']],
             ]
         );
-        
+
         // Check if we're approaching memory limit
         $threshold = config('queue.memory.threshold', 80);
         if ($memoryPercent > $threshold) {
@@ -73,18 +73,18 @@ class CheckMemoryUsage extends Command
                 $data['peak_memory'],
                 $data['memory_limit']
             );
-            
+
             Log::warning('High memory usage detected', [
                 'message' => $message,
                 'threshold' => $threshold,
             ]);
-            
+
             $this->warn($message);
-            
+
             // Return non-zero exit code to indicate warning
             return 1;
         }
-        
+
         return 0;
     }
 }

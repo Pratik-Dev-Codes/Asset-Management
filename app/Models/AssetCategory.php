@@ -14,8 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $code
@@ -26,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $assets
  * @property-read int|null $assets_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory onlyTrashed()
@@ -40,6 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCategory withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class AssetCategory extends Model
@@ -102,19 +102,19 @@ class AssetCategory extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image) {
-            return asset('storage/categories/' . $this->image);
+            return asset('storage/categories/'.$this->image);
         }
-        
+
         return asset('img/default-category.png');
     }
 
     public function getItemCountAttribute()
     {
-        return $this->assets()->count() + 
-               $this->accessories()->count() + 
-               $this->components()->count() + 
-               $this->consumables()->count() + 
-               $this->licenses()->count() + 
+        return $this->assets()->count() +
+               $this->accessories()->count() +
+               $this->components()->count() +
+               $this->consumables()->count() +
+               $this->licenses()->count() +
                $this->models()->count();
     }
 }

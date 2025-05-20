@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * 
- *
  * @property-read \App\Models\User|null $approvedBy
  * @property-read \App\Models\Asset|null $asset
  * @property-read \App\Models\User|null $performedBy
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance query()
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Maintenance withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Maintenance extends Model

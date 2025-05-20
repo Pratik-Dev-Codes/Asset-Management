@@ -10,10 +10,7 @@ class BaseApiController extends Controller
     /**
      * Success response method.
      *
-     * @param mixed $data
-     * @param string $message
-     * @param int $code
-     * @return JsonResponse
+     * @param  mixed  $data
      */
     protected function success($data = null, string $message = 'Success', int $code = 200): JsonResponse
     {
@@ -22,7 +19,7 @@ class BaseApiController extends Controller
             'message' => $message,
         ];
 
-        if (!is_null($data)) {
+        if (! is_null($data)) {
             $response['data'] = $data;
         }
 
@@ -31,11 +28,6 @@ class BaseApiController extends Controller
 
     /**
      * Error response method.
-     *
-     * @param string $message
-     * @param int $code
-     * @param array $errors
-     * @return JsonResponse
      */
     protected function error(string $message = 'Error', int $code = 400, array $errors = []): JsonResponse
     {
@@ -44,7 +36,7 @@ class BaseApiController extends Controller
             'message' => $message,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -54,9 +46,7 @@ class BaseApiController extends Controller
     /**
      * Return a paginated response.
      *
-     * @param mixed $paginatedData
-     * @param string $message
-     * @return JsonResponse
+     * @param  mixed  $paginatedData
      */
     protected function paginated($paginatedData, string $message = 'Success'): JsonResponse
     {
@@ -69,15 +59,12 @@ class BaseApiController extends Controller
                 'last_page' => $paginatedData->lastPage(),
                 'from' => $paginatedData->firstItem(),
                 'to' => $paginatedData->lastItem(),
-            ]
+            ],
         ], $message);
     }
 
     /**
      * Return a not found response.
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function notFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -86,9 +73,6 @@ class BaseApiController extends Controller
 
     /**
      * Return an unauthorized response.
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -97,9 +81,6 @@ class BaseApiController extends Controller
 
     /**
      * Return a forbidden response.
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function forbidden(string $message = 'Forbidden'): JsonResponse
     {

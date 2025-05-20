@@ -3,21 +3,21 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Throwable;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class HandleExceptions
 {
@@ -25,21 +25,20 @@ class HandleExceptions
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
+     *
      * @throws \Throwable
      */
     public function handle($request, Closure $next)
     {
         // Start transaction if not in test environment
-        if (!app()->environment('testing') && !DB::transactionLevel()) {
+        if (! app()->environment('testing') && ! DB::transactionLevel()) {
             DB::beginTransaction();
         }
 
@@ -62,7 +61,7 @@ class HandleExceptions
             if (DB::transactionLevel() > 0) {
                 DB::rollBack();
             }
-            
+
             return $this->handleException($request, $e);
         }
     }
@@ -71,14 +70,12 @@ class HandleExceptions
      * Handle the exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     /**
      * Handle the exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Illuminate\Http\JsonResponse
      */
     protected function handleException($request, Throwable $e)
@@ -89,15 +86,15 @@ class HandleExceptions
         // Handle specific exceptions
         if ($e instanceof ModelNotFoundException) {
             return $this->errorResponse(
-                'The requested resource was not found.', 
-                404, 
+                'The requested resource was not found.',
+                404,
                 $e
             );
         }
 
         if ($e instanceof AuthenticationException) {
             return $this->errorResponse(
-                'Unauthenticated. Please log in to access this resource.', 
+                'Unauthenticated. Please log in to access this resource.',
                 401,
                 $e
             );
@@ -105,7 +102,7 @@ class HandleExceptions
 
         if ($e instanceof AuthorizationException) {
             return $this->errorResponse(
-                'You do not have permission to perform this action.', 
+                'You do not have permission to perform this action.',
                 403,
                 $e
             );
@@ -113,8 +110,8 @@ class HandleExceptions
 
         if ($e instanceof ValidationException) {
             return $this->errorResponse(
-                'The given data was invalid.', 
-                422, 
+                'The given data was invalid.',
+                422,
                 $e,
                 ['errors' => $e->errors()]
             );
@@ -122,7 +119,7 @@ class HandleExceptions
 
         if ($e instanceof MethodNotAllowedHttpException) {
             return $this->errorResponse(
-                'The specified HTTP method is not allowed for this resource.', 
+                'The specified HTTP method is not allowed for this resource.',
                 405,
                 $e
             );
@@ -130,7 +127,7 @@ class HandleExceptions
 
         if ($e instanceof NotFoundHttpException) {
             return $this->errorResponse(
-                'The requested URL was not found on this server.', 
+                'The requested URL was not found on this server.',
                 404,
                 $e
             );
@@ -142,8 +139,9 @@ class HandleExceptions
 
         if ($e instanceof ThrottleRequestsException || $e instanceof TooManyRequestsHttpException) {
             $retryAfter = $e->getHeaders()['Retry-After'] ?? 60;
+
             return $this->errorResponse(
-                'Too many attempts. Please try again in ' . $retryAfter . ' seconds.', 
+                'Too many attempts. Please try again in '.$retryAfter.' seconds.',
                 429,
                 $e,
                 ['retry_after' => $retryAfter]
@@ -152,8 +150,8 @@ class HandleExceptions
 
         // Default error response for unhandled exceptions
         $statusCode = $this->getHttpStatusCode($e);
-        $message = config('app.debug') 
-            ? $e->getMessage() 
+        $message = config('app.debug')
+            ? $e->getMessage()
             : 'An error occurred while processing your request. Please try again later.';
 
         return $this->errorResponse($message, $statusCode, $e);
@@ -162,7 +160,6 @@ class HandleExceptions
     /**
      * Get the HTTP status code from the exception.
      *
-     * @param  \Throwable  $e
      * @return int
      */
     protected function getHttpStatusCode(Throwable $e)
@@ -184,13 +181,12 @@ class HandleExceptions
     /**
      * Handle database exceptions.
      *
-     * @param  \Illuminate\Database\QueryException  $e
      * @return \Illuminate\Http\JsonResponse
      */
     protected function handleDatabaseException(QueryException $e)
     {
         $errorCode = $e->errorInfo[1] ?? null;
-        
+
         // Handle common database errors
         switch ($errorCode) {
             case 1062: // Duplicate entry
@@ -225,11 +221,9 @@ class HandleExceptions
      *
      * @param  string|array  $message
      * @param  int  $statusCode
-     * @param  \Throwable|null  $e
-     * @param  array  $additionalData
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function errorResponse($message, $statusCode, Throwable $e = null, array $additionalData = [])
+    protected function errorResponse($message, $statusCode, ?Throwable $e = null, array $additionalData = [])
     {
         $response = array_merge([
             'success' => false,
@@ -299,8 +293,8 @@ class HandleExceptions
                 $context['trace'] = $error->getTraceAsString();
             }
         } else {
-            $message = is_numeric($error) 
-                ? "HTTP Error: {$error} " . Response::$statusTexts[$error] ?? ''
+            $message = is_numeric($error)
+                ? "HTTP Error: {$error} ".Response::$statusTexts[$error] ?? ''
                 : "Error: {$error}";
         }
 
@@ -325,19 +319,19 @@ class HandleExceptions
     protected function getRequestData($request)
     {
         $data = $request->all();
-        
+
         // Remove sensitive data
         $sensitiveFields = ['password', 'password_confirmation', 'token', 'api_token', 'authorization'];
-        
+
         foreach ($sensitiveFields as $field) {
             if (isset($data[$field])) {
                 $data[$field] = '***REDACTED***';
             }
         }
-        
+
         return $data;
     }
-    
+
     /**
      * Check if the error is a client error (4xx).
      *
@@ -349,14 +343,14 @@ class HandleExceptions
         if ($error instanceof HttpException) {
             return $error->getStatusCode() >= 400 && $error->getStatusCode() < 500;
         }
-        
+
         if (is_numeric($error)) {
             return $error >= 400 && $error < 500;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Check if the error is a server error (5xx).
      *
@@ -368,11 +362,11 @@ class HandleExceptions
         if ($error instanceof HttpException) {
             return $error->getStatusCode() >= 500 && $error->getStatusCode() < 600;
         }
-        
+
         if (is_numeric($error)) {
             return $error >= 500 && $error < 600;
         }
-        
-        return !$this->isClientError($error);
+
+        return ! $this->isClientError($error);
     }
 }

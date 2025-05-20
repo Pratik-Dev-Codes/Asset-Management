@@ -3,17 +3,17 @@
 namespace App\Providers;
 
 use App\Models\Asset;
-use App\Models\User;
-use App\Models\Report;
 use App\Models\Document;
 use App\Models\Maintenance;
+use App\Models\Report;
+use App\Models\User;
 use App\Policies\AssetPolicy;
-use App\Policies\UserPolicy;
-use App\Policies\ReportPolicy;
 use App\Policies\DocumentPolicy;
 use App\Policies\MaintenancePolicy;
-use Illuminate\Support\Facades\Gate;
+use App\Policies\ReportPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -39,11 +39,11 @@ class AuthServiceProvider extends ServiceProvider
 
         // Define gates for role-based access control
         $this->defineGates();
-        
+
         // Register security-related model observers
         $this->registerObservers();
     }
-    
+
     /**
      * Define the application's authorization gates.
      */
@@ -62,7 +62,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->defineReportGates();
         $this->defineSettingsGates();
     }
-    
+
     /**
      * Define gates for asset management.
      */
@@ -71,20 +71,20 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-assets', function (User $user) {
             return $user->hasPermissionTo('manage assets');
         });
-        
+
         Gate::define('view-asset', function (User $user, Asset $asset) {
             return $user->can('view', $asset);
         });
-        
+
         Gate::define('edit-asset', function (User $user, Asset $asset) {
             return $user->can('update', $asset);
         });
-        
+
         Gate::define('delete-asset', function (User $user, Asset $asset) {
             return $user->can('delete', $asset);
         });
     }
-    
+
     /**
      * Define gates for user management.
      */
@@ -93,28 +93,30 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-users', function (User $user) {
             return $user->hasPermissionTo('manage users');
         });
-        
+
         Gate::define('view-user', function (User $user, User $targetUser) {
             return $user->can('view', $targetUser);
         });
-        
+
         Gate::define('edit-user', function (User $user, User $targetUser) {
             // Users can edit their own profile
             if ($user->id === $targetUser->id) {
                 return true;
             }
+
             return $user->hasPermissionTo('edit users');
         });
-        
+
         Gate::define('delete-user', function (User $user, User $targetUser) {
             // Prevent users from deleting themselves
             if ($user->id === $targetUser->id) {
                 return false;
             }
+
             return $user->hasPermissionTo('delete users');
         });
     }
-    
+
     /**
      * Define gates for report management.
      */
@@ -123,16 +125,17 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('generate-reports', function (User $user) {
             return $user->hasPermissionTo('generate reports');
         });
-        
+
         Gate::define('view-report', function (User $user, Report $report) {
             // Users can view their own reports
             if ($report->user_id === $user->id) {
                 return true;
             }
+
             return $user->hasPermissionTo('view all reports');
         });
     }
-    
+
     /**
      * Define gates for system settings.
      */
@@ -141,12 +144,12 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-settings', function (User $user) {
             return $user->hasRole('admin') || $user->hasRole('super-admin');
         });
-        
+
         Gate::define('view-audit-logs', function (User $user) {
             return $user->hasPermissionTo('view audit logs');
         });
     }
-    
+
     /**
      * Register model observers.
      */

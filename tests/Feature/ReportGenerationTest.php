@@ -19,6 +19,7 @@ class ReportGenerationTest extends TestCase
     use RefreshDatabase, WithFaker;
 
     protected $user;
+
     protected $admin;
 
     protected function setUp(): void
@@ -83,9 +84,9 @@ class ReportGenerationTest extends TestCase
         ]);
 
         // Create a test file
-        $fileName = 'test_report_' . time() . '.xlsx';
-        $filePath = 'reports/' . $fileName;
-        
+        $fileName = 'test_report_'.time().'.xlsx';
+        $filePath = 'reports/'.$fileName;
+
         Storage::disk('reports')->put($filePath, 'Test file content');
 
         $reportFile = ReportFile::create([
@@ -113,18 +114,18 @@ class ReportGenerationTest extends TestCase
         // Assert the file was downloaded
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->assertHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+        $response->assertHeader('Content-Disposition', 'attachment; filename="'.$fileName.'"');
     }
 
     /** @test */
     public function it_can_generate_a_report_via_console_command()
     {
         $this->artisan('reports:test')
-             ->expectsQuestion('Select report type', 0) // Select first option (Asset Report)
-             ->expectsQuestion('Select export format', 0) // Select first format (XLSX)
-             ->expectsConfirmation('Would you like to apply any filters?', 'no')
-             ->expectsQuestion('Enter email address to send notification (leave empty to skip email)', 'test@example.com')
-             ->assertExitCode(0);
+            ->expectsQuestion('Select report type', 0) // Select first option (Asset Report)
+            ->expectsQuestion('Select export format', 0) // Select first format (XLSX)
+            ->expectsConfirmation('Would you like to apply any filters?', 'no')
+            ->expectsQuestion('Enter email address to send notification (leave empty to skip email)', 'test@example.com')
+            ->assertExitCode(0);
 
         // Assert the report was created
         $this->assertDatabaseHas('reports', [
@@ -169,7 +170,7 @@ class ReportGenerationTest extends TestCase
 
         // Assert the response was successful
         $response->assertStatus(200);
-        
+
         // Assert the reports are visible
         foreach ($reports as $report) {
             $response->assertSee($report->name);

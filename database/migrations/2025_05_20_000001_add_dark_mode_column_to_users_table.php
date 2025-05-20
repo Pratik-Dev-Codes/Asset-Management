@@ -13,7 +13,7 @@ class AddDarkModeColumnToUsersTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('users', 'dark_mode')) {
+        if (! Schema::hasColumn('users', 'dark_mode')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->boolean('dark_mode')->default(false)->after('remember_token');
             });

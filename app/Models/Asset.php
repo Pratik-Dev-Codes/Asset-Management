@@ -2,26 +2,24 @@
 
 namespace App\Models;
 
+use App\Models\AssetAttachment;
+use App\Models\AssetCategory;
+use App\Models\AssetCustomField;
+use App\Models\Tag;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use App\Models\AssetCustomField;
-use App\Models\AssetCategory;
-use App\Models\Tag;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Models\AssetAttachment;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $asset_code
  * @property string $name
@@ -84,6 +82,7 @@ use App\Models\AssetAttachment;
  * @property-read int|null $maintenance_schedules_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Tag> $tags
  * @property-read int|null $tags_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Asset dueForMaintenance($days = 7)
  * @method static \Illuminate\Database\Eloquent\Builder|Asset newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Asset newQuery()
@@ -131,13 +130,14 @@ use App\Models\AssetAttachment;
  * @method static \Illuminate\Database\Eloquent\Builder|Asset whereWarrantyExpiryDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Asset whereWarrantyProvider($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Asset whereWarrantyStartDate($value)
+ *
  * @mixin \Eloquent
  */
 /**
  * Asset Model
- * 
+ *
  * Represents a physical or digital asset in the system.
- * 
+ *
  * @property int $id
  * @property string $name
  * @property string $asset_code
@@ -150,7 +150,6 @@ use App\Models\AssetAttachment;
  * @property \Illuminate\Support\Carbon $purchase_date
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * 
  * @property-read \App\Models\AssetCategory $category
  * @property-read \App\Models\Location $location
  * @property-read \App\Models\Department $department
@@ -160,14 +159,14 @@ use App\Models\AssetAttachment;
 class Asset extends Model
 {
     use HasFactory, LogsActivity;
-    
+
     /**
      * The relationships that should always be loaded.
      *
      * @var array
      */
     protected $with = ['category', 'location', 'department', 'assignedTo'];
-    
+
     /**
      * The "booting" method of the model.
      *
@@ -176,16 +175,16 @@ class Asset extends Model
     protected static function booted()
     {
         parent::booted();
-        
+
         static::saved(function ($asset) {
             Cache::tags(['assets'])->flush();
         });
-        
+
         static::deleted(function ($asset) {
             Cache::tags(['assets'])->flush();
         });
     }
-    
+
     /**
      * The accessors to append to the model's array form.
      * Empty by default to prevent unnecessary calculations.
@@ -193,7 +192,7 @@ class Asset extends Model
      * @var array
      */
     protected $appends = [];
-    
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -218,7 +217,7 @@ class Asset extends Model
         'updated_at' => 'datetime',
         'custom_fields' => 'array',
     ];
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -264,7 +263,7 @@ class Asset extends Model
         'created_by',
         'updated_by',
     ];
-    
+
     /**
      * The attributes that should be logged for all events.
      * Reduced to only essential attributes to minimize memory usage.
@@ -273,16 +272,16 @@ class Asset extends Model
      */
     protected static $logAttributes = [
         'name', 'status', 'category_id', 'location_id', 'department_id',
-        'assigned_to', 'purchase_cost', 'purchase_date'
+        'assigned_to', 'purchase_cost', 'purchase_date',
     ];
-    
+
     /**
      * The attributes that should be ignored for diff.
      *
      * @var array
      */
     protected static $ignoreChangedAttributes = ['updated_at'];
-    
+
     /**
      * Configure the activity log options.
      */
@@ -294,7 +293,7 @@ class Asset extends Model
             ->dontSubmitEmptyLogs()
             ->useLogName('asset');
     }
-    
+
     /**
      * Get the description for the event.
      */
@@ -312,7 +311,7 @@ class Asset extends Model
     {
         return $this->belongsTo(AssetCategory::class)->withDefault();
     }
-    
+
     /**
      * Get the location where the asset is located.
      *
@@ -342,7 +341,7 @@ class Asset extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
-    
+
     /**
      * Get all attachments for the asset.
      *
@@ -352,7 +351,7 @@ class Asset extends Model
     {
         return $this->hasMany(AssetAttachment::class);
     }
-    
+
     /**
      * Get the maintenance logs for the asset.
      *
@@ -362,7 +361,7 @@ class Asset extends Model
     {
         return $this->hasMany(MaintenanceLog::class);
     }
-    
+
     /**
      * Get the maintenance schedules for the asset.
      *
@@ -372,7 +371,7 @@ class Asset extends Model
     {
         return $this->hasMany(MaintenanceSchedule::class);
     }
-    
+
     /**
      * Scope a query to only include assets that are due for maintenance.
      * Optimized to use subquery for better performance.
@@ -391,7 +390,7 @@ class Asset extends Model
                 ->where('is_active', true);
         });
     }
-    
+
     /**
      * Scope a query to only include assets with the given status.
      *
@@ -403,7 +402,7 @@ class Asset extends Model
     {
         return $query->where('status', $status);
     }
-    
+
     /**
      * Scope a query to only include assets assigned to a specific user.
      *
@@ -415,7 +414,7 @@ class Asset extends Model
     {
         return $query->where('assigned_to', $userId);
     }
-    
+
     /**
      * Scope a query to only include assets in a specific location.
      *
@@ -427,7 +426,7 @@ class Asset extends Model
     {
         return $query->where('location_id', $locationId);
     }
-    
+
     /**
      * Scope a query to only include assets in a specific department.
      *
@@ -439,7 +438,7 @@ class Asset extends Model
     {
         return $query->where('department_id', $departmentId);
     }
-    
+
     /**
      * Scope a query to only include assets in a specific category.
      *
@@ -451,7 +450,7 @@ class Asset extends Model
     {
         return $query->where('category_id', $categoryId);
     }
-    
+
     /**
      * Get the count of assets by status with optimized caching.
      *
@@ -466,7 +465,7 @@ class Asset extends Model
                 ->toArray();
         });
     }
-    
+
     /**
      * Get the count of assets by category with optimized caching.
      *
@@ -483,7 +482,7 @@ class Asset extends Model
                 ->toArray();
         });
     }
-    
+
     /**
      * Get the total value of all assets with optimized caching.
      *
@@ -495,7 +494,7 @@ class Asset extends Model
             return (float) self::sum('purchase_cost');
         });
     }
-    
+
     /**
      * Get the total count of assets.
      *
@@ -507,7 +506,7 @@ class Asset extends Model
             return self::count();
         });
     }
-    
+
     /**
      * Get the recently added assets with optimized caching and selective loading.
      *
@@ -516,14 +515,14 @@ class Asset extends Model
      */
     public static function getRecent($limit = 5)
     {
-        return Cache::remember('recent_assets_' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('recent_assets_'.$limit, now()->addHour(), function () use ($limit) {
             return self::select(['id', 'name', 'asset_code', 'status', 'created_at'])
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
                 ->get();
         });
     }
-    
+
     /**
      * Get the assets that are due for maintenance with optimized caching.
      *
@@ -534,41 +533,41 @@ class Asset extends Model
     public static function getDueForMaintenance($days = 7, $limit = 10)
     {
         $cacheKey = "due_for_maintenance_{$days}_{$limit}";
-        
+
         return Cache::remember($cacheKey, now()->addHour(), function () use ($days, $limit) {
             return self::select(['id', 'name', 'asset_code', 'status', 'last_maintenance_date'])
-                ->whereHas('maintenanceSchedules', function($query) use ($days) {
+                ->whereHas('maintenanceSchedules', function ($query) use ($days) {
                     $query->where('next_maintenance_date', '<=', now()->addDays($days))
-                          ->where('is_active', true);
+                        ->where('is_active', true);
                 })
-                ->with(['maintenanceSchedules' => function($query) use ($days) {
+                ->with(['maintenanceSchedules' => function ($query) use ($days) {
                     $query->where('next_maintenance_date', '<=', now()->addDays($days))
-                          ->where('is_active', true)
-                          ->select(['id', 'asset_id', 'next_maintenance_date']);
+                        ->where('is_active', true)
+                        ->select(['id', 'asset_id', 'next_maintenance_date']);
                 }])
                 ->take($limit)
                 ->get();
         });
     }
-    
+
     /**
      * Get the URL to the asset's image or a placeholder if not available.
      */
     public function getImageUrlAttribute()
     {
-        return $this->image_path 
-            ? asset('storage/' . $this->image_path)
+        return $this->image_path
+            ? asset('storage/'.$this->image_path)
             : asset('images/placeholder-asset.png');
     }
-    
+
     /**
      * Get the formatted purchase cost with currency symbol.
      */
     public function getFormattedPurchaseCostAttribute()
     {
-        return '₹' . number_format($this->purchase_cost, 2);
+        return '₹'.number_format($this->purchase_cost, 2);
     }
-    
+
     /**
      * Get the status badge HTML for the asset.
      */
@@ -587,9 +586,9 @@ class Asset extends Model
             $badgeClass = 'bg-green-100 text-green-800';
         }
 
-        return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $badgeClass . '">' . ucfirst(str_replace('_', ' ', $status)) . '</span>';
+        return '<span class="px-2 py-1 text-xs font-medium rounded-full '.$badgeClass.'">'.ucfirst(str_replace('_', ' ', $status)).'</span>';
     }
-    
+
     /**
      * Get all custom fields for the asset.
      */
@@ -597,7 +596,7 @@ class Asset extends Model
     {
         return $this->hasMany(AssetCustomField::class);
     }
-    
+
     /**
      * Get the custom fields as a key-value array.
      */
@@ -605,7 +604,7 @@ class Asset extends Model
     {
         return $this->customFields()->pluck('field_value', 'field_name');
     }
-    
+
     /**
      * Get all of the tags for the asset.
      */
@@ -613,7 +612,7 @@ class Asset extends Model
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
-    
+
     /**
      * Get the tag list for the asset.
      */
@@ -621,7 +620,7 @@ class Asset extends Model
     {
         return $this->tags->pluck('name');
     }
-    
+
     /**
      * Sync tags for the asset.
      */
@@ -630,16 +629,16 @@ class Asset extends Model
         if (is_string($tags)) {
             $tags = explode(',', $tags);
         }
-        
+
         $tagIds = [];
         foreach ($tags as $tagName) {
             $tag = Tag::firstOrCreate(['name' => trim($tagName)]);
             $tagIds[] = $tag->id;
         }
-        
+
         $this->tags()->sync($tagIds);
     }
-    
+
     /**
      * Set a custom field value.
      */
@@ -650,20 +649,19 @@ class Asset extends Model
             ['field_value' => $value]
         );
     }
-    
+
     /**
      * Get a custom field value.
      */
     public function getCustomField($fieldName, $default = null)
     {
         $field = $this->customFields()->where('field_name', $fieldName)->first();
+
         return $field ? $field->field_value : $default;
     }
 
     /**
      * Get the default relationships to load.
-     *
-     * @return array
      */
     public static function getDefaultRelations(): array
     {
@@ -672,8 +670,6 @@ class Asset extends Model
 
     /**
      * Get the default appends to include.
-     *
-     * @return array
      */
     public static function getDefaultAppends(): array
     {
@@ -688,24 +684,21 @@ class Asset extends Model
     public function toArray()
     {
         $array = parent::toArray();
-        
+
         // Only append attributes that are actually needed
         $neededAppends = array_intersect($this->appends, static::getDefaultAppends());
-        
+
         foreach ($neededAppends as $attribute) {
             if ($this->shouldAppend($attribute)) {
                 $array[$attribute] = $this->getAttribute($attribute);
             }
         }
-        
+
         return $array;
     }
 
     /**
      * Check if an attribute should be appended.
-     *
-     * @param string $attribute
-     * @return bool
      */
     protected function shouldAppend(string $attribute): bool
     {
@@ -738,7 +731,7 @@ class Asset extends Model
             'tags',
             'attachments',
             'maintenanceLogs',
-            'maintenanceSchedules'
+            'maintenanceSchedules',
         ]);
     }
 }

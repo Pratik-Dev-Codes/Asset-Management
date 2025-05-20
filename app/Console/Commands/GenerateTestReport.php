@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\GenerateReport;
 use App\Models\Report;
 use App\Models\User;
-use App\Jobs\GenerateReport;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -56,7 +56,7 @@ class GenerateTestReport extends Command
 
         // Get notification email
         $email = $this->ask('Enter email address to send notification (leave empty to skip email)');
-        
+
         if ($email) {
             $validator = Validator::make(
                 ['email' => $email],
@@ -71,7 +71,7 @@ class GenerateTestReport extends Command
 
         // Create the report record
         $report = new Report([
-            'name' => 'Test Report - ' . now()->format('Y-m-d H:i:s'),
+            'name' => 'Test Report - '.now()->format('Y-m-d H:i:s'),
             'description' => 'Test report generated from command line',
             'type' => $reportType,
             'format' => $format,
@@ -88,12 +88,12 @@ class GenerateTestReport extends Command
         $this->line("Type: {$report->type}");
         $this->line("Format: {$report->format}");
         $this->line("Status: {$report->status}");
-        
-        if (!empty($filters)) {
+
+        if (! empty($filters)) {
             $this->line("\nFilters:");
             foreach ($filters as $key => $value) {
                 if (is_array($value)) {
-                    $this->line("- {$key}: " . json_encode($value) . "");
+                    $this->line("- {$key}: ".json_encode($value).'');
                 } else {
                     $this->line("- {$key}: {$value}");
                 }
@@ -104,8 +104,8 @@ class GenerateTestReport extends Command
         GenerateReport::dispatch($report);
 
         $this->info("\nReport generation has been queued. You will be notified when it's ready.");
-        $this->line("To check the status, run: php artisan queue:work");
-        $this->line("Or check the reports list in the web interface.");
+        $this->line('To check the status, run: php artisan queue:work');
+        $this->line('Or check the reports list in the web interface.');
     }
 
     /**
@@ -140,7 +140,7 @@ class GenerateTestReport extends Command
                 $dateRange['end'] = $endDate;
             }
 
-            if (!empty($dateRange)) {
+            if (! empty($dateRange)) {
                 $filters['purchase_date'] = $dateRange;
             }
         }

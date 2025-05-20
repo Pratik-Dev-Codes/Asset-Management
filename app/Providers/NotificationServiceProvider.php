@@ -18,7 +18,7 @@ class NotificationServiceProvider extends ServiceProvider
     {
         // Register the custom broadcast channel as a singleton
         $this->app->singleton('custom.broadcast.channel', function ($app) {
-            return new \App\Broadcasting\BroadcastNotificationChannel();
+            return new \App\Broadcasting\BroadcastNotificationChannel;
         });
     }
 
@@ -33,25 +33,25 @@ class NotificationServiceProvider extends ServiceProvider
         Broadcast::channel('user.{userId}', function ($user, $userId) {
             return (int) $user->id === (int) $userId;
         });
-        
+
         // Register the broadcast channel for notifications
         Broadcast::channel('notifications.{userId}', function ($user, $userId) {
             return (int) $user->id === (int) $userId;
         });
-        
+
         // Extend the notification channels
         $this->app->extend('notifications', function ($service, $app) {
             $service->extend('broadcast', function () use ($app) {
                 return $app->make('custom.broadcast.channel');
             });
-            
+
             return $service;
         });
-        
+
         // Register the broadcast routes
         $this->registerBroadcastRoutes();
     }
-    
+
     /**
      * Register the broadcast routes.
      *
@@ -63,7 +63,7 @@ class NotificationServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             return;
         }
-        
+
         // Register the broadcast routes with authentication middleware
         Broadcast::routes([
             'middleware' => ['auth:api'],

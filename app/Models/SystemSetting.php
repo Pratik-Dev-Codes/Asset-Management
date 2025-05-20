@@ -36,23 +36,20 @@ class SystemSetting extends Model
     /**
      * Get a setting value by key.
      *
-     * @param string $key
-     * @param mixed $default
+     * @param  mixed  $default
      * @return mixed
      */
     public static function getValue(string $key, $default = null)
     {
         $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 
     /**
      * Set a setting value by key.
      *
-     * @param string $key
-     * @param mixed $value
-     * @param string|null $group
-     * @return SystemSetting
+     * @param  mixed  $value
      */
     public static function setValue(string $key, $value, ?string $group = null): self
     {
@@ -74,13 +71,10 @@ class SystemSetting extends Model
 
     /**
      * Get all settings as an associative array.
-     *
-     * @param bool $includePrivate
-     * @return array
      */
     public static function getAll(bool $includePrivate = false): array
     {
-        $query = $includePrivate 
+        $query = $includePrivate
             ? self::query()
             : self::where('is_public', true);
 
@@ -91,16 +85,12 @@ class SystemSetting extends Model
 
     /**
      * Get settings by group.
-     *
-     * @param string $group
-     * @param bool $includePrivate
-     * @return array
      */
     public static function getByGroup(string $group, bool $includePrivate = false): array
     {
         $query = self::where('group', $group);
-        
-        if (!$includePrivate) {
+
+        if (! $includePrivate) {
             $query->where('is_public', true);
         }
 
@@ -111,13 +101,11 @@ class SystemSetting extends Model
 
     /**
      * Get group from key.
-     *
-     * @param string $key
-     * @return string
      */
     protected static function getGroupFromKey(string $key): string
     {
         $parts = explode('.', $key);
+
         return $parts[0] ?? 'general';
     }
 }

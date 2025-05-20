@@ -29,8 +29,6 @@ class ReportGenerated extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @param  \App\Models\Report  $report
-     * @param  string  $downloadUrl
      * @return void
      */
     public function __construct(Report $report, string $downloadUrl)
@@ -59,11 +57,11 @@ class ReportGenerated extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Your Report is Ready: ' . $this->report->name)
+            ->subject('Your Report is Ready: '.$this->report->name)
             ->line('Your report has been successfully generated and is ready for download.')
-            ->line('**Report:** ' . $this->report->name)
+            ->line('**Report:** '.$this->report->name)
             ->when($this->report->description, function ($message) {
-                $message->line('**Description:** ' . $this->report->description);
+                $message->line('**Description:** '.$this->report->description);
             })
             ->action('Download Report', $this->downloadUrl)
             ->line('This link will expire in 7 days.')
@@ -83,14 +81,12 @@ class ReportGenerated extends Notification implements ShouldQueue
             'report_id' => $this->report->id,
             'report_name' => $this->report->name,
             'download_url' => $this->downloadUrl,
-            'message' => 'Your report "' . $this->report->name . '" is ready for download.',
+            'message' => 'Your report "'.$this->report->name.'" is ready for download.',
         ];
     }
 
     /**
      * Get the notification's database type.
-     *
-     * @return string
      */
     public function databaseType(object $notifiable): string
     {

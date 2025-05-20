@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class CleanupActivityLogs extends Command
 {
@@ -48,4 +48,4 @@ class CleanupActivityLogs extends Command
 
         $this->info("Successfully deleted {$deleted} old activity logs.");
     }
-} 
+}

@@ -13,6 +13,7 @@ class ReportCachingTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+
     protected $report;
 
     protected function setUp(): void
@@ -24,7 +25,7 @@ class ReportCachingTest extends TestCase
         $this->report = Report::factory()->create([
             'created_by' => $this->user->id,
             'type' => 'assets',
-            'columns' => ['id', 'name', 'created_at']
+            'columns' => ['id', 'name', 'created_at'],
         ]);
     }
 
@@ -59,7 +60,7 @@ class ReportCachingTest extends TestCase
             'name' => 'Updated Report Name',
             'type' => $this->report->type,
             'columns' => $this->report->columns,
-            'is_public' => true
+            'is_public' => true,
         ]);
 
         $updateResponse->assertRedirect(route('reports.show', $this->report->id));
@@ -95,14 +96,14 @@ class ReportCachingTest extends TestCase
         // Second user
         $user2 = User::factory()->create();
         $this->actingAs($user2);
-        
+
         $response2 = $this->get(route('reports.show', $this->report->id));
         $response2->assertStatus(200);
 
         // Both should have their own cache entries
         $cacheKey1 = "report.{$this->report->id}";
         $cacheKey2 = "report.{$this->report->id}";
-        
+
         $this->assertTrue(Cache::tags(["user.{$this->user->id}.reports"])->has($cacheKey1));
         $this->assertTrue(Cache::tags(["user.{$user2->id}.reports"])->has($cacheKey2));
     }

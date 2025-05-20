@@ -2,30 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset;
-use App\Models\AssetCategory;
-use App\Models\Location;
-use App\Models\Department;
-use App\Models\User;
-use App\Models\Maintenance;
-use App\Models\Depreciation;
-use App\Models\Supplier;
-use App\Services\AdvancedReportService;
-use App\Services\ReportExporter;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Excel as ExcelType;
 use App\Exports\AssetsExport;
-use App\Exports\FinancialReportExport;
 use App\Exports\ComplianceReportExport;
 use App\Exports\CustomReportExport;
+use App\Exports\FinancialReportExport;
+use App\Models\Asset;
+use App\Models\AssetCategory;
+use App\Models\Department;
+use App\Models\Depreciation;
+use App\Models\Location;
+use App\Models\Maintenance;
+use App\Models\Supplier;
+use App\Models\User;
+use App\Services\AdvancedReportService;
+use App\Services\ReportExporter;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Excel as ExcelType;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -39,7 +39,6 @@ class ReportController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  ReportExporter  $reportExporter
      * @return void
      */
     public function __construct(ReportExporter $reportExporter)
@@ -63,7 +62,7 @@ class ReportController extends Controller
                 'icon' => 'CollectionIcon',
             ],
             'total_value' => [
-                'value' => '\$' . number_format(Asset::sum('purchase_cost'), 2),
+                'value' => '\$'.number_format(Asset::sum('purchase_cost'), 2),
                 'label' => 'Total Value',
                 'trend' => 'up',
                 'change' => '12%',
@@ -140,7 +139,6 @@ class ReportController extends Controller
     /**
      * Generate asset reports with advanced filtering.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Inertia\Response
      */
     public function assets(Request $request)
@@ -178,11 +176,11 @@ class ReportController extends Controller
         // Apply filters
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('serial_number', 'like', "%{$searchTerm}%")
-                  ->orWhere('model_number', 'like', "%{$searchTerm}%")
-                  ->orWhere('notes', 'like', "%{$searchTerm}%");
+                    ->orWhere('serial_number', 'like', "%{$searchTerm}%")
+                    ->orWhere('model_number', 'like', "%{$searchTerm}%")
+                    ->orWhere('notes', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -199,7 +197,7 @@ class ReportController extends Controller
         }
 
         if ($request->filled('department_id')) {
-            $query->whereHas('assignedToUser', function($q) use ($request) {
+            $query->whereHas('assignedToUser', function ($q) use ($request) {
                 $q->where('department_id', $request->input('department_id'));
             });
         }
@@ -229,9 +227,9 @@ class ReportController extends Controller
         if ($request->has('format')) {
             $assets = $query->get();
             $columns = $request->input('columns', $this->getReportColumns());
-            
+
             // Transform data for export
-            $exportData = $assets->map(function($asset) use ($columns) {
+            $exportData = $assets->map(function ($asset) use ($columns) {
                 $data = [];
                 foreach ($columns as $column) {
                     $key = $column;
@@ -240,14 +238,15 @@ class ReportController extends Controller
                     }
                     $data[$key] = data_get($asset, $key);
                 }
+
                 return $data;
             });
-            
+
             return $this->reportExporter->export(
                 $request->input('format'),
                 $exportData,
                 is_array($columns[0] ?? null) ? $columns : $this->getReportColumns(),
-                'assets_report_' . now()->format('Y-m-d')
+                'assets_report_'.now()->format('Y-m-d')
             );
         }
 
@@ -268,7 +267,6 @@ class ReportController extends Controller
     /**
      * Generate a custom report based on user-defined parameters.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Inertia\Response
      */
     public function customReport(Request $request)
@@ -283,10 +281,10 @@ class ReportController extends Controller
             'sort_by' => 'nullable|string',
             'sort_order' => 'nullable|in:asc,desc',
         ]);
-        
-        $reportService = new AdvancedReportService();
+
+        $reportService = new AdvancedReportService;
         $filters = $request->input('filters', []);
-        
+
         // Generate the report data
         $reportData = $reportService->generateCustomReport(
             $request->report_type,
@@ -296,7 +294,7 @@ class ReportController extends Controller
             $request->sort_by,
             $request->sort_order
         );
-        
+
         // If JSON is requested, return the data directly
         if ($request->wantsJson() || $request->input('format') === 'json') {
             return response()->json([
@@ -308,12 +306,12 @@ class ReportController extends Controller
                     'filters' => $filters,
                     'group_by' => $request->group_by,
                     'generated_at' => now()->toDateTimeString(),
-                ]
+                ],
             ]);
         }
-        
+
         // If no format is specified, return the view
-        if (!$request->has('format')) {
+        if (! $request->has('format')) {
             return inertia('Reports/Custom', [
                 'reportData' => $reportData,
                 'filters' => $filters,
@@ -344,11 +342,11 @@ class ReportController extends Controller
                 ],
             ]);
         }
-        
+
         // Prepare for export
         $export = new CustomReportExport($reportData, $request->columns, $request->report_type);
-        $fileName = 'custom-report-' . Str::slug($request->report_type) . '-' . now()->format('Y-m-d');
-        
+        $fileName = 'custom-report-'.Str::slug($request->report_type).'-'.now()->format('Y-m-d');
+
         switch ($request->format) {
             case 'pdf':
                 $pdf = PDF::loadView('exports.custom.pdf', [
@@ -359,28 +357,28 @@ class ReportController extends Controller
                     'generated_at' => now(),
                     'generated_by' => Auth::user()->name,
                 ]);
-                return $pdf->download($fileName . '.pdf');
-                
+
+                return $pdf->download($fileName.'.pdf');
+
             case 'csv':
-                return Excel::download($export, $fileName . '.csv', ExcelType::CSV);
-                
+                return Excel::download($export, $fileName.'.csv', ExcelType::CSV);
+
             case 'xlsx':
             default:
-                return Excel::download($export, $fileName . '.xlsx', ExcelType::XLSX);
+                return Excel::download($export, $fileName.'.xlsx', ExcelType::XLSX);
         }
     }
 
     /**
      * Generate financial reports.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function financial(Request $request)
     {
         $request->validate([
             'format' => 'required|in:pdf,excel,csv',
-            'year' => 'required|integer|min:2000|max:' . (date('Y') + 5),
+            'year' => 'required|integer|min:2000|max:'.(date('Y') + 5),
         ]);
 
         $year = $request->year;
@@ -388,18 +386,18 @@ class ReportController extends Controller
             $date = Carbon::create($year, $month, 1);
             $start = $date->startOfMonth()->format('Y-m-d');
             $end = $date->endOfMonth()->format('Y-m-d');
-            
+
             $purchases = Asset::whereBetween('purchase_date', [$start, $end])->sum('purchase_cost');
             $depreciation = Depreciation::whereYear('date', $year)
                 ->whereMonth('date', $month)
                 ->sum('amount');
-                
+
             return [
                 $date->format('M') => [
                     'purchases' => $purchases,
                     'depreciation' => $depreciation,
                     'total' => $purchases + $depreciation,
-                ]
+                ],
             ];
         });
 
@@ -415,19 +413,19 @@ class ReportController extends Controller
 
         if ($request->format === 'pdf') {
             $pdf = PDF::loadView('reports.financial.pdf', $data);
-            return $pdf->download('financial-report-' . $year . '.pdf');
+
+            return $pdf->download('financial-report-'.$year.'.pdf');
         }
 
         $export = new FinancialReportExport($data);
         $format = $request->format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
-        
-        return Excel::download($export, 'financial-report-' . $year . '.' . $request->format, $format);
+
+        return Excel::download($export, 'financial-report-'.$year.'.'.$request->format, $format);
     }
 
     /**
      * Generate compliance reports.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function compliance(Request $request)
@@ -459,19 +457,19 @@ class ReportController extends Controller
 
         if ($request->format === 'pdf') {
             $pdf = PDF::loadView('reports.compliance.pdf', $data);
-            return $pdf->download('compliance-report-' . now()->format('Y-m-d') . '.pdf');
+
+            return $pdf->download('compliance-report-'.now()->format('Y-m-d').'.pdf');
         }
 
         $export = new ComplianceReportExport($data);
         $format = $request->format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
-        
-        return Excel::download($export, 'compliance-report-' . now()->format('Y-m-d') . '.' . $request->format, $format);
+
+        return Excel::download($export, 'compliance-report-'.now()->format('Y-m-d').'.'.$request->format, $format);
     }
 
     /**
      * Generate custom reports.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function custom(Request $request)
@@ -500,32 +498,33 @@ class ReportController extends Controller
             case 'asset_audit':
                 $data['assets'] = $this->getAssetAuditData($request);
                 $view = 'reports.custom.asset-audit';
-                $filename = 'asset-audit-report-' . now()->format('Y-m-d');
+                $filename = 'asset-audit-report-'.now()->format('Y-m-d');
                 break;
-                
+
             case 'depreciation_schedule':
                 $data['depreciations'] = $this->getDepreciationScheduleData($request);
                 $view = 'reports.custom.depreciation-schedule';
-                $filename = 'depreciation-schedule-' . now()->format('Y-m-d');
+                $filename = 'depreciation-schedule-'.now()->format('Y-m-d');
                 break;
-                
+
             case 'maintenance_history':
                 $data['maintenances'] = $this->getMaintenanceHistoryData($request);
                 $view = 'reports.custom.maintenance-history';
-                $filename = 'maintenance-history-' . now()->format('Y-m-d');
+                $filename = 'maintenance-history-'.now()->format('Y-m-d');
                 break;
         }
 
         if ($request->format === 'pdf') {
             $pdf = PDF::loadView($view, $data);
-            return $pdf->download($filename . '.pdf');
+
+            return $pdf->download($filename.'.pdf');
         }
 
-        $exportClass = 'App\\Exports\\' . ucfirst(camel_case($request->report_type)) . 'Export';
+        $exportClass = 'App\\Exports\\'.ucfirst(camel_case($request->report_type)).'Export';
         $export = new $exportClass($data);
         $format = $request->format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
-        
-        return Excel::download($export, $filename . '.' . $request->format, $format);
+
+        return Excel::download($export, $filename.'.'.$request->format, $format);
     }
 
     /**
@@ -610,24 +609,24 @@ class ReportController extends Controller
     {
         try {
             $progress = Session::get('export_progress', 0);
-            
+
             return response()->json([
                 'success' => true,
-                'progress' => (float)$progress,
+                'progress' => (float) $progress,
                 'status' => $progress >= 100 ? 'completed' : 'processing',
-                'estimated_time_remaining' => $this->calculateRemainingTime($progress)
+                'estimated_time_remaining' => $this->calculateRemainingTime($progress),
             ]);
         } catch (\Exception $e) {
-            Log::error('Error checking export progress: ' . $e->getMessage());
-            
+            Log::error('Error checking export progress: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to check export progress.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
-    
+
     /**
      * Calculate remaining time for export
      *
@@ -636,19 +635,24 @@ class ReportController extends Controller
      */
     protected function calculateRemainingTime($progress)
     {
-        if ($progress <= 0) return 'Calculating...';
-        if ($progress >= 100) return 'Almost done...';
-        
+        if ($progress <= 0) {
+            return 'Calculating...';
+        }
+        if ($progress >= 100) {
+            return 'Almost done...';
+        }
+
         $elapsedTime = microtime(true) - (Session::get('export_start_time', microtime(true)));
         $estimatedTotalTime = $elapsedTime / ($progress / 100);
         $remainingSeconds = max(1, round(($estimatedTotalTime - $elapsedTime) / 1000));
-        
+
         if ($remainingSeconds < 60) {
             return "About {$remainingSeconds} seconds remaining";
         }
-        
+
         $minutes = ceil($remainingSeconds / 60);
-        return "About {$minutes} minute".($minutes > 1 ? 's' : '')." remaining";
+
+        return "About {$minutes} minute".($minutes > 1 ? 's' : '').' remaining';
     }
 
     /**
@@ -657,6 +661,7 @@ class ReportController extends Controller
      * @param  string  $id
      * @param  string  $format
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\Response
+     *
      * @throws \Exception
      */
     public function export($id, $format = 'pdf')
@@ -664,11 +669,11 @@ class ReportController extends Controller
         // Set initial progress
         Session::put('export_progress', 0);
         Session::put('export_start_time', microtime(true));
-        
+
         try {
             $report = $this->getReportWithCache($id);
-            
-            if (!$report->is_public && $report->created_by !== Auth::id()) {
+
+            if (! $report->is_public && $report->created_by !== Auth::id()) {
                 abort(403, 'You do not have permission to export this report.');
             }
 
@@ -684,27 +689,27 @@ class ReportController extends Controller
                 $data = $data->merge($items);
                 $processed += $items->count();
                 $progress = min(95, round(($processed / $total) * 90, 2)); // Cap at 95% until complete
-                
+
                 // Update progress in session
                 Session::put('export_progress', $progress);
-                
+
                 // Small delay to allow UI updates
                 if (ob_get_level() > 0) {
                     ob_flush();
                 }
                 flush();
-                
+
                 // Small delay to prevent server overload
                 if (function_exists('usleep')) {
                     usleep(100000); // 100ms delay
                 }
             });
-            
+
             // Mark as complete
             Session::put('export_progress', 100);
 
             // Prepare the data for export
-            $exportData = $data->map(function($item) use ($report) {
+            $exportData = $data->map(function ($item) use ($report) {
                 $row = [];
                 foreach ($report->columns as $column) {
                     // Handle nested relationships (e.g., 'user.name')
@@ -712,17 +717,20 @@ class ReportController extends Controller
                         $value = $item;
                         foreach (explode('.', $column) as $segment) {
                             $value = $value->$segment ?? null;
-                            if ($value === null) break;
+                            if ($value === null) {
+                                break;
+                            }
                         }
                         $row[$column] = $value;
                     } else {
                         $row[$column] = $item->$column ?? '';
                     }
                 }
+
                 return $row;
             })->toArray();
 
-            $filename = Str::slug($report->name) . '-' . now()->format('Y-m-d');
+            $filename = Str::slug($report->name).'-'.now()->format('Y-m-d');
             $export = new ReportExport($exportData, $report->columns, $report->name);
 
             switch (strtolower($format)) {
@@ -734,22 +742,24 @@ class ReportController extends Controller
                         'columns' => $report->columns,
                         'generatedAt' => now()->format('Y-m-d H:i:s'),
                     ]);
-                    
+
                     $pdf = PDF::loadHTML($html);
-                    return $pdf->download($filename . '.pdf');
-                    
+
+                    return $pdf->download($filename.'.pdf');
+
                 case 'excel':
-                    return Excel::download($export, $filename . '.xlsx');
-                    
+                    return Excel::download($export, $filename.'.xlsx');
+
                 case 'csv':
-                    return Excel::download($export, $filename . '.csv', \Maatwebsite\Excel\Excel::CSV);
-                    
+                    return Excel::download($export, $filename.'.csv', \Maatwebsite\Excel\Excel::CSV);
+
                 default:
                     throw new \Exception('Invalid export format specified.');
             }
 
         } catch (\Exception $e) {
-            Log::error("Failed to export report {$id} as {$format}: " . $e->getMessage());
+            Log::error("Failed to export report {$id} as {$format}: ".$e->getMessage());
+
             return redirect()
                 ->back()
                 ->with('error', 'Failed to export report. Please try again later.');

@@ -23,8 +23,8 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return true;
         }
-        
-        return $user->can('view user') || 
+
+        return $user->can('view user') ||
                $user->can('view any user');
     }
 
@@ -45,13 +45,13 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return true;
         }
-        
+
         // Prevent updating super admin users unless you're a super admin
-        if ($model->hasRole('super-admin') && !$user->hasRole('super-admin')) {
+        if ($model->hasRole('super-admin') && ! $user->hasRole('super-admin')) {
             return false;
         }
-        
-        return $user->can('update user') || 
+
+        return $user->can('update user') ||
                $user->can('update any user');
     }
 
@@ -64,12 +64,12 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return false;
         }
-        
+
         // Prevent deleting super admin users unless you're a super admin
-        if ($model->hasRole('super-admin') && !$user->hasRole('super-admin')) {
+        if ($model->hasRole('super-admin') && ! $user->hasRole('super-admin')) {
             return false;
         }
-        
+
         return $user->can('delete user');
     }
 
@@ -89,7 +89,7 @@ class UserPolicy extends BasePolicy
         // Only super admins can force delete users
         return $user->hasRole('super-admin');
     }
-    
+
     /**
      * Determine whether the user can update the user's roles.
      */
@@ -99,15 +99,15 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return false;
         }
-        
+
         // Only super admins can update admin roles
         if ($model->hasRole('super-admin') || $model->hasRole('admin')) {
             return $user->hasRole('super-admin');
         }
-        
+
         return $user->can('update user roles');
     }
-    
+
     /**
      * Determine whether the user can update the user's permissions.
      */
@@ -117,15 +117,15 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return false;
         }
-        
+
         // Only super admins can update admin permissions
         if ($model->hasRole('super-admin') || $model->hasRole('admin')) {
             return $user->hasRole('super-admin');
         }
-        
+
         return $user->can('update user permissions');
     }
-    
+
     /**
      * Determine whether the user can enable/disable MFA for the user.
      */
@@ -135,7 +135,7 @@ class UserPolicy extends BasePolicy
         if ($user->id === $model->id) {
             return true;
         }
-        
+
         return $user->can('manage user mfa');
     }
 }

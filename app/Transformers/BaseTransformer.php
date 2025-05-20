@@ -23,9 +23,6 @@ abstract class BaseTransformer extends TransformerAbstract
 
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return array
      */
     public function transform(Model $model): array
     {
@@ -34,9 +31,6 @@ abstract class BaseTransformer extends TransformerAbstract
 
     /**
      * Transform the model data.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return array
      */
     abstract protected function transformModel(Model $model): array;
 
@@ -44,7 +38,6 @@ abstract class BaseTransformer extends TransformerAbstract
      * Format date to ISO 8601 format.
      *
      * @param  mixed  $date
-     * @return string|null
      */
     protected function formatDate($date): ?string
     {

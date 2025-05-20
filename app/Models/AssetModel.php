@@ -56,30 +56,30 @@ class AssetModel extends Model
     public function getFullNameAttribute()
     {
         $name = [];
-        
+
         if ($this->manufacturer) {
             $name[] = $this->manufacturer->name;
         }
-        
+
         $name[] = $this->name;
-        
+
         if ($this->model_number) {
             $name[] = $this->model_number;
         }
-        
+
         return implode(' ', $name);
     }
 
     public function getImageUrlAttribute()
     {
         if ($this->image) {
-            return asset('storage/models/' . $this->image);
+            return asset('storage/models/'.$this->image);
         }
-        
+
         if ($this->category && $this->category->image) {
-            return asset('storage/categories/' . $this->category->image);
+            return asset('storage/categories/'.$this->category->image);
         }
-        
+
         return asset('img/default-model.png');
     }
 
@@ -88,11 +88,11 @@ class AssetModel extends Model
         if ($this->eol) {
             return $this->eol;
         }
-        
+
         if ($this->category && $this->category->eol) {
             return $this->category->eol;
         }
-        
+
         return config('defaults.eol_months', 36);
     }
 }

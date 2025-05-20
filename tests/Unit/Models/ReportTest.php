@@ -57,7 +57,7 @@ class ReportTest extends TestCase
             'report_id' => $report->id,
             'created_at' => now()->subDay(),
         ]);
-        
+
         $latestFile = ReportFile::factory()->create([
             'report_id' => $report->id,
             'created_at' => now(),
@@ -81,7 +81,7 @@ class ReportTest extends TestCase
         $this->assertTrue($pendingReports->contains($pendingReport));
         $this->assertTrue($completedReports->contains($completedReport));
         $this->assertTrue($failedReports->contains($failedReport));
-        
+
         $this->assertFalse($pendingReports->contains($completedReport));
         $this->assertFalse($completedReports->contains($pendingReport));
     }
@@ -134,7 +134,7 @@ class ReportTest extends TestCase
     public function it_can_get_download_url()
     {
         $report = Report::factory()->create([
-            'file_path' => 'reports/test_report.xlsx'
+            'file_path' => 'reports/test_report.xlsx',
         ]);
 
         $this->assertStringContainsString('reports/test_report.xlsx', $report->download_url);
@@ -144,7 +144,7 @@ class ReportTest extends TestCase
     public function it_can_get_formatted_created_at()
     {
         $report = Report::factory()->create([
-            'created_at' => '2023-01-01 12:00:00'
+            'created_at' => '2023-01-01 12:00:00',
         ]);
 
         // Format depends on your application's locale settings
@@ -155,7 +155,7 @@ class ReportTest extends TestCase
     public function it_can_get_formatted_file_generated_at()
     {
         $report = Report::factory()->create([
-            'file_generated_at' => '2023-01-01 12:00:00'
+            'file_generated_at' => '2023-01-01 12:00:00',
         ]);
 
         // Format depends on your application's locale settings
@@ -166,7 +166,7 @@ class ReportTest extends TestCase
     public function it_can_get_formatted_file_size()
     {
         $report = Report::factory()->create([
-            'file_size' => 1024 // 1 KB
+            'file_size' => 1024, // 1 KB
         ]);
 
         $this->assertEquals('1 KB', $report->formatted_file_size);

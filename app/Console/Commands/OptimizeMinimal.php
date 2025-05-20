@@ -29,62 +29,62 @@ class OptimizeMinimal extends Command
     public function handle()
     {
         $this->info('Starting minimal optimization...');
-        
+
         // Disable debug mode
         config(['app.debug' => false]);
-        
+
         // Clear configuration cache
         $this->callCommand('config:clear');
-        
+
         // Clear route cache
         $this->callCommand('route:clear');
-        
+
         // Clear view cache
         $this->callCommand('view:clear');
-        
+
         // Clear compiled files
         $this->callCommand('clear-compiled');
-        
+
         // Clear application cache
         $this->callCommand('cache:clear');
-        
+
         // Optimize the application
         $this->callCommand('optimize');
-        
+
         // Cache the configuration
         $this->callCommand('config:cache');
-        
+
         // Cache the routes
         $this->callCommand('route:cache');
-        
+
         // Cache the views
         $this->callCommand('view:cache');
-        
+
         $this->info('Optimization completed successfully!');
-        
+
         return 0;
     }
-    
+
     /**
      * Call an Artisan command with memory limit.
      *
-     * @param string $command
-     * @param array $parameters
+     * @param  string  $command
+     * @param  array  $parameters
      * @return int
      */
     protected function callCommand($command, $parameters = [])
     {
         $this->info("Running: {$command}...");
-        
+
         // Run the command in a separate process to isolate memory usage
         $exitCode = Artisan::call($command, $parameters);
-        
+
         if ($exitCode !== 0) {
             $this->error("Failed to run: {$command}");
         } else {
             $this->info("Completed: {$command}");
         }
-        
+
         return $exitCode;
     }
 }

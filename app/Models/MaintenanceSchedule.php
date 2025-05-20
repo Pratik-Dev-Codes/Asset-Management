@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property int $asset_id
  * @property string $maintenance_type
@@ -36,6 +34,7 @@ use Spatie\Activitylog\LogOptions;
  * @property-read bool $is_overdue
  * @property-read string $status
  * @property-read string $status_badge
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule active()
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule dueWithinDays($days = 7)
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule newModelQuery()
@@ -60,26 +59,27 @@ use Spatie\Activitylog\LogOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceSchedule withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class MaintenanceSchedule extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
-    
+    use HasFactory, LogsActivity, SoftDeletes;
+
     /**
      * The attributes that should be logged for all events.
      *
      * @var array
      */
     protected static $logAttributes = ['*'];
-    
+
     /**
      * The attributes that should be ignored for diff.
      *
      * @var array
      */
     protected static $ignoreChangedAttributes = ['updated_at', 'next_due_date'];
-    
+
     /**
      * Configure the activity log options.
      */
@@ -91,7 +91,7 @@ class MaintenanceSchedule extends Model
             ->dontSubmitEmptyLogs()
             ->useLogName('maintenance-schedule');
     }
-    
+
     /**
      * Get the description for the event.
      */
@@ -133,7 +133,7 @@ class MaintenanceSchedule extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
-    
+
     /**
      * Scope a query to only include active maintenance schedules.
      */
@@ -141,16 +141,16 @@ class MaintenanceSchedule extends Model
     {
         return $query->where('is_active', true);
     }
-    
+
     /**
      * Scope a query to only include schedules due within the next X days.
      */
     public function scopeDueWithinDays($query, $days = 7)
     {
         return $query->where('next_due_date', '<=', now()->addDays($days))
-                    ->where('is_active', true);
+            ->where('is_active', true);
     }
-    
+
     /**
      * Check if the schedule is overdue.
      */
@@ -158,61 +158,61 @@ class MaintenanceSchedule extends Model
     {
         return $this->next_due_date && $this->next_due_date->isPast();
     }
-    
+
     /**
      * Get the status of the maintenance schedule.
      */
     public function getStatusAttribute(): string
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return 'Inactive';
         }
-        
+
         if ($this->is_overdue) {
             return 'Overdue';
         }
-        
+
         if ($this->next_due_date && $this->next_due_date->isToday()) {
             return 'Due Today';
         }
-        
+
         return 'Upcoming';
     }
-    
+
     /**
      * Get the status badge HTML for the maintenance schedule.
      */
     public function getStatusBadgeAttribute(): string
     {
         $status = $this->status;
-        
+
         $classes = [
             'Inactive' => 'bg-gray-100 text-gray-800',
             'Overdue' => 'bg-red-100 text-red-800',
             'Due Today' => 'bg-yellow-100 text-yellow-800',
             'Upcoming' => 'bg-blue-100 text-blue-800',
         ];
-        
+
         $class = $classes[$status] ?? 'bg-gray-100 text-gray-800';
-        
+
         return sprintf(
-            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full %s">%s</span>', 
-            $class, 
+            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full %s">%s</span>',
+            $class,
             $status
         );
     }
-    
+
     /**
      * Calculate the next due date based on the frequency and interval.
      */
     public function calculateNextDueDate(): ?Carbon
     {
-        if (!$this->is_active || !$this->frequency || !$this->next_due_date) {
+        if (! $this->is_active || ! $this->frequency || ! $this->next_due_date) {
             return null;
         }
-        
+
         $nextDueDate = clone $this->next_due_date;
-        
+
         switch ($this->frequency) {
             case 'daily':
                 return $nextDueDate->addDays($this->interval);

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -42,8 +42,6 @@ return new class extends Migration
 
     /**
      * Seed default settings.
-     *
-     * @return void
      */
     protected function seedDefaultSettings(): void
     {
@@ -69,7 +67,7 @@ return new class extends Migration
                 ],
                 'description' => 'Application timezone',
             ],
-            
+
             // Email Settings
             [
                 'key' => 'mail.mailers.smtp.host',
@@ -125,7 +123,7 @@ return new class extends Migration
                 'type' => 'text',
                 'description' => 'Default sender name',
             ],
-            
+
             // Asset Settings
             [
                 'key' => 'assets.default_status',
@@ -154,7 +152,7 @@ return new class extends Migration
                 'type' => 'text',
                 'description' => 'Prefix for auto-generated asset numbers',
             ],
-            
+
             // Notification Settings
             [
                 'key' => 'notifications.asset_due_for_maintenance',
@@ -170,7 +168,7 @@ return new class extends Migration
                 'type' => 'checkbox',
                 'description' => 'Send notifications when assets are assigned',
             ],
-            
+
             // Security Settings
             [
                 'key' => 'security.password_expiry_days',

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('asset_attachments')) {
+        if (! Schema::hasTable('asset_attachments')) {
             Schema::create('asset_attachments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('asset_id')->constrained()->cascadeOnDelete();
@@ -23,18 +23,18 @@ return new class extends Migration
                 $table->string('title');
                 $table->text('description')->nullable();
                 $table->timestamps();
-                
+
                 // Add indexes for better performance
                 $table->index(['asset_id', 'user_id']);
             });
-            
+
             // Add foreign key constraints separately to avoid issues
             Schema::table('asset_attachments', function (Blueprint $table) {
                 $table->foreign('asset_id')
                     ->references('id')
                     ->on('assets')
                     ->onDelete('cascade');
-                    
+
                 $table->foreign('user_id')
                     ->references('id')
                     ->on('users')
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->dropForeign(['asset_id']);
             $table->dropForeign(['user_id']);
         });
-        
+
         Schema::dropIfExists('asset_attachments');
     }
 };

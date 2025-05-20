@@ -24,7 +24,7 @@ class AssetControllerTest extends TestCase
         $assets = Asset::factory()->count(3)->create();
 
         $response = $this->getJson('/api/assets');
-        
+
         $response->assertStatus(200)
             ->assertJsonCount(3, 'data');
     }
@@ -40,10 +40,10 @@ class AssetControllerTest extends TestCase
         ];
 
         $response = $this->postJson('/api/assets', $assetData);
-        
+
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Test Asset']);
-        
+
         $this->assertDatabaseHas('assets', ['name' => 'Test Asset']);
     }
 

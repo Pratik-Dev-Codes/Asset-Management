@@ -26,12 +26,19 @@ class StatusLabel extends Model
 
     // Status types
     const TYPE_DEPLOYABLE = 'deployable';
+
     const TYPE_PENDING = 'pending';
+
     const TYPE_ARCHIVED = 'archived';
+
     const TYPE_UNDER_MAINTENANCE = 'under_maintenance';
+
     const TYPE_RETIRED = 'retired';
+
     const TYPE_LOST = 'lost';
+
     const TYPE_DAMAGED = 'damaged';
+
     const TYPE_READY_TO_DEPLOY = 'ready_to_deploy';
 
     public static function getTypes()
@@ -81,6 +88,7 @@ class StatusLabel extends Model
     public function getTypeNameAttribute()
     {
         $types = self::getTypes();
+
         return $types[$this->type] ?? 'Unknown';
     }
 

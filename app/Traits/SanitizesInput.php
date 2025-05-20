@@ -19,6 +19,7 @@ trait SanitizesInput
                 $data[$key] = $this->sanitizeInput($value);
             }
         }
+
         return $data;
     }
 
@@ -34,7 +35,7 @@ trait SanitizesInput
 
         // Validate operator
         $validOperators = ['=', '<', '>', '<=', '>=', '<>', '!=', 'like', 'not like', 'in', 'not in'];
-        if (!in_array(strtolower($operator), $validOperators)) {
+        if (! in_array(strtolower($operator), $validOperators)) {
             throw new \InvalidArgumentException('Invalid operator');
         }
 

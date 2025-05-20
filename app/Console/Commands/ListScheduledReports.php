@@ -36,6 +36,7 @@ class ListScheduledReports extends Command
 
         if ($reports->isEmpty()) {
             $this->info('No scheduled reports found.');
+
             return 0;
         }
 
@@ -43,16 +44,16 @@ class ListScheduledReports extends Command
         $this->info('================');
 
         $headers = ['ID', 'Name', 'Frequency', 'Next Run', 'Created By', 'Last Run', 'Status'];
-        
+
         $rows = $reports->map(function ($report) {
             $nextRun = $this->calculateNextRun($report);
-            
+
             return [
                 $report->id,
                 $report->name,
-                ucfirst($report->schedule_frequency) . ' at ' . $report->schedule_time,
+                ucfirst($report->schedule_frequency).' at '.$report->schedule_time,
                 $nextRun ? $nextRun->toDateTimeString() : 'N/A',
-                $report->user ? $report->user->name . ' (' . $report->user->email . ')' : 'N/A',
+                $report->user ? $report->user->name.' ('.$report->user->email.')' : 'N/A',
                 $report->last_run_at ? $report->last_run_at->diffForHumans() : 'Never',
                 $this->getStatusBadge($report->status),
             ];
@@ -71,13 +72,13 @@ class ListScheduledReports extends Command
      */
     protected function calculateNextRun($report)
     {
-        if (!$report->schedule_frequency || !$report->schedule_time) {
+        if (! $report->schedule_frequency || ! $report->schedule_time) {
             return null;
         }
 
         $now = now();
         $time = Carbon::parse($report->schedule_time);
-        
+
         $nextRun = Carbon::create(
             $now->year,
             $now->month,
@@ -93,23 +94,23 @@ class ListScheduledReports extends Command
                     $nextRun->addDay();
                 }
                 break;
-                
+
             case 'weekly':
                 $nextRun->next(ucfirst($report->schedule_day));
                 break;
-                
+
             case 'monthly':
                 $nextRun->addMonthNoOverflow();
                 $nextRun->day = min($report->schedule_day, $nextRun->daysInMonth);
                 break;
-                
+
             default:
                 return null;
         }
 
         return $nextRun;
     }
-    
+
     /**
      * Get a formatted status badge.
      *
@@ -124,7 +125,7 @@ class ListScheduledReports extends Command
             'completed' => '<fg=green>Completed</>',
             'failed' => '<fg=red>Failed</>',
         ];
-        
+
         return $statuses[strtolower($status)] ?? '<fg=gray>Unknown</>';
     }
 }

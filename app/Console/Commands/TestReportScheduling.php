@@ -33,7 +33,6 @@ class TestReportScheduling extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \App\Services\ReportSchedulerService  $scheduler
      * @return void
      */
     public function __construct(ReportSchedulerService $scheduler)
@@ -50,46 +49,49 @@ class TestReportScheduling extends Command
     public function handle()
     {
         $this->info('Testing report scheduling functionality...');
-        
+
         try {
             // Get all active scheduled reports
             $reports = Report::where('is_scheduled', true)
                 ->where('is_active', true)
                 ->with('user')
                 ->get();
-                
+
             if ($reports->isEmpty()) {
                 $this->warn('No active scheduled reports found.');
+
                 return 0;
             }
-            
+
             $this->info("Found {$reports->count()} active scheduled reports.");
-            
+
             // Process each report
             foreach ($reports as $report) {
                 $this->info("\nProcessing report: {$report->name} (ID: {$report->id})");
-                
+
                 try {
                     // Process the report
                     $this->scheduler->processReport($report);
                     $this->info("Successfully processed report: {$report->name}");
                 } catch (\Exception $e) {
                     $this->error("Failed to process report: {$e->getMessage()}");
-                    Log::error("Failed to process report: " . $e->getMessage(), [
+                    Log::error('Failed to process report: '.$e->getMessage(), [
                         'report_id' => $report->id,
-                        'exception' => $e
+                        'exception' => $e,
                     ]);
                 }
             }
-            
+
             $this->info("\nReport scheduling test completed successfully.");
+
             return 0;
-            
+
         } catch (\Exception $e) {
-            $this->error("An error occurred: " . $e->getMessage());
-            Log::error("Report scheduling test failed: " . $e->getMessage(), [
-                'exception' => $e
+            $this->error('An error occurred: '.$e->getMessage());
+            Log::error('Report scheduling test failed: '.$e->getMessage(), [
+                'exception' => $e,
             ]);
+
             return 1;
         }
     }

@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Asset;
 use App\Models\ActivityLog;
+use App\Models\Asset;
 use App\Models\Department;
 use App\Models\Location;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-// Use the correct PDF facade with an alias to avoid conflicts
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+// Use the correct PDF facade with an alias to avoid conflicts
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -41,7 +41,7 @@ class UserController extends Controller
             ->withCount('assets')
             ->latest()
             ->paginate(10);
-            
+
         return view('users.index', compact('users'));
     }
 
@@ -58,7 +58,6 @@ class UserController extends Controller
     /**
      * Store a newly created user in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -82,22 +81,20 @@ class UserController extends Controller
     /**
      * Display the specified user.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     /**
      * Display the specified user's profile.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function show(User $user)
     {
         // Eager load relationships
-        $user->load(['roles', 'department', 'assets' => function($query) {
+        $user->load(['roles', 'department', 'assets' => function ($query) {
             $query->latest('assigned_date')->take(5);
         }]);
-        
+
         // Get user statistics
         $stats = [
             'assets_count' => $user->assets()->count(),
@@ -105,28 +102,27 @@ class UserController extends Controller
             'maintenance_requests_count' => $user->maintenanceRequests()->count(),
             'activity_logs_count' => $user->activityLogs()->count(),
         ];
-        
+
         // Get recent activities
         $activities = ActivityLog::where('user_id', $user->id)
             ->with(['subject'])
             ->latest()
             ->take(10)
             ->get();
-            
+
         // Get recently assigned assets
         $assignedAssets = $user->assets()
             ->with(['category', 'status'])
             ->orderBy('assigned_date', 'desc')
             ->take(5)
             ->get();
-        
+
         return view('users.show', compact('user', 'stats', 'activities', 'assignedAssets'));
     }
 
     /**
      * Show the form for editing the specified user.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function edit(User $user)
@@ -137,15 +133,13 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
         ]);
 
         $user->update([
@@ -157,7 +151,7 @@ class UserController extends Controller
             $request->validate([
                 'password' => 'required|string|min:8|confirmed',
             ]);
-            
+
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
@@ -193,7 +187,6 @@ class UserController extends Controller
     /**
      * Handle bulk user actions
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function bulkAction(Request $request)
@@ -207,7 +200,7 @@ class UserController extends Controller
 
         $selectedUsers = $request->input('selected_users');
         $currentUserId = auth()->id();
-        
+
         // Prevent modifying self with bulk actions
         if (in_array($currentUserId, $selectedUsers)) {
             return back()->with('error', 'You cannot perform bulk actions on your own account.');
@@ -236,20 +229,20 @@ class UserController extends Controller
     {
         $selectedUsers = $request->input('selected_users');
         $currentUserId = auth()->id();
-        
+
         // Filter out current user from deletion
         $usersToDelete = array_diff($selectedUsers, [$currentUserId]);
-        
+
         if (empty($usersToDelete)) {
             return back()->with('error', 'No valid users selected for deletion.');
         }
 
         try {
             DB::beginTransaction();
-            
+
             // Soft delete users
             $deletedCount = User::whereIn('id', $usersToDelete)->delete();
-            
+
             // Log the bulk deletion
             ActivityLog::create([
                 'user_id' => $currentUserId,
@@ -260,14 +253,15 @@ class UserController extends Controller
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
-            
+
             DB::commit();
-            
+
             return back()->with('success', "Successfully deleted {$deletedCount} users.");
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Bulk user deletion failed: ' . $e->getMessage());
+            Log::error('Bulk user deletion failed: '.$e->getMessage());
+
             return back()->with('error', 'Failed to delete users. Please try again.');
         }
     }
@@ -281,23 +275,25 @@ class UserController extends Controller
             $updatedCount = User::whereIn('id', $userIds)
                 ->where('id', '!=', auth()->id())
                 ->update(['is_active' => $status]);
-                
+
             // Log the bulk status update
             ActivityLog::create([
                 'user_id' => auth()->id(),
-                'action' => 'bulk_' . ($status ? 'activate' : 'deactivate'),
+                'action' => 'bulk_'.($status ? 'activate' : 'deactivate'),
                 'model' => 'User',
                 'model_id' => null,
                 'properties' => ['count' => $updatedCount, 'user_ids' => $userIds, 'status' => $status],
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
-            
+
             $statusText = $status ? 'activated' : 'deactivated';
+
             return back()->with('success', "Successfully {$statusText} {$updatedCount} users.");
-            
+
         } catch (\Exception $e) {
-            Log::error('Bulk user status update failed: ' . $e->getMessage());
+            Log::error('Bulk user status update failed: '.$e->getMessage());
+
             return back()->with('error', 'Failed to update user status. Please try again.');
         }
     }
@@ -311,19 +307,19 @@ class UserController extends Controller
             $users = User::whereIn('id', $userIds)
                 ->where('id', '!=', auth()->id())
                 ->get();
-                
+
             $updatedCount = 0;
-            
+
             DB::beginTransaction();
-            
+
             foreach ($users as $user) {
                 // Only update if the user doesn't already have this role
-                if (!$user->hasRole($roleId)) {
+                if (! $user->hasRole($roleId)) {
                     $user->syncRoles([$roleId]);
                     $updatedCount++;
                 }
             }
-            
+
             // Log the bulk role change
             ActivityLog::create([
                 'user_id' => auth()->id(),
@@ -331,21 +327,22 @@ class UserController extends Controller
                 'model' => 'User',
                 'model_id' => null,
                 'properties' => [
-                    'count' => $updatedCount, 
-                    'user_ids' => $userIds, 
-                    'role_id' => $roleId
+                    'count' => $updatedCount,
+                    'user_ids' => $userIds,
+                    'role_id' => $roleId,
                 ],
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
-            
+
             DB::commit();
-            
+
             return back()->with('success', "Successfully updated role for {$updatedCount} users.");
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Bulk user role change failed: ' . $e->getMessage());
+            Log::error('Bulk user role change failed: '.$e->getMessage());
+
             return back()->with('error', 'Failed to update user roles. Please try again.');
         }
     }
@@ -353,7 +350,6 @@ class UserController extends Controller
     /**
      * Display the user's activity log.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function activity(User $user)
@@ -362,14 +358,13 @@ class UserController extends Controller
             ->with(['subject'])
             ->latest()
             ->paginate(20);
-            
+
         return view('users.activity', compact('user', 'activities'));
     }
 
     /**
      * Display the user's assigned assets.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function assets(User $user)
@@ -378,33 +373,32 @@ class UserController extends Controller
             ->with(['category', 'status', 'model'])
             ->orderBy('assigned_date', 'desc')
             ->paginate(20);
-            
+
         return view('users.assets', compact('user', 'assets'));
     }
 
     /**
      * Export user data as PDF.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function exportPdf(User $user)
     {
         try {
             // Check if PDF facade is available
-            if (!class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {
+            if (! class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {
                 return redirect()->back()->with('error', 'PDF generation is not available. Please install the dompdf package.');
             }
-            
+
             // Load user data with relationships
             $user->load([
-                'roles', 
-                'department', 
-                'assets' => function($query) {
+                'roles',
+                'department',
+                'assets' => function ($query) {
                     $query->with(['category', 'status']);
-                }
+                },
             ]);
-            
+
             // Generate PDF
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.users.pdf', compact('user'))
                 ->setPaper('a4', 'portrait')
@@ -413,21 +407,21 @@ class UserController extends Controller
                     'isRemoteEnabled' => true,
                     'defaultFont' => 'Arial',
                 ]);
-                
-            $filename = 'user_' . Str::slug($user->name) . '_' . now()->format('Y-m-d') . '.pdf';
-            
+
+            $filename = 'user_'.Str::slug($user->name).'_'.now()->format('Y-m-d').'.pdf';
+
             return $pdf->download($filename);
-            
+
         } catch (\Exception $e) {
-            Log::error('PDF Export Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+            Log::error('PDF Export Error: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Failed to generate PDF: '.$e->getMessage());
         }
     }
-    
+
     /**
      * Export user data as CSV.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
     public function exportCsv(User $user)
@@ -435,30 +429,30 @@ class UserController extends Controller
         try {
             // Load user data with relationships
             $user->load([
-                'roles', 
-                'department', 
+                'roles',
+                'department',
                 'location',
-                'assets' => function($query) {
+                'assets' => function ($query) {
                     $query->with(['category', 'status']);
-                }
+                },
             ]);
-            
-            $filename = 'user_' . Str::slug($user->name) . '_' . now()->format('Y-m-d') . '.csv';
-            
+
+            $filename = 'user_'.Str::slug($user->name).'_'.now()->format('Y-m-d').'.csv';
+
             $headers = [
                 'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
                 'Pragma' => 'no-cache',
                 'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Expires' => '0'
+                'Expires' => '0',
             ];
-            
-            $callback = function() use ($user) {
+
+            $callback = function () use ($user) {
                 $file = fopen('php://output', 'w');
-                
+
                 // Add UTF-8 BOM for proper Excel encoding
                 fwrite($file, "\xEF\xBB\xBF");
-                
+
                 // User Information Section
                 fputcsv($file, ['USER INFORMATION']);
                 fputcsv($file, ['Field', 'Value']);
@@ -474,7 +468,7 @@ class UserController extends Controller
                 fputcsv($file, ['Status', $user->is_active ? 'Active' : 'Inactive']);
                 fputcsv($file, ['Email Notifications', $user->receive_email_notifications ? 'Enabled' : 'Disabled']);
                 fputcsv($file, ['Last Login', $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i:s') : 'Never']);
-                
+
                 // Contact Information Section
                 fputcsv($file, []);
                 fputcsv($file, ['CONTACT INFORMATION']);
@@ -483,7 +477,7 @@ class UserController extends Controller
                 fputcsv($file, ['Mobile', $user->phone_mobile]);
                 fputcsv($file, ['Address', $user->full_address]);
                 fputcsv($file, ['Website', $user->website]);
-                
+
                 // Roles and Permissions Section
                 fputcsv($file, []);
                 fputcsv($file, ['ROLES']);
@@ -491,12 +485,12 @@ class UserController extends Controller
                 foreach ($user->roles as $role) {
                     fputcsv($file, [$role->name, $role->description ?? 'N/A']);
                 }
-                
+
                 // Assets Section
                 fputcsv($file, []);
-                fputcsv($file, ['ASSETS (Total: ' . $user->assets->count() . ')']);
+                fputcsv($file, ['ASSETS (Total: '.$user->assets->count().')']);
                 fputcsv($file, ['Asset Tag', 'Name', 'Category', 'Status', 'Assigned Date', 'Purchase Date', 'Purchase Cost']);
-                
+
                 foreach ($user->assets as $asset) {
                     fputcsv($file, [
                         $asset->asset_tag,
@@ -505,37 +499,38 @@ class UserController extends Controller
                         $asset->status ? $asset->status->name : 'N/A',
                         $asset->assigned_date ? $asset->assigned_date->format('Y-m-d') : 'N/A',
                         $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : 'N/A',
-                        $asset->purchase_cost ? '\'' . number_format($asset->purchase_cost, 2) : 'N/A',
+                        $asset->purchase_cost ? '\''.number_format($asset->purchase_cost, 2) : 'N/A',
                     ]);
                 }
-                
+
                 // Activity Log Section
                 fputcsv($file, []);
                 fputcsv($file, ['RECENT ACTIVITY (Last 10 entries)']);
                 fputcsv($file, ['Date', 'Activity', 'Description']);
-                
+
                 $activities = $user->activityLogs()
                     ->with('causer')
                     ->latest()
                     ->take(10)
                     ->get();
-                    
+
                 foreach ($activities as $activity) {
                     fputcsv($file, [
                         $activity->created_at->format('Y-m-d H:i:s'),
                         $activity->log_name,
-                        $activity->description
+                        $activity->description,
                     ]);
                 }
-                
+
                 fclose($file);
             };
-            
+
             return response()->stream($callback, 200, $headers);
-            
+
         } catch (\Exception $e) {
-            Log::error('CSV Export Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to generate CSV: ' . $e->getMessage());
+            Log::error('CSV Export Error: '.$e->getMessage());
+
+            return redirect()->back()->with('error', 'Failed to generate CSV: '.$e->getMessage());
         }
     }
 }

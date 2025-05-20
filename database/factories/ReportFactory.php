@@ -26,7 +26,7 @@ class ReportFactory extends Factory
         $types = ['asset', 'user', 'audit'];
         $formats = ['xlsx', 'csv', 'pdf'];
         $statuses = ['pending', 'processing', 'completed', 'failed'];
-        
+
         return [
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph,

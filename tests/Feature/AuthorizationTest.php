@@ -2,16 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Asset;
-use Spatie\Permission\Models\Role;
+use App\Models\User;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AuthorizationTest extends TestCase
 {
     protected $user;
+
     protected $admin;
+
     protected $asset;
 
     protected function setUp(): void

@@ -21,21 +21,21 @@ class ReportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Fake storage for testing
         Storage::fake('reports');
-        
+
         // Fake the queue
         Queue::fake();
         Bus::fake();
     }
-    
+
     /** @test */
     public function it_can_generate_a_report()
     {
         $user = User::factory()->create();
         $user->assignRole('admin');
-        
+
         $response = $this->actingAs($user, 'api')
             ->postJson('/api/v1/reports', [
                 'report_type' => 'asset',
@@ -45,38 +45,38 @@ class ReportTest extends TestCase
                     'status_id' => 1,
                 ],
             ]);
-            
+
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',
                 'message',
                 'report_id',
-                'status_url'
+                'status_url',
             ]);
-            
+
         $this->assertDatabaseHas('reports', [
             'type' => 'asset',
             'status' => 'pending',
             'created_by' => $user->id,
         ]);
-        
+
         // Assert the job was dispatched
         Bus::assertDispatched(ProcessReportJob::class);
     }
-    
+
     /** @test */
     public function it_validates_report_requests()
     {
         $user = User::factory()->create();
         $user->assignRole('admin');
-        
+
         $response = $this->actingAs($user, 'api')
             ->postJson('/api/v1/reports', [
                 'report_type' => 'invalid_type',
                 'format' => 'invalid_format',
                 'columns' => [],
             ]);
-            
+
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
                 'report_type',
@@ -84,7 +84,7 @@ class ReportTest extends TestCase
                 'columns',
             ]);
     }
-    
+
     /** @test */
     public function it_checks_report_status()
     {
@@ -94,10 +94,10 @@ class ReportTest extends TestCase
             'status' => 'processing',
             'progress' => 50,
         ]);
-        
+
         $response = $this->actingAs($user, 'api')
             ->getJson("/api/v1/reports/{$report->id}/status");
-            
+
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
@@ -105,7 +105,7 @@ class ReportTest extends TestCase
                 'progress' => 50,
             ]);
     }
-    
+
     /** @test */
     public function it_downloads_completed_reports()
     {
@@ -114,12 +114,12 @@ class ReportTest extends TestCase
             'created_by' => $user->id,
             'status' => 'completed',
         ]);
-        
+
         // Create a test file
         $file = UploadedFile::fake()->create('test.xlsx', 1024);
-        $path = 'reports/' . $report->id . '/' . $file->getClientOriginalName();
+        $path = 'reports/'.$report->id.'/'.$file->getClientOriginalName();
         Storage::put($path, file_get_contents($file));
-        
+
         // Create a report file record
         $reportFile = ReportFile::create([
             'report_id' => $report->id,
@@ -129,49 +129,49 @@ class ReportTest extends TestCase
             'mime_type' => $file->getMimeType(),
             'generated_by' => $user->id,
         ]);
-        
+
         $response = $this->actingAs($user, 'api')
             ->get("/api/v1/reports/{$report->id}/download");
-            
+
         $response->assertStatus(200)
             ->assertHeader('Content-Type', $file->getMimeType())
-            ->assertHeader('Content-Disposition', 'attachment; filename=' . $file->getClientOriginalName());
+            ->assertHeader('Content-Disposition', 'attachment; filename='.$file->getClientOriginalName());
     }
-    
+
     /** @test */
     public function it_prevents_unauthorized_access()
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         $report = Report::factory()->create([
             'created_by' => $user1->id,
             'is_public' => false,
         ]);
-        
+
         // User 2 tries to access user 1's private report
         $response = $this->actingAs($user2, 'api')
             ->getJson("/api/v1/reports/{$report->id}/status");
-            
+
         $response->assertStatus(403);
     }
-    
+
     /** @test */
     public function it_allows_access_to_public_reports()
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         $report = Report::factory()->create([
             'created_by' => $user1->id,
             'is_public' => true,
             'status' => 'completed',
         ]);
-        
+
         // User 2 can access user 1's public report
         $response = $this->actingAs($user2, 'api')
             ->getJson("/api/v1/reports/{$report->id}/status");
-            
+
         $response->assertStatus(200);
     }
 }

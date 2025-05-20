@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -14,7 +14,7 @@ return new class extends Migration
     {
         // Add full-text search index
         DB::statement('ALTER TABLE assets ADD FULLTEXT assets_search_idx (name, asset_code, serial_number, model, manufacturer, notes)');
-        
+
         // Add composite indexes for common search patterns
         Schema::table('assets', function (Blueprint $table) {
             $table->index(['status', 'purchase_date']);
@@ -32,7 +32,7 @@ return new class extends Migration
     {
         // Remove full-text search index
         DB::statement('ALTER TABLE assets DROP INDEX assets_search_idx');
-        
+
         // Remove composite indexes
         Schema::table('assets', function (Blueprint $table) {
             $table->dropIndex(['status', 'purchase_date']);
@@ -42,4 +42,4 @@ return new class extends Migration
             $table->dropIndex(['assigned_to', 'purchase_date']);
         });
     }
-}; 
+};

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
-use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -23,9 +23,6 @@ class AuthController extends BaseApiController
 
     /**
      * Authenticate a user and return the token.
-     *
-     * @param LoginRequest $request
-     * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -41,9 +38,6 @@ class AuthController extends BaseApiController
 
     /**
      * Register a new user.
-     *
-     * @param RegisterRequest $request
-     * @return JsonResponse
      */
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -59,32 +53,26 @@ class AuthController extends BaseApiController
 
     /**
      * Log the user out (Invalidate the token).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function logout(Request $request): JsonResponse
     {
         $this->authService->logout($request->user());
+
         return $this->success([], 'Successfully logged out');
     }
 
     /**
      * Refresh a token.
-     *
-     * @return JsonResponse
      */
     public function refresh(): JsonResponse
     {
         $response = $this->authService->refresh();
+
         return $this->success($response, 'Token refreshed successfully');
     }
 
     /**
      * Get the authenticated User.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function me(Request $request): JsonResponse
     {
@@ -93,9 +81,6 @@ class AuthController extends BaseApiController
 
     /**
      * Send password reset link.
-     *
-     * @param ForgotPasswordRequest $request
-     * @return JsonResponse
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
@@ -108,9 +93,6 @@ class AuthController extends BaseApiController
 
     /**
      * Reset password.
-     *
-     * @param ResetPasswordRequest $request
-     * @return JsonResponse
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {

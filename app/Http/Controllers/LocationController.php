@@ -27,10 +27,10 @@ class LocationController extends Controller
             ->withCount('assets')
             ->orderBy('name')
             ->get();
-            
+
         // Get all locations for the flat list view (optional)
         $allLocations = Location::orderBy('name')->get();
-        
+
         return view('locations.index', compact('locations', 'allLocations'));
     }
 
@@ -48,14 +48,13 @@ class LocationController extends Controller
 
         // Get locations for parent selection
         $locations = Location::getNestedList();
-        
+
         return view('locations.create', compact('locations'));
     }
 
     /**
      * Store a newly created location in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -85,7 +84,7 @@ class LocationController extends Controller
         ]);
 
         // Create the location
-        $location = new Location();
+        $location = new Location;
         $location->name = $request->name;
         $location->code = $request->code;
         $location->parent_id = $request->parent_id ?: null;
@@ -102,7 +101,7 @@ class LocationController extends Controller
         $location->type = $request->type;
         $location->is_active = $request->has('is_active');
         $location->save();
-        
+
         return redirect()->route('locations.index')
             ->with('success', 'Location created successfully.');
     }
@@ -110,7 +109,6 @@ class LocationController extends Controller
     /**
      * Display the specified location.
      *
-     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function show(Location $location)
@@ -122,17 +120,16 @@ class LocationController extends Controller
 
         // Get paginated assets for this location
         $assets = $location->assets()->paginate(10);
-        
+
         // Get departments for this location
         $departments = $location->departments;
-        
+
         return view('locations.show', compact('location', 'assets', 'departments'));
     }
 
     /**
      * Show the form for editing the specified location.
      *
-     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function edit(Location $location)
@@ -144,15 +141,13 @@ class LocationController extends Controller
 
         // Get locations for parent selection (exclude current location and its descendants)
         $locations = Location::getNestedList($location->id);
-        
+
         return view('locations.edit', compact('location', 'locations'));
     }
 
     /**
      * Update the specified location in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Location $location)
@@ -165,7 +160,7 @@ class LocationController extends Controller
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50|unique:locations,code,' . $location->id,
+            'code' => 'nullable|string|max:50|unique:locations,code,'.$location->id,
             'parent_id' => [
                 'nullable',
                 'exists:locations,id',
@@ -210,7 +205,7 @@ class LocationController extends Controller
         $location->type = $request->type;
         $location->is_active = $request->has('is_active');
         $location->save();
-        
+
         return redirect()->route('locations.show', $location)
             ->with('success', 'Location updated successfully.');
     }
@@ -218,7 +213,6 @@ class LocationController extends Controller
     /**
      * Remove the specified location from storage.
      *
-     * @param  \App\Models\Location  $location
      * @return \Illuminate\Http\Response
      */
     public function destroy(Location $location)
@@ -242,7 +236,7 @@ class LocationController extends Controller
 
         // Delete the location
         $location->delete();
-        
+
         return redirect()->route('locations.index')
             ->with('success', 'Location deleted successfully.');
     }

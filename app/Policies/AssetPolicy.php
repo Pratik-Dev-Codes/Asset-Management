@@ -12,7 +12,7 @@ class AssetPolicy extends BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('viewAny asset') || 
+        return $user->can('viewAny asset') ||
                $user->can('view own assets');
     }
 
@@ -25,8 +25,8 @@ class AssetPolicy extends BasePolicy
         if ($asset->assigned_to === $user->id) {
             return true;
         }
-        
-        return $user->can('view asset') || 
+
+        return $user->can('view asset') ||
                $user->can('view any asset');
     }
 
@@ -47,8 +47,8 @@ class AssetPolicy extends BasePolicy
         if ($asset->assigned_to === $user->id) {
             return $user->can('update own asset');
         }
-        
-        return $user->can('update asset') || 
+
+        return $user->can('update asset') ||
                $user->can('update any asset');
     }
 
@@ -61,13 +61,13 @@ class AssetPolicy extends BasePolicy
         if ($asset->is_critical) {
             return $user->hasRole('super-admin');
         }
-        
+
         // Allow users to delete their own assets
         if ($asset->assigned_to === $user->id) {
             return $user->can('delete own asset');
         }
-        
-        return $user->can('delete asset') || 
+
+        return $user->can('delete asset') ||
                $user->can('delete any asset');
     }
 
@@ -86,26 +86,26 @@ class AssetPolicy extends BasePolicy
     {
         return $user->hasRole('super-admin');
     }
-    
+
     /**
      * Determine whether the user can check in the asset.
      */
     public function checkIn(User $user, Asset $asset): bool
     {
-        return $user->can('checkin asset') || 
+        return $user->can('checkin asset') ||
                $user->can('checkin any asset') ||
                $asset->assigned_to === $user->id;
     }
-    
+
     /**
      * Determine whether the user can check out the asset.
      */
     public function checkOut(User $user, Asset $asset): bool
     {
-        return $user->can('checkout asset') || 
+        return $user->can('checkout asset') ||
                $user->can('checkout any asset');
     }
-    
+
     /**
      * Determine whether the user can request maintenance for the asset.
      */

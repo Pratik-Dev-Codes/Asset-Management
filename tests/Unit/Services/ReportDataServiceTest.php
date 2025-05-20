@@ -28,10 +28,10 @@ class ReportDataServiceTest extends TestCase
         $report = Report::factory()->create([
             'type' => 'asset',
             'filters' => [
-                ['field' => 'status', 'operator' => 'equals', 'value' => 'active']
+                ['field' => 'status', 'operator' => 'equals', 'value' => 'active'],
             ],
             'columns' => ['id', 'name', 'status'],
-            'sorting' => ['field' => 'name', 'direction' => 'asc']
+            'sorting' => ['field' => 'name', 'direction' => 'asc'],
         ]);
 
         // Mock the database query
@@ -43,7 +43,7 @@ class ReportDataServiceTest extends TestCase
                 new \Illuminate\Pagination\LengthAwarePaginator(
                     [
                         ['id' => 1, 'name' => 'Asset 1', 'status' => 'active'],
-                        ['id' => 2, 'name' => 'Asset 2', 'status' => 'active']
+                        ['id' => 2, 'name' => 'Asset 2', 'status' => 'active'],
                     ],
                     2, 15, 1
                 )
@@ -65,7 +65,7 @@ class ReportDataServiceTest extends TestCase
     {
         $report = Report::factory()->create([
             'type' => 'asset',
-            'columns' => ['id', 'name']
+            'columns' => ['id', 'name'],
         ]);
 
         // Mock the query builder
@@ -83,10 +83,10 @@ class ReportDataServiceTest extends TestCase
 
         // First call - should hit the database
         $data1 = $this->service->getReportData($report);
-        
+
         // Second call - should come from cache
         $data2 = $this->service->getReportData($report);
-        
+
         $this->assertEquals($data1, $data2);
     }
 
@@ -95,7 +95,7 @@ class ReportDataServiceTest extends TestCase
     {
         $report = Report::factory()->create([
             'type' => 'asset',
-            'columns' => ['id', 'name']
+            'columns' => ['id', 'name'],
         ]);
 
         // Mock the query builder
@@ -113,13 +113,13 @@ class ReportDataServiceTest extends TestCase
 
         // First call - should hit the database
         $data1 = $this->service->getReportData($report);
-        
+
         // Clear the cache
         $this->service->clearCache($report);
-        
+
         // Second call - should hit the database again
         $data2 = $this->service->getReportData($report);
-        
+
         $this->assertEquals($data1, $data2);
     }
 
@@ -127,12 +127,12 @@ class ReportDataServiceTest extends TestCase
     public function it_validates_report_type()
     {
         $this->expectException(\App\Exceptions\ReportGenerationException::class);
-        
+
         $report = Report::factory()->create([
             'type' => 'invalid_type',
-            'columns' => ['id']
+            'columns' => ['id'],
         ]);
-        
+
         $this->service->getReportData($report);
     }
 
@@ -142,7 +142,7 @@ class ReportDataServiceTest extends TestCase
         $report = Report::factory()->create([
             'type' => 'asset',
             'columns' => ['id', 'name'],
-            'per_page' => 5
+            'per_page' => 5,
         ]);
 
         // Mock the query builder
@@ -161,7 +161,7 @@ class ReportDataServiceTest extends TestCase
         });
 
         $data = $this->service->getReportData($report, [], ['page' => 2]);
-        
+
         $this->assertEquals(2, $data['meta']['current_page']);
         $this->assertEquals(5, $data['meta']['per_page']);
         $this->assertEquals(10, $data['meta']['total']);

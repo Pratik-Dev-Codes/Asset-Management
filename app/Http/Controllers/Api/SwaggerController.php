@@ -9,22 +9,27 @@ use OpenApi\Annotations as OA;
  *     version="1.0.0",
  *     title="Asset Management API",
  *     description="API for managing assets and locations",
+ *
  *     @OA\Contact(
  *         email="support@example.com"
  *     ),
+ *
  *     @OA\License(
  *         name="MIT",
  *         url="https://opensource.org/licenses/MIT"
  *     )
  * )
+ *
  * @OA\Server(
  *     url="/api",
  *     description="API Server"
  * )
+ *
  * @OA\Tag(
  *     name="Locations",
  *     description="API Endpoints for managing locations"
  * )
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",

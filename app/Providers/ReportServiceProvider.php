@@ -5,16 +5,17 @@ namespace App\Providers;
 use App\Console\Commands\CleanupExpiredReports;
 use App\Console\Commands\CleanupReportFiles;
 use App\Console\Commands\ListScheduledReports;
-use App\Console\Commands\RunScheduledReports;
 use App\Console\Commands\PruneOldNotifications;
-use App\Services\ReportService;
+use App\Console\Commands\RunScheduledReports;
+use App\Services\NotificationService;
 use App\Services\ReportExportService;
 use App\Services\ReportSchedulerService;
-use App\Services\NotificationService;
-use Illuminate\Support\ServiceProvider;
+use App\Services\ReportService;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ServiceProvider;
+
 use function app;
 
 class ReportServiceProvider extends ServiceProvider
@@ -40,11 +41,11 @@ class ReportServiceProvider extends ServiceProvider
 
         // Register the report services as singletons
         $this->app->singleton(ReportService::class, function ($app) {
-            return new ReportService();
+            return new ReportService;
         });
 
         $this->app->singleton(ReportExportService::class, function ($app) {
-            return new ReportExportService();
+            return new ReportExportService;
         });
 
         $this->app->singleton(ReportSchedulerService::class, function ($app) {
@@ -55,7 +56,7 @@ class ReportServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(NotificationService::class, function ($app) {
-            return new NotificationService();
+            return new NotificationService;
         });
     }
 
@@ -71,10 +72,8 @@ class ReportServiceProvider extends ServiceProvider
 
         // Publish migrations
         $this->publishes([
-            __DIR__.'/../../database/migrations/2025_05_19_001328_create_reports_table.php' => 
-                database_path('migrations/2025_05_19_001328_create_reports_table.php'),
-            __DIR__.'/../../database/migrations/2025_05_19_001518_create_report_files_table.php' => 
-                database_path('migrations/2025_05_19_001518_create_report_files_table.php'),
+            __DIR__.'/../../database/migrations/2025_05_19_001328_create_reports_table.php' => database_path('migrations/2025_05_19_001328_create_reports_table.php'),
+            __DIR__.'/../../database/migrations/2025_05_19_001518_create_report_files_table.php' => database_path('migrations/2025_05_19_001518_create_report_files_table.php'),
         ], 'migrations');
 
         // Register report types from config
@@ -87,12 +86,12 @@ class ReportServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             // Use the scheduler instance from the container
             $scheduler = $this->app->make('Illuminate\Console\Scheduling\Schedule');
-            
+
             $scheduler->command('reports:cleanup')
-                     ->dailyAt('02:00')
-                     ->timezone(Config::get('app.timezone', 'UTC'))
-                     ->withoutOverlapping()
-                     ->onOneServer();
+                ->dailyAt('02:00')
+                ->timezone(Config::get('app.timezone', 'UTC'))
+                ->withoutOverlapping()
+                ->onOneServer();
         });
     }
 
@@ -102,7 +101,7 @@ class ReportServiceProvider extends ServiceProvider
     protected function registerReportTypes(): void
     {
         $reportTypes = Config::get('reports.types', []);
-        
+
         foreach ($reportTypes as $type => $config) {
             // Ensure the export class exists
             if (isset($config['export']) && class_exists($config['export'])) {
@@ -120,12 +119,14 @@ class ReportServiceProvider extends ServiceProvider
         // Validate report type
         Validator::extend('report_type', function ($attribute, $value, $parameters, $validator) {
             $types = array_keys(Config::get('reports.types', []));
+
             return in_array($value, $types);
         }, 'The selected report type is invalid.');
 
         // Validate export format
         Validator::extend('export_format', function ($attribute, $value, $parameters, $validator) {
             $formats = ['xlsx', 'csv', 'pdf', 'html'];
+
             return in_array(strtolower($value), $formats);
         }, 'The selected export format is invalid.');
     }

@@ -17,7 +17,7 @@ class AssetTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test data
         $this->category = AssetCategory::factory()->create();
         $this->location = Location::factory()->create();
@@ -91,9 +91,9 @@ class AssetTest extends TestCase
     public function it_has_documents_relationship()
     {
         $asset = Asset::factory()->create();
-        
+
         $this->assertCount(0, $asset->documents);
-        
+
         // Test with documents would require Document factory
     }
 
@@ -101,7 +101,7 @@ class AssetTest extends TestCase
     public function it_has_maintenance_logs_relationship()
     {
         $asset = Asset::factory()->create();
-        
+
         $this->assertCount(0, $asset->maintenanceLogs);
     }
 
@@ -109,7 +109,7 @@ class AssetTest extends TestCase
     public function it_has_maintenance_schedules_relationship()
     {
         $asset = Asset::factory()->create();
-        
+
         $this->assertCount(0, $asset->maintenanceSchedules);
     }
 }

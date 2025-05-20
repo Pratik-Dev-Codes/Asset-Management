@@ -2,13 +2,13 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class ApiExceptionHandler extends ExceptionHandler
@@ -49,7 +49,6 @@ class ApiExceptionHandler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
@@ -68,7 +67,6 @@ class ApiExceptionHandler extends ExceptionHandler
      * Handle API exceptions
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Illuminate\Http\JsonResponse
      */
     protected function handleApiException($request, Throwable $e)
@@ -97,24 +95,24 @@ class ApiExceptionHandler extends ExceptionHandler
                 $response['message'] = 'The requested resource was not found.';
                 $statusCode = 404;
                 break;
-                
+
             case $e instanceof NotFoundHttpException:
                 $response['message'] = 'The requested endpoint was not found.';
                 $statusCode = 404;
                 break;
-                
+
             case $e instanceof MethodNotAllowedHttpException:
                 $response['message'] = 'The specified method for the request is invalid.';
                 $statusCode = 405;
                 break;
-                
+
             case $e instanceof HttpException:
                 $response['message'] = $e->getMessage() ?: 'An error occurred while processing your request.';
                 break;
-                
+
             default:
                 $response['message'] = $e->getMessage() ?: 'An error occurred while processing your request.';
-                
+
                 // Include debug information in non-production environments
                 if (config('app.debug')) {
                     $response['debug'] = [
@@ -149,7 +147,6 @@ class ApiExceptionHandler extends ExceptionHandler
      * Convert an authentication exception into a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -163,7 +160,6 @@ class ApiExceptionHandler extends ExceptionHandler
     /**
      * Create a response object from the given validation exception.
      *
-     * @param  \Illuminate\Validation\ValidationException  $e
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -171,18 +167,18 @@ class ApiExceptionHandler extends ExceptionHandler
     {
         $errors = $e->errors();
         $message = $e->getMessage();
-        
+
         // If no custom message is set, use the first error message
         if ($message === 'The given data was invalid.') {
             $message = 'Validation failed.';
-            
+
             // Get the first error message
             $firstError = collect($errors)->first();
             if (is_array($firstError) && count($firstError) > 0) {
                 $message = $firstError[0];
             }
         }
-        
+
         return response()->json([
             'message' => $message,
             'errors' => $errors,

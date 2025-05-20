@@ -29,13 +29,13 @@ class ReportFilterTest extends TestCase
             'filters' => [
                 'date_range' => [
                     'from' => '2023-01-01',
-                    'to' => 'invalid-date'
-                ]
-            ]
+                    'to' => 'invalid-date',
+                ],
+            ],
         ]);
 
         $response = $this->get(route('reports.show', $report->id));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['filters.date_range.to']);
     }
@@ -47,12 +47,12 @@ class ReportFilterTest extends TestCase
             'created_by' => $this->user->id,
             'type' => 'assets',
             'filters' => [
-                'status' => 'invalid-status'
-            ]
+                'status' => 'invalid-status',
+            ],
         ]);
 
         $response = $this->get(route('reports.show', $report->id));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['filters.status']);
     }
@@ -63,11 +63,11 @@ class ReportFilterTest extends TestCase
         $report = Report::factory()->create([
             'created_by' => $this->user->id,
             'type' => 'assets',
-            'columns' => ['invalid_column']
+            'columns' => ['invalid_column'],
         ]);
 
         $response = $this->get(route('reports.show', $report->id));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['columns.0']);
     }
@@ -79,12 +79,12 @@ class ReportFilterTest extends TestCase
             'created_by' => $this->user->id,
             'type' => 'assets',
             'sorting' => [
-                'invalid_column' => 'asc'
-            ]
+                'invalid_column' => 'asc',
+            ],
         ]);
 
         $response = $this->get(route('reports.show', $report->id));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['sorting']);
     }

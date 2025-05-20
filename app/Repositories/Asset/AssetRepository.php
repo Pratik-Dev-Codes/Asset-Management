@@ -8,27 +8,22 @@ use App\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class AssetRepository extends BaseRepository implements AssetRepositoryInterface
 {
-    /**
-     * @var array
-     */
     protected array $searchableColumns = [
         'name',
         'asset_code',
         'serial_number',
         'model',
         'manufacturer',
-        'notes'
+        'notes',
     ];
 
     /**
      * AssetRepository constructor.
-     *
-     * @param Asset $model
      */
     public function __construct(Asset $model)
     {
@@ -36,7 +31,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getByStatus(string $status, array $columns = ['*'], array $relations = []): Collection
     {
@@ -47,7 +42,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getByLocation(int $locationId, array $columns = ['*'], array $relations = []): Collection
     {
@@ -58,7 +53,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getByCategory(int $categoryId, array $columns = ['*'], array $relations = []): Collection
     {
@@ -69,7 +64,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getByDepartment(int $departmentId, array $columns = ['*'], array $relations = []): Collection
     {
@@ -80,14 +75,14 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function search(array $filters = [], int $perPage = 15, array $columns = ['*'], array $relations = []): LengthAwarePaginator
     {
         $query = $this->newQuery();
 
         // Apply search filters with index hints
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
             $query->where(function (Builder $q) use ($searchTerm) {
                 foreach ($this->searchableColumns as $column) {
@@ -102,24 +97,24 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
             'category_id' => 'assets_category_id_idx',
             'location_id' => 'assets_location_id_idx',
             'department_id' => 'assets_department_id_idx',
-            'assigned_to' => 'assets_assigned_to_idx'
+            'assigned_to' => 'assets_assigned_to_idx',
         ];
-        
+
         foreach ($indexedFilters as $field => $index) {
-            if (!empty($filters[$field])) {
+            if (! empty($filters[$field])) {
                 $query->where($field, $filters[$field])->useIndex($index);
             }
         }
 
         // Apply date range filters with index
-        if (!empty($filters['purchase_date_from'])) {
+        if (! empty($filters['purchase_date_from'])) {
             $query->whereDate('purchase_date', '>=', $filters['purchase_date_from'])
-                  ->useIndex('assets_purchase_date_idx');
+                ->useIndex('assets_purchase_date_idx');
         }
 
-        if (!empty($filters['purchase_date_to'])) {
+        if (! empty($filters['purchase_date_to'])) {
             $query->whereDate('purchase_date', '<=', $filters['purchase_date_to'])
-                  ->useIndex('assets_purchase_date_idx');
+                ->useIndex('assets_purchase_date_idx');
         }
 
         // Apply sorting
@@ -128,7 +123,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
         $query->orderBy($sortBy, $sortOrder);
 
         // Load only necessary relations
-        if (!empty($relations)) {
+        if (! empty($relations)) {
             $query->with($relations);
         }
 
@@ -136,7 +131,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function checkOut(int $assetId, int $userId, string $notes = ''): Asset
     {
@@ -153,7 +148,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
             ->performedOn($asset)
             ->withProperties([
                 'assigned_to' => $userId,
-                'notes' => $notes
+                'notes' => $notes,
             ])
             ->log('checked out');
 
@@ -161,7 +156,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function checkIn(int $assetId, string $notes = ''): Asset
     {
@@ -173,7 +168,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
             ->performedOn($asset)
             ->withProperties([
                 'previous_assigned_to' => $asset->assigned_to,
-                'notes' => $notes
+                'notes' => $notes,
             ])
             ->log('checked in');
 
@@ -187,7 +182,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getStatistics(): array
     {
@@ -204,7 +199,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getDueForMaintenance(int $days = 7, int $limit = 10): Collection
     {
@@ -220,7 +215,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getRecentlyAdded(int $limit = 5): Collection
     {
@@ -232,7 +227,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getTotalValue(): float
     {
@@ -240,7 +235,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getCountByStatus(): Collection
     {
@@ -251,7 +246,7 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getCountByCategory(): Collection
     {
@@ -263,24 +258,19 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
 
     /**
      * Get a new query builder instance with optimized select.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function newQuery(): Builder
     {
         return $this->model->newQuery()
             ->select([
-                'id', 'name', 'asset_code', 'status', 'category_id', 
+                'id', 'name', 'asset_code', 'status', 'category_id',
                 'location_id', 'department_id', 'assigned_to', 'purchase_cost',
-                'purchase_date', 'created_at', 'updated_at'
+                'purchase_date', 'created_at', 'updated_at',
             ]);
     }
 
     /**
      * Count assets by status with optimized query.
-     *
-     * @param string $status
-     * @return int
      */
     public function countByStatus(string $status): int
     {
@@ -291,8 +281,6 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
 
     /**
      * Get total count of assets with optimized query.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -301,9 +289,6 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
 
     /**
      * Get sum of a column with optimized query.
-     *
-     * @param string $column
-     * @return float
      */
     public function sum(string $column): float
     {
@@ -312,25 +297,21 @@ class AssetRepository extends BaseRepository implements AssetRepositoryInterface
 
     /**
      * Process assets in chunks with memory optimization.
-     *
-     * @param int $chunkSize
-     * @param callable $callback
-     * @return void
      */
     public function chunk(int $chunkSize, callable $callback): void
     {
         $this->model->select([
-            'id', 'name', 'asset_code', 'status', 'category_id', 
+            'id', 'name', 'asset_code', 'status', 'category_id',
             'location_id', 'department_id', 'assigned_to', 'purchase_cost',
-            'purchase_date', 'created_at', 'updated_at'
+            'purchase_date', 'created_at', 'updated_at',
         ])->chunk($chunkSize, function ($assets) use ($callback) {
             // Clear any cached data to free memory
             Cache::forget('asset_statistics');
             Cache::forget('asset_status_counts');
             Cache::forget('asset_category_counts');
-            
+
             $callback($assets);
-            
+
             // Force garbage collection after each chunk
             if (function_exists('gc_collect_cycles')) {
                 gc_collect_cycles();

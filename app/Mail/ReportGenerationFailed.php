@@ -30,8 +30,6 @@ class ReportGenerationFailed extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param  \App\Models\Report  $report
-     * @param  string  $errorMessage
      * @return void
      */
     public function __construct(Report $report, string $errorMessage)
@@ -42,20 +40,16 @@ class ReportGenerationFailed extends Mailable
 
     /**
      * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Report Generation Failed: ' . $this->report->name,
+            subject: 'Report Generation Failed: '.$this->report->name,
         );
     }
 
     /**
      * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
      */
     public function content(): Content
     {
@@ -70,8 +64,6 @@ class ReportGenerationFailed extends Mailable
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array
      */
     public function attachments(): array
     {

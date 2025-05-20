@@ -3,20 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
 
 class HealthCheckController extends Controller
 {
     /**
      * Health check endpoint
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -27,7 +24,7 @@ class HealthCheckController extends Controller
             'storage' => $this->checkStorage(),
         ];
 
-        $isHealthy = !in_array(false, array_column($checks, 'healthy'), true);
+        $isHealthy = ! in_array(false, array_column($checks, 'healthy'), true);
         $status = $isHealthy ? 200 : 503;
 
         return response()->json([
@@ -39,8 +36,6 @@ class HealthCheckController extends Controller
 
     /**
      * Check application status
-     *
-     * @return array
      */
     protected function checkApplication(): array
     {
@@ -57,14 +52,12 @@ class HealthCheckController extends Controller
 
     /**
      * Check database connection
-     *
-     * @return array
      */
     protected function checkDatabase(): array
     {
         try {
             DB::connection()->getPdo();
-            
+
             return [
                 'connection' => config('database.default'),
                 'status' => 'connected',
@@ -82,18 +75,16 @@ class HealthCheckController extends Controller
 
     /**
      * Check cache status
-     *
-     * @return array
      */
     protected function checkCache(): array
     {
         try {
-            $key = 'health:check:' . time();
+            $key = 'health:check:'.time();
             $value = 'test';
-            
+
             Cache::put($key, $value, now()->addMinute());
             $cached = Cache::get($key);
-            
+
             return [
                 'driver' => config('cache.default'),
                 'status' => $cached === $value ? 'working' : 'failed',
@@ -111,32 +102,30 @@ class HealthCheckController extends Controller
 
     /**
      * Check storage status
-     *
-     * @return array
      */
     protected function checkStorage(): array
     {
         try {
             $disk = config('filesystems.default');
-            $path = 'health-check-' . time() . '.txt';
+            $path = 'health-check-'.time().'.txt';
             $content = 'test';
-            
+
             Storage::put($path, $content);
             $stored = Storage::get($path);
             Storage::delete($path);
-            
+
             $totalSpace = disk_total_space(storage_path());
             $freeSpace = disk_free_space(storage_path());
             $usedSpace = $totalSpace - $freeSpace;
             $usagePercentage = $totalSpace > 0 ? round(($usedSpace / $totalSpace) * 100, 2) : 0;
-            
+
             return [
                 'driver' => $disk,
                 'status' => $stored === $content ? 'writable' : 'readonly',
                 'total_space' => $this->formatBytes($totalSpace),
                 'free_space' => $this->formatBytes($freeSpace),
                 'used_space' => $this->formatBytes($usedSpace),
-                'usage_percentage' => $usagePercentage . '%',
+                'usage_percentage' => $usagePercentage.'%',
                 'healthy' => $stored === $content && $usagePercentage < 90,
             ];
         } catch (\Exception $e) {
@@ -148,13 +137,9 @@ class HealthCheckController extends Controller
             ];
         }
     }
-    
+
     /**
      * Format bytes to human-readable format
-     *
-     * @param  int  $bytes
-     * @param  int  $precision
-     * @return string
      */
     protected function formatBytes(int $bytes, int $precision = 2): string
     {
@@ -163,7 +148,7 @@ class HealthCheckController extends Controller
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
-        
-        return round($bytes, $precision) . ' ' . $units[$pow];
+
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

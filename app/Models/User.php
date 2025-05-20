@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\AssetAttachment;
+use App\Models\MaintenanceRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Permission\Traits\HasPermissions;
-use Illuminate\Support\Facades\Cache;
-use Spatie\Permission\PermissionRegistrar;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
+use Laravel\Sanctum\HasApiTokens;
 use PragmaRX\Countries\Package\Countries;
-use App\Models\AssetAttachment;
-use App\Models\MaintenanceRequest;
+use Spatie\Permission\PermissionRegistrar;
+use Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPermissions;
+    use HasApiTokens, HasFactory, HasPermissions, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -89,7 +89,7 @@ class User extends Authenticatable
         'status_badge',
         'status_text',
         'country_name',
-        'is_admin'
+        'is_admin',
     ];
 
     /**
@@ -107,45 +107,49 @@ class User extends Authenticatable
     public function getFullAddressAttribute()
     {
         $parts = [];
-        if ($this->address) $parts[] = $this->address;
-        
+        if ($this->address) {
+            $parts[] = $this->address;
+        }
+
         $cityState = [];
-        if ($this->city) $cityState[] = $this->city;
-        if ($this->state) $cityState[] = $this->state;
-        if ($this->postal_code) $cityState[] = $this->postal_code;
-        
-        if (!empty($cityState)) {
+        if ($this->city) {
+            $cityState[] = $this->city;
+        }
+        if ($this->state) {
+            $cityState[] = $this->state;
+        }
+        if ($this->postal_code) {
+            $cityState[] = $this->postal_code;
+        }
+
+        if (! empty($cityState)) {
             $parts[] = implode(', ', $cityState);
         }
-        
+
         if ($this->country) {
             $parts[] = $this->country;
         }
-        
-        return !empty($parts) ? implode("\n", $parts) : null;
+
+        return ! empty($parts) ? implode("\n", $parts) : null;
     }
 
     /**
      * Get the URL to the user's avatar.
-     *
-     * @return string
      */
     /**
      * Get the user's avatar URL.
-     *
-     * @return string
      */
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar_path) {
-            return asset('storage/' . $this->avatar_path);
+            return asset('storage/'.$this->avatar_path);
         }
-        
+
         // Generate initials avatar as fallback
         $name = trim(collect(explode(' ', $this->name))->map(function ($segment) {
             return mb_substr($segment, 0, 1);
         })->join(' '));
-        
+
         return 'https://ui-avatars.com/api/?name='.urlencode($name).'&color=7F9CF5&background=EBF4FF';
     }
 
@@ -183,8 +187,6 @@ class User extends Authenticatable
 
     /**
      * Check if the user is an admin.
-     *
-     * @return bool
      */
     public function isAdmin(): bool
     {
@@ -193,8 +195,6 @@ class User extends Authenticatable
 
     /**
      * Get the is_admin attribute.
-     *
-     * @return bool
      */
     public function getIsAdminAttribute(): bool
     {
@@ -265,10 +265,10 @@ class User extends Authenticatable
      */
     public function getCountryNameAttribute()
     {
-        if (!$this->country) {
+        if (! $this->country) {
             return null;
         }
-        
+
         // Use a simple lookup array for common country codes
         $countries = [
             'US' => 'United States',
@@ -278,10 +278,10 @@ class User extends Authenticatable
             'IN' => 'India',
             // Add more countries as needed
         ];
-        
+
         return $countries[$this->country] ?? $this->country;
     }
-    
+
     /**
      * Toggle the user's dark mode preference
      *
@@ -289,7 +289,8 @@ class User extends Authenticatable
      */
     public function toggleDarkMode()
     {
-        $this->dark_mode = !$this->dark_mode;
+        $this->dark_mode = ! $this->dark_mode;
+
         return $this->save();
     }
 

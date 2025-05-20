@@ -8,19 +8,19 @@ use App\Models\Asset;
 use App\Services\AssetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @OA\Tag(
  *     name="Assets",
  *     description="Operations about assets"
  * )
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Cache;
  * @OA\Schema(
  *     schema="AssetResource",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Dell XPS 15"),
  *     @OA\Property(property="description", type="string", example="High-performance laptop"),
@@ -62,24 +63,20 @@ class AssetController extends BaseApiController
 {
     /**
      * The asset service instance.
-     *
-     * @var AssetService
      */
     protected AssetService $assetService;
 
     /**
      * Create a new controller instance.
-     *
-     * @param AssetService $assetService
      */
     public function __construct(AssetService $assetService)
     {
         $this->assetService = $assetService;
-        
+
         // Apply middleware
         $this->middleware('auth:api');
     }
-    
+
     /**
      * @OA\Get(
      *     path="/api/assets",
@@ -88,55 +85,70 @@ class AssetController extends BaseApiController
      *     operationId="getAssets",
      *     tags={"Assets"},
      *     security={{"bearerAuth": {}}},
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Search term to filter assets by name, description, or serial number",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="status",
      *         in="query",
      *         description="Filter by asset status",
      *         required=false,
+     *
      *         @OA\Schema(
      *             type="string",
      *             enum={"available", "assigned", "maintenance", "retired"}
      *         )
      *     ),
+     *
      *     @OA\Parameter(
      *         name="category_id",
      *         in="query",
      *         description="Filter by category ID",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="location_id",
      *         in="query",
      *         description="Filter by location ID",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Items per page (default: 15)",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=15)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Assets retrieved successfully"),
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/AssetResource")
      *             ),
+     *
      *             @OA\Property(
      *                 property="meta",
      *                 type="object",
@@ -149,30 +161,33 @@ class AssetController extends BaseApiController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="You do not have permission to view assets.")
      *         )
      *     )
      * )
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 15);
         $assets = $this->assetService->getAllAssets($request->all(), $perPage);
-        
+
         return $this->success(
             AssetResource::collection($assets),
             'Assets retrieved successfully'
@@ -187,11 +202,14 @@ class AssetController extends BaseApiController
      *     operationId="createAsset",
      *     tags={"Assets"},
      *     security={{"bearerAuth": {}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         description="Asset data",
+     *
      *         @OA\JsonContent(
      *             required={"name", "serial_number", "purchase_date", "purchase_cost", "status", "category_id", "location_id"},
+     *
      *             @OA\Property(property="name", type="string", example="Dell XPS 15", description="Name of the asset"),
      *             @OA\Property(property="description", type="string", example="High-performance laptop with 16GB RAM", description="Description of the asset"),
      *             @OA\Property(property="serial_number", type="string", example="SN123456789", description="Unique serial number of the asset"),
@@ -202,10 +220,13 @@ class AssetController extends BaseApiController
      *             @OA\Property(property="location_id", type="integer", example=1, description="ID of the location where the asset is stored")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Asset created successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Asset created successfully"),
      *             @OA\Property(
@@ -214,10 +235,13 @@ class AssetController extends BaseApiController
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The given data was invalid"),
      *             @OA\Property(
      *                 property="errors",
@@ -225,29 +249,34 @@ class AssetController extends BaseApiController
      *                 @OA\Property(
      *                     property="field_name",
      *                     type="array",
+     *
      *                     @OA\Items(type="string")
      *                 )
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated.")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="You do not have permission to create assets.")
      *         )
      *     )
      * )
      *
-     * @param Request $request
-     * @return JsonResponse
      * @throws ValidationException
      * @throws \Exception
      */
@@ -264,9 +293,9 @@ class AssetController extends BaseApiController
                 'category_id' => 'required|exists:categories,id',
                 'location_id' => 'required|exists:locations,id',
             ]);
-            
+
             $asset = $this->assetService->createAsset($validated);
-            
+
             return $this->success(
                 new AssetResource($asset->load(['category', 'location', 'department', 'assignedTo'])),
                 'Asset created successfully',
@@ -275,17 +304,18 @@ class AssetController extends BaseApiController
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            Log::error('Failed to create asset: ' . $e->getMessage());
+            Log::error('Failed to create asset: '.$e->getMessage());
+
             return $this->error('Failed to create asset', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     public function show(Asset $asset)
     {
-        return Cache::remember('assets.' . $asset->id, 60, function () use ($asset) {
+        return Cache::remember('assets.'.$asset->id, 60, function () use ($asset) {
             return $asset->load(['category', 'location', 'department']);
         });
     }
-    
+
     // ... rest of the controller methods ...
 }

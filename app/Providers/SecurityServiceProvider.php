@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
 class SecurityServiceProvider extends ServiceProvider
@@ -19,7 +19,6 @@ class SecurityServiceProvider extends ServiceProvider
     {
         //
     }
-
 
     /**
      * Bootstrap services.
@@ -44,9 +43,9 @@ class SecurityServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $maxAttempts = config('security.rate_limiting.login.max_attempts', 5);
             $decayMinutes = config('security.rate_limiting.login.decay_minutes', 15);
-            
+
             return Limit::perMinutes($decayMinutes, $maxAttempts)
-                ->by($request->input('email') . '|' . $request->ip());
+                ->by($request->input('email').'|'.$request->ip());
         });
 
         // Global throttle for all requests
@@ -95,13 +94,13 @@ class SecurityServiceProvider extends ServiceProvider
             }
 
             $parsed = parse_url($value);
-            
-            if (!isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
+
+            if (! isset($parsed['scheme']) || ! in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
                 return false;
             }
 
             // Validate hostname format
-            if (!isset($parsed['host']) || !preg_match('/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}$/i', $parsed['host'])) {
+            if (! isset($parsed['host']) || ! preg_match('/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}$/i', $parsed['host'])) {
                 return false;
             }
 

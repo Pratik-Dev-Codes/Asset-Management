@@ -16,6 +16,7 @@ class MaintenanceLogController extends Controller
     {
         return view('maintenance.landing');
     }
+
     /**
      * Display a listing of the resource.
      */

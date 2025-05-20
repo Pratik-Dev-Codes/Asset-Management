@@ -26,7 +26,7 @@ class ReportPermissionsSeeder extends Seeder
             'delete reports',
             'generate reports',
             'schedule reports',
-            
+
             // Report file permissions
             'view report files',
             'download report files',

@@ -14,9 +14,13 @@ class ReportAuthorizationTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $user;
+
     protected $otherUser;
+
     protected $report;
+
     protected $publicReport;
 
     protected function setUp(): void
@@ -46,12 +50,12 @@ class ReportAuthorizationTest extends TestCase
         // Create reports
         $this->report = Report::factory()->create([
             'created_by' => $this->user->id,
-            'is_public' => false
+            'is_public' => false,
         ]);
 
         $this->publicReport = Report::factory()->create([
             'created_by' => $this->otherUser->id,
-            'is_public' => true
+            'is_public' => true,
         ]);
     }
 
@@ -76,7 +80,7 @@ class ReportAuthorizationTest extends TestCase
     {
         $otherReport = Report::factory()->create([
             'created_by' => $this->otherUser->id,
-            'is_public' => false
+            'is_public' => false,
         ]);
 
         $this->actingAs($this->user);
@@ -99,12 +103,12 @@ class ReportAuthorizationTest extends TestCase
         $response = $this->put(route('reports.update', $this->report->id), [
             'name' => 'Updated by Admin',
             'type' => $this->report->type,
-            'columns' => $this->report->columns
+            'columns' => $this->report->columns,
         ]);
         $response->assertRedirect(route('reports.show', $this->report->id));
         $this->assertDatabaseHas('reports', [
             'id' => $this->report->id,
-            'name' => 'Updated by Admin'
+            'name' => 'Updated by Admin',
         ]);
     }
 
@@ -115,12 +119,12 @@ class ReportAuthorizationTest extends TestCase
         $response = $this->put(route('reports.update', $this->report->id), [
             'name' => 'Updated by Owner',
             'type' => $this->report->type,
-            'columns' => $this->report->columns
+            'columns' => $this->report->columns,
         ]);
         $response->assertRedirect(route('reports.show', $this->report->id));
         $this->assertDatabaseHas('reports', [
             'id' => $this->report->id,
-            'name' => 'Updated by Owner'
+            'name' => 'Updated by Owner',
         ]);
     }
 
@@ -128,19 +132,19 @@ class ReportAuthorizationTest extends TestCase
     public function user_cannot_update_other_users_reports()
     {
         $otherReport = Report::factory()->create([
-            'created_by' => $this->otherUser->id
+            'created_by' => $this->otherUser->id,
         ]);
 
         $this->actingAs($this->user);
         $response = $this->put(route('reports.update', $otherReport->id), [
             'name' => 'Should Not Update',
             'type' => $otherReport->type,
-            'columns' => $otherReport->columns
+            'columns' => $otherReport->columns,
         ]);
         $response->assertStatus(403);
         $this->assertDatabaseMissing('reports', [
             'id' => $otherReport->id,
-            'name' => 'Should Not Update'
+            'name' => 'Should Not Update',
         ]);
     }
 
@@ -166,7 +170,7 @@ class ReportAuthorizationTest extends TestCase
     public function user_cannot_delete_other_users_reports()
     {
         $otherReport = Report::factory()->create([
-            'created_by' => $this->otherUser->id
+            'created_by' => $this->otherUser->id,
         ]);
 
         $this->actingAs($this->user);

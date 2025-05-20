@@ -11,14 +11,11 @@ class DashboardController extends BaseApiController
 {
     /**
      * Get dashboard overview.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         // Sample dashboard data - replace with actual queries in a real implementation
         $data = [
             'total_assets' => DB::table('assets')->count(),
@@ -28,20 +25,17 @@ class DashboardController extends BaseApiController
             'recent_activities' => [],
             'upcoming_maintenance' => [],
         ];
-        
+
         return $this->success($data, 'Dashboard data retrieved successfully');
     }
 
     /**
      * Get dashboard statistics.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function statistics(Request $request): JsonResponse
     {
         $filters = $request->all();
-        
+
         // Sample statistics data - replace with actual queries in a real implementation
         $data = [
             'assets_by_status' => [
@@ -57,7 +51,7 @@ class DashboardController extends BaseApiController
                 ->get(),
             'recent_activities' => [],
         ];
-        
+
         return $this->success($data, 'Dashboard statistics retrieved successfully');
     }
 }

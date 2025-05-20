@@ -1,6 +1,6 @@
 <?php
 
-if (!function_exists('swagger_scan_paths')) {
+if (! function_exists('swagger_scan_paths')) {
     /**
      * Get the paths to scan for Swagger annotations.
      *
@@ -16,7 +16,7 @@ if (!function_exists('swagger_scan_paths')) {
     }
 }
 
-if (!function_exists('generate_swagger_docs')) {
+if (! function_exists('generate_swagger_docs')) {
     /**
      * Generate Swagger documentation.
      *

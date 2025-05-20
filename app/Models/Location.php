@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Kalnoy\Nestedset\NodeTrait;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $code
@@ -38,6 +36,7 @@ use Kalnoy\Nestedset\NodeTrait;
  * @property-read string $location_path
  * @property-read string $url
  * @property-read Location|null $parent
+ *
  * @method static \Kalnoy\Nestedset\QueryBuilder|Location active()
  * @method static \Kalnoy\Nestedset\Collection<int, static> all($columns = ['*'])
  * @method static \Kalnoy\Nestedset\QueryBuilder|Location ancestorsAndSelf($id, array $columns = [])
@@ -100,11 +99,12 @@ use Kalnoy\Nestedset\NodeTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|Location withTrashed()
  * @method static \Kalnoy\Nestedset\QueryBuilder|Location withoutRoot()
  * @method static \Illuminate\Database\Eloquent\Builder|Location withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Location extends Model
 {
-    use HasFactory, SoftDeletes, NodeTrait;
+    use HasFactory, NodeTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -153,7 +153,7 @@ class Location extends Model
         'full_address',
         'location_path',
         'is_leaf',
-        'has_children'
+        'has_children',
     ];
 
     /**
@@ -170,9 +170,9 @@ class Location extends Model
             if (empty($model->code)) {
                 $model->code = static::generateUniqueCode($model->name);
             }
-            
+
             // Set default active status if not provided
-            if (!isset($model->is_active)) {
+            if (! isset($model->is_active)) {
                 $model->is_active = true;
             }
         });
@@ -187,42 +187,39 @@ class Location extends Model
 
     /**
      * Generate a unique code from the location name
-     *
-     * @param string $name
-     * @return string
      */
     protected static function generateUniqueCode(string $name): string
     {
         $baseCode = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $name), 0, 10));
-        $code = $baseCode . '_' . substr(uniqid(), -6);
-        
+        $code = $baseCode.'_'.substr(uniqid(), -6);
+
         // Ensure code is unique
         $count = 1;
         while (static::where('code', $code)->exists()) {
-            $code = $baseCode . '_' . substr(uniqid(), -6);
+            $code = $baseCode.'_'.substr(uniqid(), -6);
             if ($count++ > 10) {
                 throw new \RuntimeException('Unable to generate unique location code');
             }
         }
-        
+
         return $code;
     }
-    
+
     /**
      * Get all locations in a flat list with proper indentation.
      *
-     * @param int $exceptId
+     * @param  int  $exceptId
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getTree($exceptId = null)
     {
         $query = static::with('ancestors')
             ->orderBy('_lft');
-            
+
         if ($exceptId) {
             $query->where('id', '!=', $exceptId);
         }
-            
+
         return $query->get();
     }
 
@@ -243,7 +240,7 @@ class Location extends Model
 
         return $parts ? implode(', ', $parts) : null;
     }
-    
+
     /**
      * Get the location's path as a breadcrumb.
      *
@@ -251,16 +248,16 @@ class Location extends Model
      */
     public function getLocationPathAttribute()
     {
-        if (!$this->parent_id) {
+        if (! $this->parent_id) {
             return $this->name;
         }
-        
+
         $ancestors = $this->ancestors()->pluck('name')->toArray();
         $ancestors[] = $this->name;
-        
+
         return implode(' > ', $ancestors);
     }
-    
+
     /**
      * Check if the location is a leaf (has no children).
      *
@@ -270,7 +267,7 @@ class Location extends Model
     {
         return $this->children()->count() === 0;
     }
-    
+
     /**
      * Check if the location has children.
      *
@@ -280,7 +277,7 @@ class Location extends Model
     {
         return $this->children()->count() > 0;
     }
-    
+
     /**
      * Scope a query to only include active locations.
      *
@@ -291,7 +288,7 @@ class Location extends Model
     {
         return $query->where('is_active', true);
     }
-    
+
     /**
      * Scope a query to only include locations of a given type.
      *
@@ -303,7 +300,7 @@ class Location extends Model
     {
         return $query->where('type', $type);
     }
-    
+
     /**
      * Get the URL for viewing the location.
      *
@@ -313,7 +310,7 @@ class Location extends Model
     {
         return route('locations.show', $this->id);
     }
-    
+
     /**
      * Get the edit URL for the location.
      *
@@ -323,7 +320,7 @@ class Location extends Model
     {
         return route('locations.edit', $this->id);
     }
-    
+
     /**
      * Get the delete URL for the location.
      *
@@ -363,7 +360,7 @@ class Location extends Model
     {
         return $this->ancestors()->count();
     }
-    
+
     /**
      * Get the nested children of the location.
      *
@@ -373,11 +370,11 @@ class Location extends Model
     {
         return $this->hasMany(Location::class, 'parent_id');
     }
-    
+
     /**
      * Get all locations in a flat list with proper indentation for select dropdowns.
      *
-     * @param int $exceptId
+     * @param  int  $exceptId
      * @return \Illuminate\Support\Collection
      */
     public static function getNestedList($exceptId = null)
@@ -386,20 +383,20 @@ class Location extends Model
             ->whereNull('parent_id')
             ->orderBy('name')
             ->get();
-            
+
         if ($exceptId) {
-            $locations = $locations->filter(function($location) use ($exceptId) {
+            $locations = $locations->filter(function ($location) use ($exceptId) {
                 return $location->id != $exceptId;
             });
         }
-        
+
         return $locations;
     }
-    
+
     /**
      * Check if the location is a descendant of the given location.
      *
-     * @param int $locationId
+     * @param  int  $locationId
      * @return bool
      */
     public function isDescendantOf($locationId)

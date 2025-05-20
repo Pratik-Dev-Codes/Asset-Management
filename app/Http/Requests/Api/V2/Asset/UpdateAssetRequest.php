@@ -15,19 +15,19 @@ class UpdateAssetRequest extends BaseApiRequest
     public function rules()
     {
         $assetId = $this->route('asset');
-        
+
         return [
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'asset_tag' => [
                 'sometimes',
                 'string',
-                Rule::unique('assets', 'asset_tag')->ignore($assetId)
+                Rule::unique('assets', 'asset_tag')->ignore($assetId),
             ],
             'serial_number' => [
                 'nullable',
                 'string',
-                Rule::unique('assets', 'serial_number')->ignore($assetId)
+                Rule::unique('assets', 'serial_number')->ignore($assetId),
             ],
             'model_number' => 'nullable|string|max:100',
             'manufacturer' => 'nullable|string|max:100',

@@ -15,7 +15,7 @@ class NotificationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             // Handle unauthenticated user, e.g., redirect to login
             return redirect()->route('login')->with('error', 'Please login to view notifications.');
         }
@@ -29,13 +29,13 @@ class NotificationController extends Controller
     /**
      * Mark a specific notification as read.
      *
-     * @param  string $id The ID of the notification
+     * @param  string  $id  The ID of the notification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function markAsRead(string $id)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please login.');
         }
 
@@ -48,6 +48,7 @@ class NotificationController extends Controller
                 return redirect($notification->data['action_url']);
             }
         }
+
         return redirect()->route('notifications.index')->with('success', 'Notification marked as read.');
     }
 
@@ -59,11 +60,12 @@ class NotificationController extends Controller
     public function markAllAsRead()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please login.');
         }
 
         $user->unreadNotifications->markAsRead();
+
         return redirect()->route('notifications.index')->with('success', 'All notifications marked as read.');
     }
 }

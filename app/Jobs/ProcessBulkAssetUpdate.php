@@ -55,9 +55,6 @@ class ProcessBulkAssetUpdate implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param array $assetIds
-     * @param array $updates
-     * @param User $user
      * @return void
      */
     public function __construct(array $assetIds, array $updates, User $user)
@@ -85,13 +82,13 @@ class ProcessBulkAssetUpdate implements ShouldQueue
                 ->chunkById(100, function ($assets) {
                     foreach ($assets as $asset) {
                         // Skip if the asset doesn't exist anymore
-                        if (!$asset) {
+                        if (! $asset) {
                             continue;
                         }
 
                         // Update the asset
                         $asset->update($this->updates);
-                        
+
                         // Log the update
                         activity()
                             ->performedOn($asset)
@@ -105,13 +102,13 @@ class ProcessBulkAssetUpdate implements ShouldQueue
                 });
 
         } catch (\Exception $e) {
-            Log::error('Bulk asset update failed: ' . $e->getMessage(), [
+            Log::error('Bulk asset update failed: '.$e->getMessage(), [
                 'asset_ids' => $this->assetIds,
                 'updates' => $this->updates,
                 'user_id' => $this->user->id,
                 'exception' => $e,
             ]);
-            
+
             throw $e; // Re-throw to allow for retries
         }
     }
@@ -119,7 +116,6 @@ class ProcessBulkAssetUpdate implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $exception
      * @return void
      */
     public function failed(\Throwable $exception)

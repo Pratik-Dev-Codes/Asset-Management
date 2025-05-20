@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * 
- *
  * @property int $id
  * @property string $title
  * @property string|null $description
@@ -29,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read mixed $thumbnail_url
  * @property-read mixed $url
  * @property-read \App\Models\User $uploader
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Document newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Document onlyTrashed()
@@ -49,6 +48,7 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|Document whereUploadedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Document withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Document withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Document extends Model
@@ -67,7 +67,7 @@ class Document extends Model
         'document_type',
         'uploaded_by',
     ];
-    
+
     protected $appends = ['url', 'thumbnail_url'];
 
     /**
@@ -85,7 +85,7 @@ class Document extends Model
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
-    
+
     /**
      * Get the URL for the document.
      */
@@ -94,9 +94,10 @@ class Document extends Model
         if ($this->file_path) {
             return Storage::url($this->file_path);
         }
+
         return null;
     }
-    
+
     /**
      * Get the URL for the thumbnail.
      */
@@ -105,15 +106,16 @@ class Document extends Model
         if ($this->thumbnail_path) {
             return Storage::url($this->thumbnail_path);
         }
+
         return null;
     }
-    
+
     /**
      * Check if the document is an image.
      */
     public function getIsImageAttribute()
     {
-        return $this->type === 'image' || 
+        return $this->type === 'image' ||
                strpos($this->file_type, 'image/') === 0;
     }
 }

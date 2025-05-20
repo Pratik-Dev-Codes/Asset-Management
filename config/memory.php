@@ -10,7 +10,6 @@ return [
     |
     */
 
-    
     /*
     |--------------------------------------------------------------------------
     | Memory Monitoring Settings
@@ -24,7 +23,7 @@ return [
         'log_all' => env('MEMORY_MONITOR_LOG_ALL', false),
         'threshold' => env('MEMORY_MONITOR_THRESHOLD', 80), // percentage
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Memory Limits
@@ -38,7 +37,7 @@ return [
         'cli' => env('MEMORY_LIMIT_CLI', '256M'),
         'queue' => env('MEMORY_LIMIT_QUEUE', '256M'),
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Memory Cleanup

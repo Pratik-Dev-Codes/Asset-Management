@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string $code
@@ -23,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Location|null $location
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Department newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Department newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Department onlyTrashed()
@@ -38,6 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Department whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Department withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Department withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Department extends Model

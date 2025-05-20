@@ -33,28 +33,28 @@ class CleanupLogs extends Command
         $days = (int) $this->option('days');
         $dryRun = $this->option('dry-run');
         $cutoff = now()->subDays($days)->getTimestamp();
-        
+
         $this->info(sprintf(
             'Looking for log files older than %d days in %s',
             $days,
             $logPath
         ));
-        
+
         if ($dryRun) {
             $this->info('DRY RUN: No files will be deleted');
         }
-        
+
         $files = File::files($logPath);
         $deleted = 0;
         $skipped = 0;
         $errors = 0;
-        
+
         foreach ($files as $file) {
             $lastModified = $file->getMTime();
             $size = $file->getSize();
             $formattedSize = $this->formatBytes($size);
             $formattedDate = date('Y-m-d H:i:s', $lastModified);
-            
+
             if ($lastModified < $cutoff && $file->getExtension() === 'log') {
                 $this->line(sprintf(
                     'Found old log file: %s (%s, last modified: %s)',
@@ -62,14 +62,14 @@ class CleanupLogs extends Command
                     $formattedSize,
                     $formattedDate
                 ));
-                
-                if (!$dryRun) {
+
+                if (! $dryRun) {
                     try {
                         File::delete($file->getPathname());
-                        $this->info('Deleted: ' . $file->getFilename());
+                        $this->info('Deleted: '.$file->getFilename());
                         $deleted++;
                     } catch (\Exception $e) {
-                        $this->error('Error deleting ' . $file->getFilename() . ': ' . $e->getMessage());
+                        $this->error('Error deleting '.$file->getFilename().': '.$e->getMessage());
                         Log::error('Error deleting log file', [
                             'file' => $file->getFilename(),
                             'error' => $e->getMessage(),
@@ -83,7 +83,7 @@ class CleanupLogs extends Command
                 $skipped++;
             }
         }
-        
+
         $this->newLine();
         $this->info(sprintf(
             'Log cleanup complete. %d files would be deleted (%d actually deleted, %d skipped, %d errors)',
@@ -92,7 +92,7 @@ class CleanupLogs extends Command
             $skipped,
             $errors
         ));
-        
+
         if ($deleted > 0) {
             Log::info('Log cleanup completed', [
                 'deleted' => $deleted,
@@ -102,15 +102,12 @@ class CleanupLogs extends Command
                 'days' => $days,
             ]);
         }
-        
+
         return $errors > 0 ? 1 : 0;
     }
-    
+
     /**
      * Format bytes to human-readable format
-     * 
-     * @param int $bytes
-     * @return string
      */
     protected function formatBytes(int $bytes): string
     {
@@ -118,7 +115,7 @@ class CleanupLogs extends Command
         $bytes = max($bytes, 0);
         $pow = $bytes ? floor(log($bytes) / log(1024)) : 0;
         $pow = min($pow, count($units) - 1);
-        
-        return round($bytes / (1024 ** $pow), 2) . ' ' . $units[$pow];
+
+        return round($bytes / (1024 ** $pow), 2).' '.$units[$pow];
     }
 }

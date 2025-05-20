@@ -62,8 +62,8 @@ class AssetResource extends JsonResource
                 ] : null;
             }),
             'custom_fields' => $this->when($this->relationLoaded('customFields'), function () {
-                return $this->customFields->mapWithKeys(fn($field) => [
-                    $field->name => $field->pivot->value
+                return $this->customFields->mapWithKeys(fn ($field) => [
+                    $field->name => $field->pivot->value,
                 ]);
             }),
             'maintenance_logs_count' => $this->whenCounted('maintenanceLogs'),

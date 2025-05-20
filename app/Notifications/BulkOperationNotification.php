@@ -28,13 +28,11 @@ class BulkOperationNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @param array $data
      * @return void
      */
     /**
      * Create a new notification instance.
      *
-     * @param array $data
      * @return void
      */
     public function __construct(array $data = [])
@@ -70,13 +68,13 @@ class BulkOperationNotification extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject($this->data['title'])
             ->line($this->data['message']);
-            
+
         if ($this->data['action']) {
             $mail->action('View Details', url($this->data['action']));
         } else {
             $mail->action('View Dashboard', url('/dashboard'));
         }
-        
+
         return $mail->line('Thank you for using our application!');
     }
 

@@ -17,8 +17,8 @@ return [
                 ],
                 'security' => [
                     [
-                        'bearerAuth' => []
-                    ]
+                        'bearerAuth' => [],
+                    ],
                 ],
                 'securityDefinitions' => [
                     'bearerAuth' => [
@@ -117,8 +117,8 @@ return [
             ],
             'security' => [
                 [
-                    'bearerAuth' => []
-                ]
+                    'bearerAuth' => [],
+                ],
             ],
         ],
     ],

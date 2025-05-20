@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AssetCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 class AssetCategoryController extends Controller
@@ -19,6 +19,7 @@ class AssetCategoryController extends Controller
     {
         return view('asset_categories.landing');
     }
+
     /**
      * Display a listing of the asset categories.
      *
@@ -27,12 +28,12 @@ class AssetCategoryController extends Controller
     public function index()
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.view')) {
+        if (! auth()->user()->can('asset.category.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view asset categories.');
         }
 
         $categories = AssetCategory::withCount('assets')->get();
-        
+
         return view('asset-categories.index', compact('categories'));
     }
 
@@ -44,7 +45,7 @@ class AssetCategoryController extends Controller
     public function create()
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.create')) {
+        if (! auth()->user()->can('asset.category.create')) {
             return redirect()->route('asset-categories.index')->with('error', 'You do not have permission to create asset categories.');
         }
 
@@ -54,13 +55,12 @@ class AssetCategoryController extends Controller
     /**
      * Store a newly created asset category in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.create')) {
+        if (! auth()->user()->can('asset.category.create')) {
             return redirect()->route('asset-categories.index')->with('error', 'You do not have permission to create asset categories.');
         }
 
@@ -72,15 +72,15 @@ class AssetCategoryController extends Controller
         ]);
 
         // Create the category
-        $category = new AssetCategory();
+        $category = new AssetCategory;
         $category->name = $request->name;
         $category->description = $request->description;
-        
+
         // Handle icon upload
         if ($request->hasFile('icon')) {
             $path = $request->file('icon')->store('asset-categories/icons', 'public');
             $category->icon = $path;
-            
+
             // Resize icon if needed
             $img = Image::make(public_path('storage/'.$path))
                 ->resize(64, 64, function ($constraint) {
@@ -89,9 +89,9 @@ class AssetCategoryController extends Controller
                 });
             $img->save();
         }
-        
+
         $category->save();
-        
+
         return redirect()->route('asset-categories.index')
             ->with('success', 'Asset category created successfully.');
     }
@@ -99,33 +99,31 @@ class AssetCategoryController extends Controller
     /**
      * Display the specified asset category.
      *
-     * @param  \App\Models\AssetCategory  $category
      * @return \Illuminate\Http\Response
      */
     public function show(AssetCategory $category)
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.view')) {
+        if (! auth()->user()->can('asset.category.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view asset categories.');
         }
 
-        $category->load(['assets' => function($query) {
+        $category->load(['assets' => function ($query) {
             $query->paginate(10);
         }]);
-        
+
         return view('asset-categories.show', compact('category'));
     }
 
     /**
      * Show the form for editing the specified asset category.
      *
-     * @param  \App\Models\AssetCategory  $category
      * @return \Illuminate\Http\Response
      */
     public function edit(AssetCategory $category)
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.edit')) {
+        if (! auth()->user()->can('asset.category.edit')) {
             return redirect()->route('asset-categories.show', $category)->with('error', 'You do not have permission to edit asset categories.');
         }
 
@@ -135,20 +133,18 @@ class AssetCategoryController extends Controller
     /**
      * Update the specified asset category in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\AssetCategory  $category
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, AssetCategory $category)
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.edit')) {
+        if (! auth()->user()->can('asset.category.edit')) {
             return redirect()->route('asset-categories.show', $category)->with('error', 'You do not have permission to edit asset categories.');
         }
 
         // Validate the request
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:asset_categories,name,' . $category->id,
+            'name' => 'required|string|max:255|unique:asset_categories,name,'.$category->id,
             'description' => 'nullable|string',
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -156,17 +152,17 @@ class AssetCategoryController extends Controller
         // Update the category
         $category->name = $request->name;
         $category->description = $request->description;
-        
+
         // Handle icon upload
         if ($request->hasFile('icon')) {
             // Delete old icon if exists
             if ($category->icon) {
                 Storage::disk('public')->delete($category->icon);
             }
-            
+
             $path = $request->file('icon')->store('asset-categories/icons', 'public');
             $category->icon = $path;
-            
+
             // Resize icon if needed
             $img = Image::make(public_path('storage/'.$path))
                 ->resize(64, 64, function ($constraint) {
@@ -175,9 +171,9 @@ class AssetCategoryController extends Controller
                 });
             $img->save();
         }
-        
+
         $category->save();
-        
+
         return redirect()->route('asset-categories.index')
             ->with('success', 'Asset category updated successfully.');
     }
@@ -185,13 +181,12 @@ class AssetCategoryController extends Controller
     /**
      * Remove the specified asset category from storage.
      *
-     * @param  \App\Models\AssetCategory  $category
      * @return \Illuminate\Http\Response
      */
     public function destroy(AssetCategory $category)
     {
         // Check permission
-        if (!auth()->user()->can('asset.category.delete')) {
+        if (! auth()->user()->can('asset.category.delete')) {
             return redirect()->route('asset-categories.index')->with('error', 'You do not have permission to delete asset categories.');
         }
 
@@ -205,10 +200,10 @@ class AssetCategoryController extends Controller
         if ($category->icon) {
             Storage::disk('public')->delete($category->icon);
         }
-        
+
         // Delete the category
         $category->delete();
-        
+
         return redirect()->route('asset-categories.index')
             ->with('success', 'Asset category deleted successfully.');
     }
@@ -221,7 +216,7 @@ class AssetCategoryController extends Controller
     public function getCategories()
     {
         $categories = AssetCategory::select('id', 'name')->get();
-        
+
         return response()->json($categories);
     }
 }

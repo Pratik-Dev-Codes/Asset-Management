@@ -2,18 +2,18 @@
 
 namespace App\Exports;
 
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Illuminate\Support\Collection;
-use Carbon\Carbon;
 
-class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithTitle, WithEvents
+class ReportExport implements FromCollection, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     /**
      * The report data.
@@ -40,8 +40,6 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
      * Create a new export instance.
      *
      * @param  mixed  $data
-     * @param  array  $columns
-     * @param  string  $title
      * @return void
      */
     public function __construct($data, array $columns, string $title = 'Report')
@@ -63,8 +61,6 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
 
     /**
      * Get the headings for the export.
-     *
-     * @return array
      */
     public function headings(): array
     {
@@ -75,41 +71,38 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
      * Map the data for the export.
      *
      * @param  mixed  $row
-     * @return array
      */
     public function map($row): array
     {
         $result = [];
-        
+
         foreach (array_keys($this->columns) as $key) {
             // Handle nested data using dot notation
             $value = data_get($row, $key, '');
-            
+
             // Format dates
             if ($value instanceof \DateTime || $value instanceof Carbon) {
                 $value = $value->format('Y-m-d H:i:s');
             }
-            
+
             // Convert arrays/objects to JSON
             if (is_array($value) || is_object($value)) {
                 $value = json_encode($value, JSON_PRETTY_PRINT);
             }
-            
+
             // Handle money formatting
             if (in_array(strtolower($key), ['price', 'cost', 'amount', 'total', 'subtotal', 'purchase_cost'])) {
                 $value = is_numeric($value) ? number_format($value, 2) : $value;
             }
-            
+
             $result[] = $value;
         }
-        
+
         return $result;
     }
 
     /**
      * Get the title for the sheet.
-     *
-     * @return string
      */
     public function title(): string
     {
@@ -118,20 +111,18 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
 
     /**
      * Register events for the export.
-     *
-     * @return array
      */
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                
+
                 // Auto-size columns
                 foreach (range('A', $sheet->getHighestColumn()) as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
-                
+
                 // Style the header row
                 $event->sheet->getStyle('A1:'.$sheet->getHighestColumn().'1')->applyFromArray([
                     'font' => [
@@ -151,10 +142,10 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
                         ],
                     ],
                 ]);
-                
+
                 // Add filters to the header row
                 $event->sheet->setAutoFilter('A1:'.$sheet->getHighestColumn().'1');
-                
+
                 // Freeze the first row
                 $event->sheet->freezePane('A2');
             },

@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Models\Report;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use App\Notifications\ReportGenerated;
 use App\Notifications\ReportGenerationFailed;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ReportSchedulerService
 {
@@ -27,8 +27,6 @@ class ReportSchedulerService
     /**
      * Create a new scheduler instance.
      *
-     * @param  \App\Services\ReportService  $reportService
-     * @param  \App\Services\NotificationService  $notificationService
      * @return void
      */
     public function __construct(ReportService $reportService, NotificationService $notificationService)
@@ -57,11 +55,11 @@ class ReportSchedulerService
             try {
                 $this->processReport($report);
             } catch (\Exception $e) {
-                Log::error("Failed to process scheduled report: " . $e->getMessage(), [
+                Log::error('Failed to process scheduled report: '.$e->getMessage(), [
                     'report_id' => $report->id,
-                    'exception' => $e
+                    'exception' => $e,
                 ]);
-                
+
                 // Notify admin of failure
                 if ($report->user) {
                     $this->notificationService->notifyUser(
@@ -76,8 +74,8 @@ class ReportSchedulerService
     /**
      * Process a single scheduled report.
      *
-     * @param  \App\Models\Report  $report
      * @return bool True if the report was processed successfully, false otherwise
+     *
      * @throws \Exception If there's an error processing the report
      */
     public function processReport(Report $report)
@@ -103,7 +101,7 @@ class ReportSchedulerService
             Log::error('Failed to process scheduled report', [
                 'report_id' => $report->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             if ($report->user) {
@@ -120,7 +118,6 @@ class ReportSchedulerService
     /**
      * Calculate the next run date based on the schedule.
      *
-     * @param  \Carbon\Carbon  $now
      * @return \Carbon\Carbon
      */
     protected function getNextRunDate(Carbon $now)

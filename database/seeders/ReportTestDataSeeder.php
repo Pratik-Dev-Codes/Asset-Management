@@ -20,7 +20,7 @@ class ReportTestDataSeeder extends Seeder
     {
         // Ensure storage directory exists
         $storagePath = storage_path('app/reports/test');
-        if (!file_exists($storagePath)) {
+        if (! file_exists($storagePath)) {
             mkdir($storagePath, 0755, true);
         }
 
@@ -37,7 +37,7 @@ class ReportTestDataSeeder extends Seeder
         // Sample report data
         $reports = [
             [
-                'name' => 'Monthly Asset Report - ' . now()->format('F Y'),
+                'name' => 'Monthly Asset Report - '.now()->format('F Y'),
                 'description' => 'Monthly asset inventory report',
                 'type' => 'asset',
                 'format' => 'xlsx',
@@ -49,7 +49,7 @@ class ReportTestDataSeeder extends Seeder
                 'updated_at' => now()->subDays(5),
             ],
             [
-                'name' => 'Quarterly Asset Report - Q' . ceil(now()->month / 3) . ' ' . now()->year,
+                'name' => 'Quarterly Asset Report - Q'.ceil(now()->month / 3).' '.now()->year,
                 'description' => 'Quarterly asset status report',
                 'type' => 'asset',
                 'format' => 'pdf',
@@ -61,7 +61,7 @@ class ReportTestDataSeeder extends Seeder
                 'updated_at' => now()->subDays(15),
             ],
             [
-                'name' => 'Asset Purchase Report - ' . now()->year,
+                'name' => 'Asset Purchase Report - '.now()->year,
                 'description' => 'Annual asset purchase report',
                 'type' => 'asset',
                 'format' => 'csv',
@@ -69,7 +69,7 @@ class ReportTestDataSeeder extends Seeder
                     'purchase_date' => [
                         'start' => now()->startOfYear()->format('Y-m-d'),
                         'end' => now()->format('Y-m-d'),
-                    ]
+                    ],
                 ],
                 'status' => 'pending',
                 'created_by' => $user->id,
@@ -78,7 +78,7 @@ class ReportTestDataSeeder extends Seeder
                 'updated_at' => now()->subDays(2),
             ],
             [
-                'name' => 'Failed Report - ' . now()->format('Y-m-d'),
+                'name' => 'Failed Report - '.now()->format('Y-m-d'),
                 'description' => 'This is a failed report for testing purposes',
                 'type' => 'asset',
                 'format' => 'xlsx',
@@ -108,22 +108,22 @@ class ReportTestDataSeeder extends Seeder
     /**
      * Create a sample report file for testing.
      *
-     * @param \App\Models\Report $report
-     * @param \App\Models\User $user
+     * @param  \App\Models\Report  $report
+     * @param  \App\Models\User  $user
      * @return void
      */
     protected function createSampleReportFile($report, $user)
     {
-        $fileName = 'report_' . Str::uuid() . '.' . $report->format;
-        $filePath = 'reports/test/' . $fileName;
-        $fullPath = storage_path('app/' . $filePath);
+        $fileName = 'report_'.Str::uuid().'.'.$report->format;
+        $filePath = 'reports/test/'.$fileName;
+        $fullPath = storage_path('app/'.$filePath);
 
         // Create a dummy file
         $content = "This is a sample {$report->format} report for testing purposes.\n";
         $content .= "Report ID: {$report->id}\n";
         $content .= "Name: {$report->name}\n";
         $content .= "Type: {$report->type}\n";
-        $content .= "Generated at: " . now()->toDateTimeString() . "\n";
+        $content .= 'Generated at: '.now()->toDateTimeString()."\n";
 
         file_put_contents($fullPath, $content);
 
@@ -148,7 +148,7 @@ class ReportTestDataSeeder extends Seeder
     /**
      * Get the MIME type for a file format.
      *
-     * @param string $format
+     * @param  string  $format
      * @return string
      */
     protected function getMimeType($format)

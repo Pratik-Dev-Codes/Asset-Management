@@ -9,8 +9,6 @@ class ApiDocumentationController extends Controller
 {
     /**
      * Display API documentation.
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -38,7 +36,7 @@ class ApiDocumentationController extends Controller
                 ],
                 'status' => [
                     'GET /api/v1/status' => 'Check API status',
-                ]
+                ],
             ],
             'authentication' => [
                 'type' => 'Bearer Token',

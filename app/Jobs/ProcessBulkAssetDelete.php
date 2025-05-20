@@ -48,8 +48,6 @@ class ProcessBulkAssetDelete implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param array $assetIds
-     * @param User $user
      * @return void
      */
     public function __construct(array $assetIds, User $user)
@@ -76,7 +74,7 @@ class ProcessBulkAssetDelete implements ShouldQueue
                 ->chunkById(100, function ($assets) {
                     foreach ($assets as $asset) {
                         // Skip if the asset doesn't exist anymore
-                        if (!$asset) {
+                        if (! $asset) {
                             continue;
                         }
 
@@ -88,19 +86,19 @@ class ProcessBulkAssetDelete implements ShouldQueue
                                 'batch' => $this->batch() ? $this->batch()->id : null,
                             ])
                             ->log('Asset deleted in bulk operation');
-                        
+
                         // Delete the asset (soft delete)
                         $asset->delete();
                     }
                 });
 
         } catch (\Exception $e) {
-            Log::error('Bulk asset delete failed: ' . $e->getMessage(), [
+            Log::error('Bulk asset delete failed: '.$e->getMessage(), [
                 'asset_ids' => $this->assetIds,
                 'user_id' => $this->user->id,
                 'exception' => $e,
             ]);
-            
+
             throw $e; // Re-throw to allow for retries
         }
     }
@@ -108,7 +106,6 @@ class ProcessBulkAssetDelete implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $exception
      * @return void
      */
     public function failed(\Throwable $exception)

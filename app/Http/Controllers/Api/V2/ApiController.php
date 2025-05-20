@@ -10,27 +10,19 @@ class ApiController extends Controller
     /**
      * Success response method.
      *
-     * @param mixed $data
-     * @param string $message
-     * @param int $code
-     * @return JsonResponse
+     * @param  mixed  $data
      */
     protected function success($data = null, string $message = 'Success', int $code = 200): JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ], $code);
     }
 
     /**
      * Error response method.
-     *
-     * @param string $message
-     * @param int $code
-     * @param array $errors
-     * @return JsonResponse
      */
     protected function error(string $message = 'Error', int $code = 400, array $errors = []): JsonResponse
     {
@@ -39,7 +31,7 @@ class ApiController extends Controller
             'message' => $message,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -49,9 +41,7 @@ class ApiController extends Controller
     /**
      * Return a successful response with pagination.
      *
-     * @param mixed $paginatedData
-     * @param string $message
-     * @return JsonResponse
+     * @param  mixed  $paginatedData
      */
     protected function paginate($paginatedData, string $message = 'Success'): JsonResponse
     {
@@ -65,7 +55,7 @@ class ApiController extends Controller
                 'per_page' => $paginatedData->perPage(),
                 'total' => $paginatedData->total(),
                 'path' => $paginatedData->path(),
-            ]
+            ],
         ];
 
         return response()->json($data);

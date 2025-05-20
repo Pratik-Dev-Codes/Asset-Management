@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class MemoryUsageLog extends Model
 {
@@ -40,7 +40,7 @@ class MemoryUsageLog extends Model
     /**
      * Get the memory usage logs for the last X hours.
      *
-     * @param int $hours Number of hours to look back
+     * @param  int  $hours  Number of hours to look back
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRecent($query, $hours = 24)
@@ -51,7 +51,7 @@ class MemoryUsageLog extends Model
     /**
      * Get the memory usage statistics for the dashboard.
      *
-     * @param int $hours Number of hours to include in the statistics
+     * @param  int  $hours  Number of hours to include in the statistics
      * @return array
      */
     public static function getDashboardStats($hours = 24)

@@ -13,7 +13,7 @@ class ReportPolicy extends BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view reports') || 
+        return $user->can('view reports') ||
                $user->can('view own reports');
     }
 
@@ -26,14 +26,14 @@ class ReportPolicy extends BasePolicy
         if ($user->id === $report->created_by) {
             return true;
         }
-        
+
         // Check if report is public
         if ($report->is_public) {
             return true;
         }
-        
+
         // Check if user has permission to view all reports
-        return $user->can('view all reports') || 
+        return $user->can('view all reports') ||
                $user->hasRole('admin');
     }
 
@@ -42,7 +42,7 @@ class ReportPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create reports') || 
+        return $user->can('create reports') ||
                $user->hasRole('manager');
     }
 
@@ -55,9 +55,9 @@ class ReportPolicy extends BasePolicy
         if ($user->id === $report->created_by) {
             return $user->can('update own reports');
         }
-        
+
         // Check if user can update any report
-        return $user->can('update reports') || 
+        return $user->can('update reports') ||
                $user->can('update any report');
     }
 
@@ -70,9 +70,9 @@ class ReportPolicy extends BasePolicy
         if ($user->id === $report->created_by) {
             return $user->can('delete own reports');
         }
-        
+
         // Check if user can delete any report
-        return $user->can('delete reports') || 
+        return $user->can('delete reports') ||
                $user->can('delete any report');
     }
 
@@ -84,7 +84,7 @@ class ReportPolicy extends BasePolicy
         // Only super admins can force delete reports
         return $user->hasRole('super-admin');
     }
-    
+
     /**
      * Determine whether the user can export the report.
      */
@@ -94,34 +94,34 @@ class ReportPolicy extends BasePolicy
         if ($user->id === $report->created_by) {
             return true;
         }
-        
+
         // Check if report is public
         if ($report->is_public) {
             return true;
         }
-        
+
         // Check if user has permission to export any report
-        return $user->can('export reports') || 
+        return $user->can('export reports') ||
                $user->can('export any report');
     }
-    
+
     /**
      * Determine whether the user can download the report.
+     *
      * @param  \App\Models\Report  $report
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function download(User $user, $report)
     {
         // Users can download their own reports, public reports, or if they have permission
-        return $user->id === $report->created_by || 
-               $report->is_public || 
+        return $user->id === $report->created_by ||
+               $report->is_public ||
                $user->can('download all reports');
     }
-    
+
     /**
      * Determine whether the user can generate the report.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Models\Report  $report
      * @return \Illuminate\Auth\Access\Response|bool
      */
@@ -130,11 +130,10 @@ class ReportPolicy extends BasePolicy
         // Users can generate reports they can view
         return $this->view($user, $report);
     }
-    
+
     /**
      * Determine whether the user can schedule the report.
      *
-     * @param  \App\Models\User  $user
      * @param  \App\Models\Report  $report
      * @return \Illuminate\Auth\Access\Response|bool
      */
@@ -144,9 +143,9 @@ class ReportPolicy extends BasePolicy
         if ($user->id === $report->created_by) {
             return $user->can('schedule reports');
         }
-        
+
         // Check if user can schedule any report
-        return $user->can('schedule any report') || 
+        return $user->can('schedule any report') ||
                $user->hasRole('admin');
     }
 }

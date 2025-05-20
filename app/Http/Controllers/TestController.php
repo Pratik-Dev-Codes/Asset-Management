@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TestController extends Controller
@@ -12,11 +12,11 @@ class TestController extends Controller
     {
         // Get the authenticated user
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['message' => 'Not authenticated'], 401);
         }
-        
+
         // Check if the user has the 'admin' role using the User model
         if ($user->hasRole('admin')) {
             return response()->json([
@@ -25,14 +25,14 @@ class TestController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'roles' => $user->getRoleNames()
-                ]
+                    'roles' => $user->getRoleNames(),
+                ],
             ]);
         }
 
         return response()->json([
             'message' => 'You do not have the admin role.',
-            'user_roles' => $user->getRoleNames()
+            'user_roles' => $user->getRoleNames(),
         ], 403);
     }
 }

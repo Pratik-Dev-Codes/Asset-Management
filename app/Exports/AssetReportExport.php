@@ -3,18 +3,18 @@
 namespace App\Exports;
 
 use App\Models\Asset;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTitle, WithEvents, WithColumnFormatting
+class AssetReportExport implements FromQuery, WithColumnFormatting, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     /**
      * The filters for the report.
@@ -26,7 +26,6 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
     /**
      * Create a new export instance.
      *
-     * @param array $filters
      * @return void
      */
     public function __construct(array $filters = [])
@@ -45,7 +44,7 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
                 'categories.name as category_name',
                 'locations.name as location_name',
                 'users.name as assigned_to_name',
-                'vendors.name as vendor_name'
+                'vendors.name as vendor_name',
             ])
             ->leftJoin('categories', 'assets.category_id', '=', 'categories.id')
             ->leftJoin('locations', 'assets.location_id', '=', 'locations.id')
@@ -53,11 +52,11 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
             ->leftJoin('vendors', 'assets.vendor_id', '=', 'vendors.id');
 
         // Apply filters
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('assets.status', $this->filters['status']);
         }
 
-        if (!empty($this->filters['purchase_date'])) {
+        if (! empty($this->filters['purchase_date'])) {
             if (isset($this->filters['purchase_date']['start'])) {
                 $query->whereDate('assets.purchase_date', '>=', $this->filters['purchase_date']['start']);
             }
@@ -69,9 +68,6 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
         return $query->orderBy('assets.id', 'asc');
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -95,9 +91,7 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
     }
 
     /**
-     * @param mixed $asset
-     *
-     * @return array
+     * @param  mixed  $asset
      */
     public function map($asset): array
     {
@@ -121,21 +115,15 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
         ];
     }
 
-    /**
-     * @return string
-     */
     public function title(): string
     {
-        return 'Assets_' . now()->format('Y-m-d');
+        return 'Assets_'.now()->format('Y-m-d');
     }
 
-    /**
-     * @return array
-     */
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 // Auto-size columns
                 $event->sheet->getDelegate()->getColumnDimension('A')->setAutoSize(true);
                 $event->sheet->getDelegate()->getColumnDimension('B')->setAutoSize(true);
@@ -167,15 +155,15 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
                 ]);
 
                 // Set number format for currency and dates
-                $event->sheet->getStyle('K2:K' . $event->sheet->getHighestRow())
+                $event->sheet->getStyle('K2:K'.$event->sheet->getHighestRow())
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
 
-                $event->sheet->getStyle('J2:J' . $event->sheet->getHighestRow())
+                $event->sheet->getStyle('J2:J'.$event->sheet->getHighestRow())
                     ->getNumberFormat()
                     ->setFormatCode('yyyy-mm-dd');
 
-                $event->sheet->getStyle('O2:P' . $event->sheet->getHighestRow())
+                $event->sheet->getStyle('O2:P'.$event->sheet->getHighestRow())
                     ->getNumberFormat()
                     ->setFormatCode('yyyy-mm-dd hh:mm:ss');
 
@@ -185,9 +173,6 @@ class AssetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
         ];
     }
 
-    /**
-     * @return array
-     */
     public function columnFormats(): array
     {
         return [

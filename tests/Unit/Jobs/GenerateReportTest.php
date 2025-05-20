@@ -19,10 +19,10 @@ class GenerateReportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Fake storage for report files
         Storage::fake('reports');
-        
+
         // Create a test user
         $this->user = User::factory()->create();
     }
@@ -41,7 +41,7 @@ class GenerateReportTest extends TestCase
                 'date_to' => now()->format('Y-m-d'),
             ]),
         ]);
-        
+
         // Mock the ReportService
         $reportService = Mockery::mock(ReportService::class);
         $reportService->shouldReceive('generateReport')
@@ -58,14 +58,14 @@ class GenerateReportTest extends TestCase
                 'file_size' => 1024,
                 'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]);
-        
+
         // Bind the mock to the service container
         $this->app->instance(ReportService::class, $reportService);
-        
+
         // Dispatch the job
         $job = new GenerateReport($report);
         $job->handle($reportService);
-        
+
         // Assert the report was updated
         $this->assertDatabaseHas('reports', [
             'id' => $report->id,
@@ -76,7 +76,7 @@ class GenerateReportTest extends TestCase
             'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'error_message' => null,
         ], 'mysql');
-        
+
         // Assert the report file was created
         $this->assertDatabaseHas('report_files', [
             'report_id' => $report->id,
@@ -87,7 +87,7 @@ class GenerateReportTest extends TestCase
             'generated_by' => $this->user->id,
         ], 'mysql');
     }
-    
+
     /** @test */
     public function it_handles_report_generation_failure()
     {
@@ -102,20 +102,20 @@ class GenerateReportTest extends TestCase
                 'date_to' => now()->format('Y-m-d'),
             ]),
         ]);
-        
+
         // Mock the ReportService to throw an exception
         $reportService = Mockery::mock(ReportService::class);
         $reportService->shouldReceive('generateReport')
             ->once()
             ->andThrow(new \Exception('Failed to generate report'));
-        
+
         // Bind the mock to the service container
         $this->app->instance(ReportService::class, $reportService);
-        
+
         // Dispatch the job
         $job = new GenerateReport($report);
         $job->handle($reportService);
-        
+
         // Assert the report was marked as failed
         $this->assertDatabaseHas('reports', [
             'id' => $report->id,
@@ -123,7 +123,7 @@ class GenerateReportTest extends TestCase
             'error_message' => 'Failed to generate report',
         ], 'mysql');
     }
-    
+
     /** @test */
     public function it_can_generate_different_report_formats()
     {
@@ -132,7 +132,7 @@ class GenerateReportTest extends TestCase
             'csv' => 'text/csv',
             'pdf' => 'application/pdf',
         ];
-        
+
         foreach ($formats as $format => $mimeType) {
             // Create a report with the current format
             $report = Report::factory()->create([
@@ -145,7 +145,7 @@ class GenerateReportTest extends TestCase
                     'date_to' => now()->format('Y-m-d'),
                 ]),
             ]);
-            
+
             // Mock the ReportService
             $reportService = Mockery::mock(ReportService::class);
             $reportService->shouldReceive('generateReport')
@@ -156,14 +156,14 @@ class GenerateReportTest extends TestCase
                     'file_size' => 1024,
                     'mime_type' => $mimeType,
                 ]);
-            
+
             // Bind the mock to the service container
             $this->app->instance(ReportService::class, $reportService);
-            
+
             // Dispatch the job
             $job = new GenerateReport($report);
             $job->handle($reportService);
-            
+
             // Assert the report was updated with the correct format
             $this->assertDatabaseHas('reports', [
                 'id' => $report->id,
@@ -173,7 +173,7 @@ class GenerateReportTest extends TestCase
             ], 'mysql');
         }
     }
-    
+
     protected function tearDown(): void
     {
         parent::tearDown();

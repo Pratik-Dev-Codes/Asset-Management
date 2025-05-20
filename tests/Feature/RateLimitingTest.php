@@ -25,7 +25,7 @@ class RateLimitingTest extends TestCase
                 'email' => 'test@example.com',
                 'password' => 'wrong-password',
             ]);
-            
+
             $response->assertStatus(302);
         }
 
@@ -43,26 +43,26 @@ class RateLimitingTest extends TestCase
     {
         // Create a test user
         $user = User::factory()->create();
-        
+
         // Generate a token for the user
         $token = $user->createToken('test-token')->plainTextToken;
-        
+
         // Make 60 requests (API limit is 60 per minute)
         for ($i = 0; $i < 60; $i++) {
             $response = $this->withHeaders([
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => 'Bearer '.$token,
                 'Accept' => 'application/json',
             ])->get('/api/v1/user');
-            
+
             $response->assertStatus(200);
         }
-        
+
         // 61st request should be rate limited
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
         ])->get('/api/v1/user');
-        
+
         $response->assertStatus(429);
     }
 
@@ -74,15 +74,15 @@ class RateLimitingTest extends TestCase
             $response = $this->post('/forgot-password', [
                 'email' => 'test@example.com',
             ]);
-            
+
             $response->assertStatus(302);
         }
-        
+
         // 4th attempt should be rate limited
         $response = $this->post('/forgot-password', [
             'email' => 'test@example.com',
         ]);
-        
+
         $response->assertStatus(429);
     }
 }

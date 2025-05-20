@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\MaintenanceLog;
-use App\Models\MaintenanceSchedule;
-use App\Models\MaintenanceRequest;
-use App\Models\SparePart;
 use App\Models\Document;
+use App\Models\MaintenanceLog;
+use App\Models\MaintenanceRequest;
+use App\Models\MaintenanceSchedule;
+use App\Models\SparePart;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -21,13 +21,12 @@ class MaintenanceController extends Controller
     /**
      * Display a listing of the maintenance requests.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function indexRequests(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.view')) {
+        if (! auth()->user()->can('maintenance.request.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance requests.');
         }
 
@@ -38,7 +37,7 @@ class MaintenanceController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -83,7 +82,7 @@ class MaintenanceController extends Controller
     public function createRequest()
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.create')) {
+        if (! auth()->user()->can('maintenance.request.create')) {
             return redirect()->route('maintenance.requests')->with('error', 'You do not have permission to create maintenance requests.');
         }
 
@@ -97,13 +96,12 @@ class MaintenanceController extends Controller
     /**
      * Store a newly created maintenance request in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function storeRequest(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.create')) {
+        if (! auth()->user()->can('maintenance.request.create')) {
             return redirect()->route('maintenance.requests')->with('error', 'You do not have permission to create maintenance requests.');
         }
 
@@ -123,7 +121,7 @@ class MaintenanceController extends Controller
 
         try {
             // Create the maintenance request
-            $maintenanceRequest = new MaintenanceRequest();
+            $maintenanceRequest = new MaintenanceRequest;
             $maintenanceRequest->asset_id = $request->asset_id;
             $maintenanceRequest->request_user_id = Auth::id();
             $maintenanceRequest->title = $request->title;
@@ -140,11 +138,11 @@ class MaintenanceController extends Controller
                 foreach ($request->file('documents') as $file) {
                     $path = $file->store('maintenance/requests/documents', 'public');
                     $mimeType = $file->getMimeType();
-                    
+
                     // Create thumbnail if it's an image
                     $thumbnailPath = null;
                     if (strpos($mimeType, 'image/') === 0) {
-                        $thumbnailPath = 'maintenance/requests/thumbnails/' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
+                        $thumbnailPath = 'maintenance/requests/thumbnails/'.pathinfo($path, PATHINFO_FILENAME).'.jpg';
                         $thumb = Image::make($file)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
                             $constraint->upsize();
@@ -153,7 +151,7 @@ class MaintenanceController extends Controller
                     }
 
                     // Save document record
-                    $document = new Document();
+                    $document = new Document;
                     $document->documentable_id = $maintenanceRequest->id;
                     $document->documentable_type = 'App\\Models\\MaintenanceRequest';
                     $document->file_path = $path;
@@ -181,7 +179,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance request created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error creating maintenance request: ' . $e->getMessage())
+
+            return back()->with('error', 'Error creating maintenance request: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -189,22 +188,21 @@ class MaintenanceController extends Controller
     /**
      * Display the specified maintenance request.
      *
-     * @param  \App\Models\MaintenanceRequest  $maintenanceRequest
      * @return \Illuminate\Http\Response
      */
     public function showRequest(MaintenanceRequest $maintenanceRequest)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.view')) {
+        if (! auth()->user()->can('maintenance.request.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance requests.');
         }
 
         // Load related data
         $maintenanceRequest->load([
-            'asset', 
-            'requestUser', 
-            'assignedTo', 
-            'documents'
+            'asset',
+            'requestUser',
+            'assignedTo',
+            'documents',
         ]);
 
         // Get related maintenance logs
@@ -218,13 +216,12 @@ class MaintenanceController extends Controller
     /**
      * Show the form for editing the specified maintenance request.
      *
-     * @param  \App\Models\MaintenanceRequest  $maintenanceRequest
      * @return \Illuminate\Http\Response
      */
     public function editRequest(MaintenanceRequest $maintenanceRequest)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.edit')) {
+        if (! auth()->user()->can('maintenance.request.edit')) {
             return redirect()->route('maintenance.requests.show', $maintenanceRequest)->with('error', 'You do not have permission to edit maintenance requests.');
         }
 
@@ -247,14 +244,12 @@ class MaintenanceController extends Controller
     /**
      * Update the specified maintenance request in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MaintenanceRequest  $maintenanceRequest
      * @return \Illuminate\Http\Response
      */
     public function updateRequest(Request $request, MaintenanceRequest $maintenanceRequest)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.edit')) {
+        if (! auth()->user()->can('maintenance.request.edit')) {
             return redirect()->route('maintenance.requests.show', $maintenanceRequest)->with('error', 'You do not have permission to edit maintenance requests.');
         }
 
@@ -304,11 +299,11 @@ class MaintenanceController extends Controller
                 foreach ($request->file('documents') as $file) {
                     $path = $file->store('maintenance/requests/documents', 'public');
                     $mimeType = $file->getMimeType();
-                    
+
                     // Create thumbnail if it's an image
                     $thumbnailPath = null;
                     if (strpos($mimeType, 'image/') === 0) {
-                        $thumbnailPath = 'maintenance/requests/thumbnails/' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
+                        $thumbnailPath = 'maintenance/requests/thumbnails/'.pathinfo($path, PATHINFO_FILENAME).'.jpg';
                         $thumb = Image::make($file)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
                             $constraint->upsize();
@@ -317,7 +312,7 @@ class MaintenanceController extends Controller
                     }
 
                     // Save document record
-                    $document = new Document();
+                    $document = new Document;
                     $document->documentable_id = $maintenanceRequest->id;
                     $document->documentable_type = 'App\\Models\\MaintenanceRequest';
                     $document->file_path = $path;
@@ -332,17 +327,17 @@ class MaintenanceController extends Controller
 
             // Handle asset status updates based on request status
             $asset = Asset::find($request->asset_id);
-            
+
             if ($asset) {
                 // If status changed to Resolved or Closed and was previously In Progress or Assigned
-                if ($statusChanged && ($newStatus === 'Resolved' || $newStatus === 'Closed') && 
+                if ($statusChanged && ($newStatus === 'Resolved' || $newStatus === 'Closed') &&
                     ($oldStatus === 'In Progress' || $oldStatus === 'Assigned')) {
                     // Check if there are other open maintenance requests for this asset
                     $otherOpenRequests = MaintenanceRequest::where('asset_id', $asset->id)
                         ->where('id', '!=', $maintenanceRequest->id)
                         ->whereIn('status', ['Open', 'Assigned', 'In Progress'])
                         ->count();
-                    
+
                     if ($otherOpenRequests === 0) {
                         $asset->status = 'operational';
                         $asset->last_maintenance_date = Carbon::now();
@@ -359,11 +354,11 @@ class MaintenanceController extends Controller
 
             // Create a maintenance log if resolved now
             if ($resolvedNow && $request->filled('resolution_details')) {
-                $maintenanceLog = new MaintenanceLog();
+                $maintenanceLog = new MaintenanceLog;
                 $maintenanceLog->asset_id = $request->asset_id;
                 $maintenanceLog->maintenance_request_id = $maintenanceRequest->id;
                 $maintenanceLog->maintenance_type = 'Corrective';
-                $maintenanceLog->title = 'Resolved: ' . $request->title;
+                $maintenanceLog->title = 'Resolved: '.$request->title;
                 $maintenanceLog->summary = $request->resolution_details;
                 $maintenanceLog->start_datetime = $maintenanceRequest->reported_date;
                 $maintenanceLog->completion_datetime = Carbon::now();
@@ -377,7 +372,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance request updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error updating maintenance request: ' . $e->getMessage())
+
+            return back()->with('error', 'Error updating maintenance request: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -385,19 +381,18 @@ class MaintenanceController extends Controller
     /**
      * Remove the specified maintenance request from storage.
      *
-     * @param  \App\Models\MaintenanceRequest  $maintenanceRequest
      * @return \Illuminate\Http\Response
      */
     public function destroyRequest(MaintenanceRequest $maintenanceRequest)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.request.delete')) {
+        if (! auth()->user()->can('maintenance.request.delete')) {
             return redirect()->route('maintenance.requests')->with('error', 'You do not have permission to delete maintenance requests.');
         }
 
         // Check if there are maintenance logs linked to this request
         $logsCount = MaintenanceLog::where('maintenance_request_id', $maintenanceRequest->id)->count();
-        
+
         if ($logsCount > 0) {
             return redirect()->route('maintenance.requests.show', $maintenanceRequest)
                 ->with('error', 'Cannot delete maintenance request that has linked maintenance logs.');
@@ -425,20 +420,20 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance request deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error deleting maintenance request: ' . $e->getMessage());
+
+            return back()->with('error', 'Error deleting maintenance request: '.$e->getMessage());
         }
     }
 
     /**
      * Display a listing of the maintenance logs.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function indexLogs(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.view')) {
+        if (! auth()->user()->can('maintenance.log.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance logs.');
         }
 
@@ -449,7 +444,7 @@ class MaintenanceController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('summary', 'like', "%{$search}%");
+                    ->orWhere('summary', 'like', "%{$search}%");
             });
         }
 
@@ -463,8 +458,8 @@ class MaintenanceController extends Controller
 
         if ($request->filled('date_from') && $request->filled('date_to')) {
             $query->whereBetween('completion_datetime', [
-                $request->input('date_from') . ' 00:00:00',
-                $request->input('date_to') . ' 23:59:59'
+                $request->input('date_from').' 00:00:00',
+                $request->input('date_to').' 23:59:59',
             ]);
         }
 
@@ -490,13 +485,12 @@ class MaintenanceController extends Controller
     /**
      * Show the form for creating a new maintenance log.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function createLog(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.create')) {
+        if (! auth()->user()->can('maintenance.log.create')) {
             return redirect()->route('maintenance.logs')->with('error', 'You do not have permission to create maintenance logs.');
         }
 
@@ -508,7 +502,7 @@ class MaintenanceController extends Controller
         // Check if this is linked to a request
         $requestId = $request->input('request_id');
         $maintenanceRequest = null;
-        
+
         if ($requestId) {
             $maintenanceRequest = MaintenanceRequest::with('asset')->find($requestId);
         }
@@ -525,13 +519,12 @@ class MaintenanceController extends Controller
     /**
      * Store a newly created maintenance log in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function storeLog(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.create')) {
+        if (! auth()->user()->can('maintenance.log.create')) {
             return redirect()->route('maintenance.logs')->with('error', 'You do not have permission to create maintenance logs.');
         }
 
@@ -562,7 +555,7 @@ class MaintenanceController extends Controller
 
         try {
             // Create the maintenance log
-            $maintenanceLog = new MaintenanceLog();
+            $maintenanceLog = new MaintenanceLog;
             $maintenanceLog->asset_id = $request->asset_id;
             $maintenanceLog->maintenance_request_id = $request->maintenance_request_id;
             $maintenanceLog->maintenance_schedule_id = $request->maintenance_schedule_id;
@@ -581,12 +574,12 @@ class MaintenanceController extends Controller
             // Handle spare parts
             if ($request->has('spare_parts')) {
                 foreach ($request->spare_parts as $partData) {
-                    if (!isset($partData['id']) || !isset($partData['quantity'])) {
+                    if (! isset($partData['id']) || ! isset($partData['quantity'])) {
                         continue;
                     }
 
                     $sparePart = SparePart::find($partData['id']);
-                    
+
                     if ($sparePart) {
                         // Record usage
                         DB::table('maintenance_log_spare_parts')->insert([
@@ -611,11 +604,11 @@ class MaintenanceController extends Controller
                 foreach ($request->file('documents') as $file) {
                     $path = $file->store('maintenance/logs/documents', 'public');
                     $mimeType = $file->getMimeType();
-                    
+
                     // Create thumbnail if it's an image
                     $thumbnailPath = null;
                     if (strpos($mimeType, 'image/') === 0) {
-                        $thumbnailPath = 'maintenance/logs/thumbnails/' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
+                        $thumbnailPath = 'maintenance/logs/thumbnails/'.pathinfo($path, PATHINFO_FILENAME).'.jpg';
                         $thumb = Image::make($file)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
                             $constraint->upsize();
@@ -624,7 +617,7 @@ class MaintenanceController extends Controller
                     }
 
                     // Save document record
-                    $document = new Document();
+                    $document = new Document;
                     $document->documentable_id = $maintenanceLog->id;
                     $document->documentable_type = 'App\\Models\\MaintenanceLog';
                     $document->file_path = $path;
@@ -641,22 +634,22 @@ class MaintenanceController extends Controller
             $asset = Asset::find($request->asset_id);
             if ($asset) {
                 $asset->last_maintenance_date = $request->completion_datetime;
-                
+
                 // If this is preventive maintenance, schedule the next one
                 if ($request->maintenance_type === 'Preventive' && $asset->expected_lifetime_years > 0) {
                     // Simple logic - schedule next maintenance based on asset type
                     // Real implementation would be more sophisticated
                     $months = 3; // Default quarterly
-                    
+
                     if ($asset->expected_lifetime_years >= 10) {
                         $months = 6; // Bi-annual for long-lived assets
                     } elseif ($asset->expected_lifetime_years <= 2) {
                         $months = 1; // Monthly for short-lived assets
                     }
-                    
+
                     $asset->next_maintenance_date = Carbon::parse($request->completion_datetime)->addMonths($months);
                 }
-                
+
                 // If there was a request, update its status
                 if ($request->maintenance_request_id) {
                     $maintenanceRequest = MaintenanceRequest::find($request->maintenance_request_id);
@@ -666,18 +659,18 @@ class MaintenanceController extends Controller
                         $maintenanceRequest->resolved_at = Carbon::now();
                         $maintenanceRequest->save();
                     }
-                    
+
                     // Check if there are other open maintenance requests for this asset
                     $otherOpenRequests = MaintenanceRequest::where('asset_id', $asset->id)
                         ->where('id', '!=', $request->maintenance_request_id)
                         ->whereIn('status', ['Open', 'Assigned', 'In Progress'])
                         ->count();
-                    
+
                     if ($otherOpenRequests === 0) {
                         $asset->status = 'operational';
                     }
                 }
-                
+
                 // If there was a schedule, update its next due date
                 if ($request->maintenance_schedule_id) {
                     $schedule = MaintenanceSchedule::find($request->maintenance_schedule_id);
@@ -685,7 +678,7 @@ class MaintenanceController extends Controller
                         $this->updateMaintenanceSchedule($schedule, $request->completion_datetime);
                     }
                 }
-                
+
                 $asset->save();
             }
 
@@ -701,7 +694,8 @@ class MaintenanceController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error creating maintenance log: ' . $e->getMessage())
+
+            return back()->with('error', 'Error creating maintenance log: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -709,23 +703,22 @@ class MaintenanceController extends Controller
     /**
      * Display the specified maintenance log.
      *
-     * @param  \App\Models\MaintenanceLog  $maintenanceLog
      * @return \Illuminate\Http\Response
      */
     public function showLog(MaintenanceLog $maintenanceLog)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.view')) {
+        if (! auth()->user()->can('maintenance.log.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance logs.');
         }
 
         // Load related data
         $maintenanceLog->load([
-            'asset', 
-            'performedBy', 
-            'maintenanceRequest', 
+            'asset',
+            'performedBy',
+            'maintenanceRequest',
             'maintenanceSchedule',
-            'documents'
+            'documents',
         ]);
 
         // Get spare parts used
@@ -748,13 +741,12 @@ class MaintenanceController extends Controller
     /**
      * Show the form for editing the specified maintenance log.
      *
-     * @param  \App\Models\MaintenanceLog  $maintenanceLog
      * @return \Illuminate\Http\Response
      */
     public function editLog(MaintenanceLog $maintenanceLog)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.edit')) {
+        if (! auth()->user()->can('maintenance.log.edit')) {
             return redirect()->route('maintenance.logs.show', $maintenanceLog)->with('error', 'You do not have permission to edit maintenance logs.');
         }
 
@@ -792,14 +784,12 @@ class MaintenanceController extends Controller
     /**
      * Update the specified maintenance log in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MaintenanceLog  $maintenanceLog
      * @return \Illuminate\Http\Response
      */
     public function updateLog(Request $request, MaintenanceLog $maintenanceLog)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.edit')) {
+        if (! auth()->user()->can('maintenance.log.edit')) {
             return redirect()->route('maintenance.logs.show', $maintenanceLog)->with('error', 'You do not have permission to edit maintenance logs.');
         }
 
@@ -846,11 +836,11 @@ class MaintenanceController extends Controller
                 foreach ($request->file('documents') as $file) {
                     $path = $file->store('maintenance/logs/documents', 'public');
                     $mimeType = $file->getMimeType();
-                    
+
                     // Create thumbnail if it's an image
                     $thumbnailPath = null;
                     if (strpos($mimeType, 'image/') === 0) {
-                        $thumbnailPath = 'maintenance/logs/thumbnails/' . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
+                        $thumbnailPath = 'maintenance/logs/thumbnails/'.pathinfo($path, PATHINFO_FILENAME).'.jpg';
                         $thumb = Image::make($file)->resize(200, 200, function ($constraint) {
                             $constraint->aspectRatio();
                             $constraint->upsize();
@@ -859,7 +849,7 @@ class MaintenanceController extends Controller
                     }
 
                     // Save document record
-                    $document = new Document();
+                    $document = new Document;
                     $document->documentable_id = $maintenanceLog->id;
                     $document->documentable_type = 'App\\Models\\MaintenanceLog';
                     $document->file_path = $path;
@@ -885,7 +875,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance log updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error updating maintenance log: ' . $e->getMessage())
+
+            return back()->with('error', 'Error updating maintenance log: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -893,13 +884,12 @@ class MaintenanceController extends Controller
     /**
      * Remove the specified maintenance log from storage.
      *
-     * @param  \App\Models\MaintenanceLog  $maintenanceLog
      * @return \Illuminate\Http\Response
      */
     public function destroyLog(MaintenanceLog $maintenanceLog)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.delete')) {
+        if (! auth()->user()->can('maintenance.log.delete')) {
             return redirect()->route('maintenance.logs')->with('error', 'You do not have permission to delete maintenance logs.');
         }
 
@@ -920,7 +910,7 @@ class MaintenanceController extends Controller
             $spareParts = DB::table('maintenance_log_spare_parts')
                 ->where('maintenance_log_id', $maintenanceLog->id)
                 ->get();
-            
+
             foreach ($spareParts as $part) {
                 $sparePart = SparePart::find($part->spare_part_id);
                 if ($sparePart) {
@@ -943,20 +933,20 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance log deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error deleting maintenance log: ' . $e->getMessage());
+
+            return back()->with('error', 'Error deleting maintenance log: '.$e->getMessage());
         }
     }
 
     /**
      * Display a listing of maintenance schedules.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function indexSchedules(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.view')) {
+        if (! auth()->user()->can('maintenance.schedule.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance schedules.');
         }
 
@@ -967,7 +957,7 @@ class MaintenanceController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -982,7 +972,7 @@ class MaintenanceController extends Controller
         if ($request->filled('due_date_from') && $request->filled('due_date_to')) {
             $query->whereBetween('next_due_date', [
                 $request->input('due_date_from'),
-                $request->input('due_date_to')
+                $request->input('due_date_to'),
             ]);
         }
 
@@ -1015,7 +1005,7 @@ class MaintenanceController extends Controller
             'all' => 'All Schedules',
             'upcoming' => 'Upcoming',
             'overdue' => 'Overdue',
-            'today' => 'Due Today'
+            'today' => 'Due Today',
         ];
 
         return view('maintenance.schedules.index', compact(
@@ -1034,7 +1024,7 @@ class MaintenanceController extends Controller
     public function createSchedule()
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.create')) {
+        if (! auth()->user()->can('maintenance.schedule.create')) {
             return redirect()->route('maintenance.schedules')->with('error', 'You do not have permission to create maintenance schedules.');
         }
 
@@ -1047,7 +1037,7 @@ class MaintenanceController extends Controller
             'Weekly' => 'Weekly',
             'Monthly' => 'Monthly',
             'Yearly' => 'Yearly',
-            'UsageBased' => 'Based on usage'
+            'UsageBased' => 'Based on usage',
         ];
 
         return view('maintenance.schedules.create', compact(
@@ -1061,13 +1051,12 @@ class MaintenanceController extends Controller
     /**
      * Store a newly created maintenance schedule in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function storeSchedule(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.create')) {
+        if (! auth()->user()->can('maintenance.schedule.create')) {
             return redirect()->route('maintenance.schedules')->with('error', 'You do not have permission to create maintenance schedules.');
         }
 
@@ -1096,7 +1085,7 @@ class MaintenanceController extends Controller
 
         try {
             // Create the maintenance schedule
-            $schedule = new MaintenanceSchedule();
+            $schedule = new MaintenanceSchedule;
             $schedule->asset_id = $request->asset_id;
             $schedule->title = $request->title;
             $schedule->maintenance_type = $request->maintenance_type;
@@ -1124,7 +1113,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance schedule created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error creating maintenance schedule: ' . $e->getMessage())
+
+            return back()->with('error', 'Error creating maintenance schedule: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -1132,13 +1122,12 @@ class MaintenanceController extends Controller
     /**
      * Display the specified maintenance schedule.
      *
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function showSchedule(MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.view')) {
+        if (! auth()->user()->can('maintenance.schedule.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view maintenance schedules.');
         }
 
@@ -1157,13 +1146,12 @@ class MaintenanceController extends Controller
     /**
      * Show the form for editing the specified maintenance schedule.
      *
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function editSchedule(MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.edit')) {
+        if (! auth()->user()->can('maintenance.schedule.edit')) {
             return redirect()->route('maintenance.schedules.show', $maintenanceSchedule)->with('error', 'You do not have permission to edit maintenance schedules.');
         }
 
@@ -1176,7 +1164,7 @@ class MaintenanceController extends Controller
             'Weekly' => 'Weekly',
             'Monthly' => 'Monthly',
             'Yearly' => 'Yearly',
-            'UsageBased' => 'Based on usage'
+            'UsageBased' => 'Based on usage',
         ];
 
         return view('maintenance.schedules.edit', compact(
@@ -1191,14 +1179,12 @@ class MaintenanceController extends Controller
     /**
      * Update the specified maintenance schedule in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function updateSchedule(Request $request, MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.edit')) {
+        if (! auth()->user()->can('maintenance.schedule.edit')) {
             return redirect()->route('maintenance.schedules.show', $maintenanceSchedule)->with('error', 'You do not have permission to edit maintenance schedules.');
         }
 
@@ -1255,7 +1241,7 @@ class MaintenanceController extends Controller
             // If explicitly set, use the provided next_due_date
             if ($request->filled('next_due_date')) {
                 $maintenanceSchedule->next_due_date = $request->next_due_date;
-            } 
+            }
             // Otherwise recalculate if needed
             elseif ($recalculateNextDue) {
                 $maintenanceSchedule->next_due_date = $this->calculateNextDueDate($maintenanceSchedule);
@@ -1269,7 +1255,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Maintenance schedule updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error updating maintenance schedule: ' . $e->getMessage())
+
+            return back()->with('error', 'Error updating maintenance schedule: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -1277,19 +1264,18 @@ class MaintenanceController extends Controller
     /**
      * Remove the specified maintenance schedule from storage.
      *
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function destroySchedule(MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.schedule.delete')) {
+        if (! auth()->user()->can('maintenance.schedule.delete')) {
             return redirect()->route('maintenance.schedules')->with('error', 'You do not have permission to delete maintenance schedules.');
         }
 
         // Check if there are maintenance logs linked to this schedule
         $logsCount = MaintenanceLog::where('maintenance_schedule_id', $maintenanceSchedule->id)->count();
-        
+
         if ($logsCount > 0) {
             return redirect()->route('maintenance.schedules.show', $maintenanceSchedule)
                 ->with('error', 'Cannot delete maintenance schedule that has linked maintenance logs.');
@@ -1305,13 +1291,12 @@ class MaintenanceController extends Controller
     /**
      * Generate a work order for a maintenance schedule.
      *
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function generateWorkOrder(MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.work_order.create')) {
+        if (! auth()->user()->can('maintenance.work_order.create')) {
             return redirect()->route('maintenance.schedules.show', $maintenanceSchedule)->with('error', 'You do not have permission to generate work orders.');
         }
 
@@ -1326,13 +1311,12 @@ class MaintenanceController extends Controller
     /**
      * Complete a scheduled maintenance.
      *
-     * @param  \App\Models\MaintenanceSchedule  $maintenanceSchedule
      * @return \Illuminate\Http\Response
      */
     public function completeScheduledMaintenance(MaintenanceSchedule $maintenanceSchedule)
     {
         // Check permission
-        if (!auth()->user()->can('maintenance.log.create')) {
+        if (! auth()->user()->can('maintenance.log.create')) {
             return redirect()->route('maintenance.schedules.show', $maintenanceSchedule)->with('error', 'You do not have permission to complete maintenance.');
         }
 
@@ -1393,10 +1377,10 @@ class MaintenanceController extends Controller
             case 'Monthly':
                 $interval = $schedule->recurrence_interval ?? 1;
                 $dayOfMonth = $schedule->day_of_month ?? $startDate->day;
-                
+
                 // Start with current month
                 $nextDue = $now->copy()->day(1)->addMonths($interval);
-                
+
                 // Adjust to the specified day, but cap at the last day of the month
                 $daysInMonth = $nextDue->daysInMonth;
                 $nextDue->day(min($dayOfMonth, $daysInMonth));
@@ -1406,10 +1390,10 @@ class MaintenanceController extends Controller
                 $interval = $schedule->recurrence_interval ?? 1;
                 $monthOfYear = $schedule->month_of_year ?? $startDate->month;
                 $dayOfMonth = $schedule->day_of_month ?? $startDate->day;
-                
+
                 // Start with current year
                 $nextDue = $now->copy()->month($monthOfYear)->day(1)->addYears($interval);
-                
+
                 // Adjust to the specified day, but cap at the last day of the month
                 $daysInMonth = $nextDue->daysInMonth;
                 $nextDue->day(min($dayOfMonth, $daysInMonth));
@@ -1454,17 +1438,19 @@ class MaintenanceController extends Controller
         if ($schedule->recurrence_type === 'Once') {
             $schedule->is_active = false;
             $schedule->save();
+
             return;
         }
 
         // For recurring schedules, calculate the next due date
         $completionDateTime = Carbon::parse($completionDate);
-        
+
         // For usage-based maintenance, we don't update the next due date here
         // It will be updated when asset usage is recorded
         if ($schedule->recurrence_type === 'UsageBased') {
             $schedule->last_service_usage_reading = $schedule->usage_threshold; // Reset the counter
             $schedule->save();
+
             return;
         }
 
@@ -1477,13 +1463,12 @@ class MaintenanceController extends Controller
     /**
      * Update asset usage for usage-based maintenance.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function updateAssetUsage(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('asset.usage.update')) {
+        if (! auth()->user()->can('asset.usage.update')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to update asset usage.');
         }
 
@@ -1520,7 +1505,7 @@ class MaintenanceController extends Controller
 
             foreach ($usageSchedules as $schedule) {
                 // Skip if usage threshold or last reading is not set
-                if (!$schedule->usage_threshold || !$schedule->last_service_usage_reading) {
+                if (! $schedule->usage_threshold || ! $schedule->last_service_usage_reading) {
                     continue;
                 }
 
@@ -1540,7 +1525,8 @@ class MaintenanceController extends Controller
                 ->with('success', 'Asset usage updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error updating asset usage: ' . $e->getMessage())
+
+            return back()->with('error', 'Error updating asset usage: '.$e->getMessage())
                 ->withInput();
         }
     }

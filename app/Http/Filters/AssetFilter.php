@@ -3,8 +3,8 @@
 namespace App\Http\Filters;
 
 use App\Models\Asset;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class AssetFilter
 {
@@ -24,8 +24,6 @@ class AssetFilter
 
     /**
      * Initialize a new filter instance.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request)
     {
@@ -34,16 +32,13 @@ class AssetFilter
 
     /**
      * Apply the filters.
-     *
-     * @param  Builder $builder
-     * @return Builder
      */
     public function apply(Builder $builder): Builder
     {
         $this->builder = $builder;
 
         foreach ($this->filters() as $name => $value) {
-            if (method_exists($this, $name) && !is_null($value)) {
+            if (method_exists($this, $name) && ! is_null($value)) {
                 call_user_func_array([$this, $name], array_filter([$value]));
             }
         }
@@ -53,8 +48,6 @@ class AssetFilter
 
     /**
      * Get all request filters.
-     *
-     * @return array
      */
     public function filters(): array
     {
@@ -63,9 +56,6 @@ class AssetFilter
 
     /**
      * Filter by search query.
-     *
-     * @param string $search
-     * @return void
      */
     protected function search(string $search): void
     {
@@ -79,9 +69,6 @@ class AssetFilter
 
     /**
      * Filter by status.
-     *
-     * @param string $status
-     * @return void
      */
     protected function status(string $status): void
     {
@@ -90,9 +77,6 @@ class AssetFilter
 
     /**
      * Filter by category ID.
-     *
-     * @param int $categoryId
-     * @return void
      */
     protected function category_id(int $categoryId): void
     {
@@ -101,9 +85,6 @@ class AssetFilter
 
     /**
      * Filter by location ID.
-     *
-     * @param int $locationId
-     * @return void
      */
     protected function location_id(int $locationId): void
     {
@@ -112,9 +93,6 @@ class AssetFilter
 
     /**
      * Filter by department ID.
-     *
-     * @param int $departmentId
-     * @return void
      */
     protected function department_id(int $departmentId): void
     {
@@ -123,9 +101,6 @@ class AssetFilter
 
     /**
      * Filter by assigned user ID.
-     *
-     * @param int $userId
-     * @return void
      */
     protected function assigned_to(int $userId): void
     {
@@ -134,16 +109,13 @@ class AssetFilter
 
     /**
      * Order the results.
-     *
-     * @param string $orderBy
-     * @return void
      */
     protected function order_by(string $orderBy): void
     {
         $direction = str_starts_with($orderBy, '-') ? 'desc' : 'asc';
         $column = ltrim($orderBy, '-');
-        
-        if (in_array($column, (new Asset())->getFillable())) {
+
+        if (in_array($column, (new Asset)->getFillable())) {
             $this->builder->orderBy($column, $direction);
         }
     }

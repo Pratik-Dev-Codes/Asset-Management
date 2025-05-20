@@ -15,7 +15,7 @@ class UserObserver
         Log::info('New user registered', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'ip_address' => request()->ip()
+            'ip_address' => request()->ip(),
         ]);
     }
 
@@ -27,7 +27,7 @@ class UserObserver
         // Log sensitive field changes
         $sensitiveFields = ['email', 'password', 'mfa_secret', 'is_active'];
         $changes = [];
-        
+
         foreach ($sensitiveFields as $field) {
             if ($user->isDirty($field)) {
                 $changes[$field] = [
@@ -36,12 +36,12 @@ class UserObserver
                 ];
             }
         }
-        
-        if (!empty($changes)) {
+
+        if (! empty($changes)) {
             Log::info('User updated - sensitive changes', [
                 'user_id' => $user->id,
                 'changes' => $changes,
-                'updated_by' => auth()->id()
+                'updated_by' => auth()->id(),
             ]);
         }
     }
@@ -54,7 +54,7 @@ class UserObserver
         Log::warning('User deleted', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'deleted_by' => auth()->id()
+            'deleted_by' => auth()->id(),
         ]);
     }
 
@@ -66,7 +66,7 @@ class UserObserver
         Log::info('User restored', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'restored_by' => auth()->id()
+            'restored_by' => auth()->id(),
         ]);
     }
 
@@ -78,10 +78,10 @@ class UserObserver
         Log::warning('User force deleted', [
             'user_id' => $user->id,
             'email' => $user->email,
-            'deleted_by' => auth()->id()
+            'deleted_by' => auth()->id(),
         ]);
     }
-    
+
     /**
      * Handle the User "login" event.
      */
@@ -91,14 +91,14 @@ class UserObserver
             'last_login_at' => now(),
             'last_login_ip' => request()->ip(),
         ]);
-        
+
         Log::info('User logged in', [
             'user_id' => $user->id,
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent()
+            'user_agent' => request()->userAgent(),
         ]);
     }
-    
+
     /**
      * Handle the User "logout" event.
      */
@@ -106,7 +106,7 @@ class UserObserver
     {
         Log::info('User logged out', [
             'user_id' => $user->id,
-            'ip_address' => request()->ip()
+            'ip_address' => request()->ip(),
         ]);
     }
 }

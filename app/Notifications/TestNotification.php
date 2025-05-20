@@ -4,9 +4,9 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class TestNotification extends Notification
 {
@@ -22,7 +22,6 @@ class TestNotification extends Notification
     /**
      * Create a new notification instance.
      *
-     * @param  array  $data
      * @return void
      */
     public function __construct(array $data = [])
@@ -62,7 +61,7 @@ class TestNotification extends Notification
     {
         return (new MailMessage)
             ->subject($this->data['title'])
-            ->greeting('Hello ' . $notifiable->name . '!')
+            ->greeting('Hello '.$notifiable->name.'!')
             ->line($this->data['message'])
             ->action('Get Started', url($this->data['url']))
             ->line('If you have any questions, feel free to contact our support team.');
@@ -84,7 +83,7 @@ class TestNotification extends Notification
             'time' => now()->toDateTimeString(),
         ];
     }
-    
+
     /**
      * Get the broadcastable representation of the notification.
      *

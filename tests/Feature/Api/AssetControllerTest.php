@@ -17,20 +17,21 @@ class AssetControllerTest extends TestCase
     use RefreshDatabase, WithFaker;
 
     protected $user;
+
     protected $token;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a user and generate a token
         $this->user = User::factory()->create();
         $this->token = $this->user->createToken('test-token')->plainTextToken;
-        
+
         // Create test data
         $this->category = AssetCategory::factory()->create();
         $this->location = Location::factory()->create();
-        
+
         // Mock storage
         Storage::fake('public');
     }
@@ -38,7 +39,7 @@ class AssetControllerTest extends TestCase
     protected function getHeaders()
     {
         return [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
             'Accept' => 'application/json',
         ];
     }
@@ -61,10 +62,10 @@ class AssetControllerTest extends TestCase
                         'status',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'links',
-                'meta'
+                'meta',
             ]);
     }
 
@@ -72,7 +73,7 @@ class AssetControllerTest extends TestCase
     public function it_can_create_an_asset()
     {
         $data = [
-            'asset_code' => 'AST-' . rand(1000, 9999),
+            'asset_code' => 'AST-'.rand(1000, 9999),
             'name' => 'Test Asset',
             'description' => 'Test Description',
             'category_id' => $this->category->id,
@@ -93,7 +94,7 @@ class AssetControllerTest extends TestCase
                     'status',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('assets', [
@@ -122,25 +123,25 @@ class AssetControllerTest extends TestCase
     public function it_can_upload_asset_image()
     {
         $asset = Asset::factory()->create();
-        
+
         $file = UploadedFile::fake()->image('asset.jpg');
-        
+
         $response = $this->postJson("/api/assets/{$asset->id}/upload-image", [
             'image' => $file,
         ], $this->getHeaders());
-        
+
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'message',
                 'data' => [
                     'image_url',
                     'thumbnail_url',
-                ]
+                ],
             ]);
-            
+
         // Assert the file was stored
         Storage::disk('public')->assertExists("assets/images/{$file->hashName()}");
-        Storage::disk('public')->assertExists("assets/thumbnails/" . pathinfo($file->hashName(), PATHINFO_FILENAME) . '.jpg');
+        Storage::disk('public')->assertExists('assets/thumbnails/'.pathinfo($file->hashName(), PATHINFO_FILENAME).'.jpg');
     }
 
     /** @test */
@@ -156,7 +157,7 @@ class AssetControllerTest extends TestCase
                     'id' => $asset->id,
                     'asset_code' => $asset->asset_code,
                     'name' => $asset->name,
-                ]
+                ],
             ]);
     }
 
@@ -172,7 +173,7 @@ class AssetControllerTest extends TestCase
     public function it_can_update_an_asset()
     {
         $asset = Asset::factory()->create();
-        
+
         $data = [
             'name' => 'Updated Asset Name',
             'description' => 'Updated Description',
@@ -187,9 +188,9 @@ class AssetControllerTest extends TestCase
                     'name' => 'Updated Asset Name',
                     'description' => 'Updated Description',
                     'status' => 'under-maintenance',
-                ]
+                ],
             ]);
-            
+
         $this->assertDatabaseHas('assets', [
             'id' => $asset->id,
             'name' => 'Updated Asset Name',

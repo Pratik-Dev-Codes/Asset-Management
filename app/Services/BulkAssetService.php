@@ -31,7 +31,7 @@ class BulkAssetService
     public function export(Collection $assets, string $format = 'csv')
     {
         $headers = [
-            'id', 'name', 'asset_tag', 'status', 'assigned_to', 'purchase_date', 'purchase_cost'
+            'id', 'name', 'asset_tag', 'status', 'assigned_to', 'purchase_date', 'purchase_cost',
         ];
 
         $data = $assets->map(function ($asset) {
@@ -55,29 +55,31 @@ class BulkAssetService
 
     protected function exportToCsv(array $data, array $headers)
     {
-        $filename = 'assets-export-' . now()->format('Y-m-d-H-i-s') . '.csv';
+        $filename = 'assets-export-'.now()->format('Y-m-d-H-i-s').'.csv';
         $handle = fopen('php://output', 'w');
-        
+
         // Add headers
         fputcsv($handle, $headers);
-        
+
         // Add data
         foreach ($data as $row) {
             fputcsv($handle, array_values($row));
         }
-        
+
         fclose($handle);
-        
+
         return response()->stream(
-            function () use ($handle) { flush(); },
+            function () {
+                flush();
+            },
             200,
             [
                 'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]
         );
     }
-    
+
     protected function exportToExcel(array $data, array $headers)
     {
         // Implementation for Excel export

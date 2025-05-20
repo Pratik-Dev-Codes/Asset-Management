@@ -26,18 +26,18 @@ class ReportFileFactory extends Factory
     {
         $extensions = ['xlsx', 'csv', 'pdf'];
         $extension = $this->faker->randomElement($extensions);
-        $fileName = 'report_' . Str::random(10) . '.' . $extension;
-        
+        $fileName = 'report_'.Str::random(10).'.'.$extension;
+
         $mimeTypes = [
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'csv' => 'text/csv',
             'pdf' => 'application/pdf',
         ];
-        
+
         return [
             'report_id' => Report::factory(),
             'file_name' => $fileName,
-            'file_path' => 'reports/' . $fileName,
+            'file_path' => 'reports/'.$fileName,
             'file_size' => $this->faker->numberBetween(1024, 10240), // 1KB to 10KB
             'mime_type' => $mimeTypes[$extension],
             'generated_by' => User::factory(),
@@ -58,7 +58,6 @@ class ReportFileFactory extends Factory
     /**
      * Set the report for this file.
      *
-     * @param \App\Models\Report $report
      * @return \Database\Factories\ReportFileFactory
      */
     public function forReport(Report $report)
@@ -73,7 +72,6 @@ class ReportFileFactory extends Factory
     /**
      * Set the user who generated this file.
      *
-     * @param \App\Models\User $user
      * @return \Database\Factories\ReportFileFactory
      */
     public function generatedBy(User $user)
@@ -88,7 +86,6 @@ class ReportFileFactory extends Factory
     /**
      * Set the file format.
      *
-     * @param string $format
      * @return \Database\Factories\ReportFileFactory
      */
     public function format(string $format)
@@ -98,17 +95,17 @@ class ReportFileFactory extends Factory
             'csv' => 'text/csv',
             'pdf' => 'application/pdf',
         ];
-        
-        if (!array_key_exists($format, $mimeTypes)) {
+
+        if (! array_key_exists($format, $mimeTypes)) {
             throw new \InvalidArgumentException("Invalid file format: {$format}");
         }
-        
-        $fileName = 'report_' . Str::random(10) . '.' . $format;
-        
+
+        $fileName = 'report_'.Str::random(10).'.'.$format;
+
         return $this->state(function (array $attributes) use ($format, $mimeTypes, $fileName) {
             return [
                 'file_name' => $fileName,
-                'file_path' => 'reports/' . $fileName,
+                'file_path' => 'reports/'.$fileName,
                 'mime_type' => $mimeTypes[$format],
             ];
         });
@@ -117,7 +114,7 @@ class ReportFileFactory extends Factory
     /**
      * Set the expiration date.
      *
-     * @param \DateTimeInterface|string $date
+     * @param  \DateTimeInterface|string  $date
      * @return \Database\Factories\ReportFileFactory
      */
     public function expiresAt($date)

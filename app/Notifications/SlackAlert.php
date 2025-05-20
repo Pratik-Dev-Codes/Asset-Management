@@ -28,8 +28,6 @@ class SlackAlert extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @param  string  $message
-     * @param  string  $level
      * @return void
      */
     public function __construct(string $message, string $level = 'INFO')
@@ -61,26 +59,23 @@ class SlackAlert extends Notification implements ShouldQueue
         $message = $this->message;
         $appName = config('app.name');
         $environment = config('app.env');
-        
+
         $slackMessage = (new SlackMessage)
             ->content("*[{$level}]* {$appName} ({$environment}): {$message}")
             ->from(config('monitoring.notifications.slack.username', 'Asset Management Monitor'))
             ->to(config('monitoring.notifications.slack.channel', '#alerts'));
-            
+
         // Add emoji based on level
         $emoji = $this->getEmojiForLevel($level);
         if ($emoji) {
             $slackMessage->icon($emoji);
         }
-        
+
         return $slackMessage;
     }
-    
+
     /**
      * Get the emoji for the given alert level.
-     *
-     * @param  string  $level
-     * @return string|null
      */
     protected function getEmojiForLevel(string $level): ?string
     {
@@ -91,7 +86,7 @@ class SlackAlert extends Notification implements ShouldQueue
             'ERROR' => ':x:',
             'SUCCESS' => ':white_check_mark:',
         ];
-        
+
         return $emojis[$level] ?? null;
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\Department;
 use App\Models\Location;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\ServiceProvider;
 
 class CacheServiceProvider extends ServiceProvider
 {
@@ -34,11 +34,11 @@ class CacheServiceProvider extends ServiceProvider
     {
         // Cache frequently accessed data
         $this->cacheReferenceData();
-        
+
         // Clear cache on model events
         $this->registerModelEvents();
     }
-    
+
     /**
      * Cache reference data that's frequently accessed
      */
@@ -49,17 +49,17 @@ class CacheServiceProvider extends ServiceProvider
             Cache::remember('asset_categories', self::DEFAULT_CACHE_TTL, function () {
                 return AssetCategory::orderBy('name')->get();
             });
-            
+
             // Cache departments
             Cache::remember('departments', self::DEFAULT_CACHE_TTL, function () {
                 return Department::orderBy('name')->get();
             });
-            
+
             // Cache locations
             Cache::remember('locations', self::DEFAULT_CACHE_TTL, function () {
                 return Location::orderBy('name')->get();
             });
-            
+
             // Cache asset counts by status
             Cache::remember('asset_counts', self::DEFAULT_CACHE_TTL, function () {
                 return [
@@ -69,12 +69,12 @@ class CacheServiceProvider extends ServiceProvider
                     'retired' => Asset::where('status', 'retired')->count(),
                 ];
             });
-            
+
         } catch (\Exception $e) {
-            Log::error('Failed to cache reference data: ' . $e->getMessage());
+            Log::error('Failed to cache reference data: '.$e->getMessage());
         }
     }
-    
+
     /**
      * Register model events to clear cache
      */
@@ -86,32 +86,32 @@ class CacheServiceProvider extends ServiceProvider
             Department::class,
             Location::class,
         ];
-        
+
         foreach ($models as $model) {
             $model::saved(function () use ($model) {
                 $this->clearModelCache($model);
             });
-            
+
             $model::deleted(function () use ($model) {
                 $this->clearModelCache($model);
             });
         }
     }
-    
+
     /**
      * Clear cache for a specific model
      */
     protected function clearModelCache(string $model): void
     {
         $prefix = strtolower(class_basename($model));
-        Cache::forget($prefix . '_all');
-        
+        Cache::forget($prefix.'_all');
+
         // Clear related caches
         if ($model === Asset::class) {
             Cache::forget('asset_counts');
         }
     }
-    
+
     /**
      * Get cached data or retrieve and cache it
      */
@@ -119,7 +119,7 @@ class CacheServiceProvider extends ServiceProvider
     {
         return Cache::remember($key, $minutes ?? self::DEFAULT_CACHE_TTL, $callback);
     }
-    
+
     /**
      * Clear all application caches
      */
@@ -129,7 +129,7 @@ class CacheServiceProvider extends ServiceProvider
             Cache::flush();
             $this->cacheReferenceData(); // Rebuild caches
         } catch (\Exception $e) {
-            Log::error('Failed to clear caches: ' . $e->getMessage());
+            Log::error('Failed to clear caches: '.$e->getMessage());
         }
     }
 }

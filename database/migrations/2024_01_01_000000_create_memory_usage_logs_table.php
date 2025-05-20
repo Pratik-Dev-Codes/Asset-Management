@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -14,7 +14,7 @@ return new class extends Migration
     {
         // Disable query logging to save memory
         DB::connection()->disableQueryLog();
-        
+
         // Use raw SQL for better performance
         DB::statement('
             CREATE TABLE memory_usage_logs (

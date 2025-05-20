@@ -14,7 +14,7 @@ class BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('viewAny ' . $this->getModelName());
+        return $user->can('viewAny '.$this->getModelName());
     }
 
     /**
@@ -26,8 +26,8 @@ class BasePolicy
         if (method_exists($model, 'user_id') && $model->user_id === $user->id) {
             return true;
         }
-        
-        return $user->can('view ' . $this->getModelName());
+
+        return $user->can('view '.$this->getModelName());
     }
 
     /**
@@ -35,7 +35,7 @@ class BasePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create ' . $this->getModelName());
+        return $user->can('create '.$this->getModelName());
     }
 
     /**
@@ -47,8 +47,8 @@ class BasePolicy
         if (method_exists($model, 'user_id') && $model->user_id === $user->id) {
             return true;
         }
-        
-        return $user->can('update ' . $this->getModelName());
+
+        return $user->can('update '.$this->getModelName());
     }
 
     /**
@@ -60,13 +60,13 @@ class BasePolicy
         if ($model instanceof User && $model->id === $user->id) {
             return false;
         }
-        
+
         // Allow users to delete their own models
         if (method_exists($model, 'user_id') && $model->user_id === $user->id) {
-            return $user->can('delete own ' . $this->getModelName());
+            return $user->can('delete own '.$this->getModelName());
         }
-        
-        return $user->can('delete ' . $this->getModelName());
+
+        return $user->can('delete '.$this->getModelName());
     }
 
     /**
@@ -74,7 +74,7 @@ class BasePolicy
      */
     public function restore(User $user, $model): bool
     {
-        return $user->can('restore ' . $this->getModelName());
+        return $user->can('restore '.$this->getModelName());
     }
 
     /**
@@ -84,7 +84,7 @@ class BasePolicy
     {
         return $user->hasRole('super-admin');
     }
-    
+
     /**
      * Get the model name in kebab case.
      */

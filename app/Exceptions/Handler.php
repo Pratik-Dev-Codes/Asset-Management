@@ -2,19 +2,19 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 use App\Exceptions\ApiExceptionHandler;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -26,7 +26,7 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         //
     ];
-    
+
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
@@ -37,11 +37,10 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
-    
+
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     public function report(Throwable $e)
@@ -52,7 +51,6 @@ class Handler extends ExceptionHandler
     /**
      * Determine if the exception should be reported.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     public function shouldReport(Throwable $e)
@@ -77,7 +75,7 @@ class Handler extends ExceptionHandler
                 $context['method'] = request()->method();
                 $context['ip'] = request()->ip();
                 $context['user_agent'] = request()->userAgent();
-                
+
                 if (auth()->check()) {
                     $context['user_id'] = auth()->id();
                 }
@@ -96,8 +94,8 @@ class Handler extends ExceptionHandler
                     'status' => 'error',
                     'message' => 'The requested resource was not found.',
                     'errors' => [
-                        'resource' => ['The requested resource does not exist.']
-                    ]
+                        'resource' => ['The requested resource does not exist.'],
+                    ],
                 ], 404);
             }
         });
@@ -118,8 +116,8 @@ class Handler extends ExceptionHandler
                     'status' => 'error',
                     'message' => 'Unauthenticated.',
                     'errors' => [
-                        'authentication' => ['You are not authenticated.']
-                    ]
+                        'authentication' => ['You are not authenticated.'],
+                    ],
                 ], 401);
             }
         });
@@ -130,8 +128,8 @@ class Handler extends ExceptionHandler
                     'status' => 'error',
                     'message' => 'The specified method for the request is invalid.',
                     'errors' => [
-                        'method' => ['The requested method is not allowed for this resource.']
-                    ]
+                        'method' => ['The requested method is not allowed for this resource.'],
+                    ],
                 ], 405);
             }
         });
@@ -142,8 +140,8 @@ class Handler extends ExceptionHandler
                     'status' => 'error',
                     'message' => 'The requested resource was not found.',
                     'errors' => [
-                        'resource' => ['The requested resource does not exist.']
-                    ]
+                        'resource' => ['The requested resource does not exist.'],
+                    ],
                 ], 404);
             }
         });
@@ -152,18 +150,18 @@ class Handler extends ExceptionHandler
         $this->renderable(function (Throwable $e, $request) {
             if ($this->shouldReturnJson($request, $e)) {
                 $status = 500;
-                
+
                 if ($e instanceof HttpException) {
                     $status = $e->getStatusCode();
                 } elseif ($e instanceof HttpExceptionInterface) {
                     $status = $e->getCode();
                 }
-                
+
                 $response = [
                     'status' => 'error',
                     'message' => $e->getMessage() ?: 'An error occurred while processing your request.',
                 ];
-                
+
                 // Add debug info in non-production environments
                 if (config('app.debug')) {
                     $response['exception'] = get_class($e);
@@ -171,10 +169,10 @@ class Handler extends ExceptionHandler
                     $response['line'] = $e->getLine();
                     $response['trace'] = $e->getTrace();
                 }
-                
+
                 return response()->json($response, $status);
             }
-            
+
             return redirect()->guest(route('login'));
         });
 
@@ -200,7 +198,6 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
@@ -216,10 +213,6 @@ class Handler extends ExceptionHandler
 
     /**
      * Handle API exceptions.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
-     * @return \Illuminate\Http\JsonResponse
      */
     private function handleApiException(Request $request, Throwable $exception): JsonResponse
     {
@@ -228,21 +221,21 @@ class Handler extends ExceptionHandler
         if ($exception instanceof AuthenticationException) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated.'
+                'message' => 'Unauthenticated.',
             ], 401);
         }
-
 
         if ($exception instanceof ValidationException) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation Error',
-                'errors' => $exception->errors()
+                'errors' => $exception->errors(),
             ], 422);
         }
 
         if ($exception instanceof ModelNotFoundException) {
             $model = str_replace('App\\Models\\', '', $exception->getModel());
+
             return response()->json([
                 'success' => false,
                 'message' => "{$model} not found.",
@@ -252,21 +245,21 @@ class Handler extends ExceptionHandler
         if ($exception instanceof NotFoundHttpException) {
             return response()->json([
                 'success' => false,
-                'message' => 'The specified URL cannot be found.'
+                'message' => 'The specified URL cannot be found.',
             ], 404);
         }
 
         if ($exception instanceof MethodNotAllowedHttpException) {
             return response()->json([
                 'success' => false,
-                'message' => 'The specified method for the request is invalid.'
+                'message' => 'The specified method for the request is invalid.',
             ], 405);
         }
 
         if ($exception instanceof HttpException) {
             return response()->json([
                 'success' => false,
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], $exception->getStatusCode());
         }
 
@@ -284,13 +277,13 @@ class Handler extends ExceptionHandler
                 'exception' => get_class($exception),
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'trace' => $exception->getTrace()
+                'trace' => $exception->getTrace(),
             ];
         }
 
         return response()->json([
             'success' => false,
-            'message' => $message
+            'message' => $message,
         ], $statusCode);
     }
 }

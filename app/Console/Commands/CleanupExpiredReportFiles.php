@@ -34,30 +34,31 @@ class CleanupExpiredReportFiles extends Command
     {
         $isDryRun = $this->option('dry-run');
         $days = $this->option('days') ? (int) $this->option('days') : null;
-        
-        $this->info('Starting cleanup of expired report files' . ($isDryRun ? ' (dry run)' : '') . '...');
-        
+
+        $this->info('Starting cleanup of expired report files'.($isDryRun ? ' (dry run)' : '').'...');
+
         // Get the query for expired files
         $query = ReportFile::query()
             ->whereNotNull('expires_at')
             ->where('expires_at', '<=', now());
-            
+
         // If days is specified, only delete files older than that many days
         if ($days !== null) {
             $query->where('expires_at', '<=', now()->subDays($days));
         }
-        
+
         // Get the files to be deleted
         $files = $query->get();
         $totalFiles = $files->count();
-        
+
         if ($totalFiles === 0) {
             $this->info('No expired report files found.');
+
             return 0;
         }
-        
+
         $this->info("Found {$totalFiles} expired report files to clean up.");
-        
+
         if ($isDryRun) {
             $this->info('This is a dry run. No files will be deleted.');
             $this->table(
@@ -71,17 +72,18 @@ class CleanupExpiredReportFiles extends Command
                     ];
                 })
             );
+
             return 0;
         }
-        
+
         // Create a progress bar
         $bar = $this->output->createProgressBar($totalFiles);
         $bar->start();
-        
+
         $deletedCount = 0;
         $failedCount = 0;
         $deletedSize = 0;
-        
+
         foreach ($files as $file) {
             try {
                 // Delete the file from storage
@@ -89,37 +91,37 @@ class CleanupExpiredReportFiles extends Command
                     Storage::delete($file->file_path);
                     $deletedSize += $file->file_size;
                 }
-                
+
                 // Delete the database record
                 $file->delete();
                 $deletedCount++;
-                
+
                 // Log the deletion
                 Log::info("Deleted expired report file: {$file->file_name} (ID: {$file->id})");
             } catch (\Exception $e) {
                 $failedCount++;
-                Log::error("Failed to delete report file: {$file->file_name} (ID: {$file->id}) - " . $e->getMessage());
+                Log::error("Failed to delete report file: {$file->file_name} (ID: {$file->id}) - ".$e->getMessage());
             }
-            
+
             $bar->advance();
         }
-        
+
         $bar->finish();
         $this->newLine(2);
-        
+
         // Output the results
-        $this->info("Cleanup completed!");
+        $this->info('Cleanup completed!');
         $this->line("Total files processed: {$totalFiles}");
         $this->line("Successfully deleted: {$deletedCount}");
         $this->line("Failed to delete: {$failedCount}");
-        $this->line("Total storage freed: " . $this->formatBytes($deletedSize));
-        
+        $this->line('Total storage freed: '.$this->formatBytes($deletedSize));
+
         // Log the summary
-        Log::info("Report file cleanup completed. Deleted {$deletedCount} files, failed {$failedCount}, freed " . $this->formatBytes($deletedSize));
-        
+        Log::info("Report file cleanup completed. Deleted {$deletedCount} files, failed {$failedCount}, freed ".$this->formatBytes($deletedSize));
+
         return 0;
     }
-    
+
     /**
      * Format bytes to a human-readable format.
      *
@@ -130,13 +132,13 @@ class CleanupExpiredReportFiles extends Command
     protected function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        
+
         $bytes /= (1 << (10 * $pow));
-        
-        return round($bytes, $precision) . ' ' . $units[$pow];
+
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

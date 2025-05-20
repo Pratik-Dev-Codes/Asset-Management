@@ -3,18 +3,18 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class AssetAuditExport implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize, WithEvents
+class AssetAuditExport implements FromCollection, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     protected $data;
 
@@ -84,54 +84,54 @@ class AssetAuditExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet;
                 $lastRow = $this->data['assets']->count() + 3;
-                
+
                 // Set title and date range
                 $sheet->mergeCells('A1:R1');
                 $sheet->setCellValue('A1', 'Asset Audit Report');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                
+
                 // Add date range if provided
-                if (!empty($this->data['date_from']) || !empty($this->data['date_to'])) {
+                if (! empty($this->data['date_from']) || ! empty($this->data['date_to'])) {
                     $dateRange = 'Date Range: ';
-                    $dateRange .= !empty($this->data['date_from']) ? 'From ' . $this->data['date_from'] . ' ' : '';
-                    $dateRange .= !empty($this->data['date_to']) ? 'To ' . $this->data['date_to'] : '';
-                    
+                    $dateRange .= ! empty($this->data['date_from']) ? 'From '.$this->data['date_from'].' ' : '';
+                    $dateRange .= ! empty($this->data['date_to']) ? 'To '.$this->data['date_to'] : '';
+
                     $sheet->mergeCells('A2:R2');
                     $sheet->setCellValue('A2', $dateRange);
                     $sheet->getStyle('A2')->getFont()->setBold(true);
                     $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }
-                
+
                 // Set headers
-                $headerRow = !empty($this->data['date_from']) || !empty($this->data['date_to']) ? 3 : 2;
-                $sheet->fromArray($this->headings(), null, 'A' . $headerRow);
-                $sheet->getStyle('A' . $headerRow . ':R' . $headerRow)->getFont()->setBold(true);
-                $sheet->getStyle('A' . $headerRow . ':R' . $headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFD3D3D3');
-                
+                $headerRow = ! empty($this->data['date_from']) || ! empty($this->data['date_to']) ? 3 : 2;
+                $sheet->fromArray($this->headings(), null, 'A'.$headerRow);
+                $sheet->getStyle('A'.$headerRow.':R'.$headerRow)->getFont()->setBold(true);
+                $sheet->getStyle('A'.$headerRow.':R'.$headerRow)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFD3D3D3');
+
                 // Format currency columns
                 $currencyColumns = ['M', 'N'];
                 foreach ($currencyColumns as $col) {
-                    $sheet->getStyle($col . ($headerRow + 1) . ':' . $col . $lastRow)
+                    $sheet->getStyle($col.($headerRow + 1).':'.$col.$lastRow)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
                 }
-                
+
                 // Format date columns
                 $dateColumns = ['L', 'O', 'P'];
                 foreach ($dateColumns as $col) {
-                    $sheet->getStyle($col . ($headerRow + 1) . ':' . $col . $lastRow)
+                    $sheet->getStyle($col.($headerRow + 1).':'.$col.$lastRow)
                         ->getNumberFormat()
                         ->setFormatCode('yyyy-mm-dd');
                 }
-                
+
                 // Add conditional formatting for audit status
                 $auditStatusColumn = 'Q';
                 $startRow = $headerRow + 1;
-                
+
                 // Set colors based on audit status
                 $colors = [
                     'Passed' => 'FFC6EFCE',  // Light green
@@ -139,9 +139,9 @@ class AssetAuditExport implements FromCollection, WithHeadings, WithMapping, Wit
                     'Needs Attention' => 'FFFFEB9C', // Light yellow
                     'Not Audited' => 'FFD9D9D9', // Light gray
                 ];
-                
+
                 for ($i = $startRow; $i <= $lastRow; $i++) {
-                    $cell = $auditStatusColumn . $i;
+                    $cell = $auditStatusColumn.$i;
                     $status = $sheet->getCell($cell)->getValue();
                     if (isset($colors[$status])) {
                         $sheet->getStyle($cell)
@@ -151,33 +151,33 @@ class AssetAuditExport implements FromCollection, WithHeadings, WithMapping, Wit
                             ->setARGB($colors[$status]);
                     }
                 }
-                
+
                 // Add borders
-                $sheet->getStyle('A' . $headerRow . ':R' . $lastRow)
+                $sheet->getStyle('A'.$headerRow.':R'.$lastRow)
                     ->getBorders()
                     ->getAllBorders()
                     ->setBorderStyle(Border::BORDER_THIN);
-                
+
                 // Add generated info
-                $sheet->setCellValue('A' . ($lastRow + 2), 'Generated by: ' . $this->data['generated_by']);
-                $sheet->setCellValue('A' . ($lastRow + 3), 'Generated at: ' . $this->data['generated_at']->format('Y-m-d H:i:s'));
-                
+                $sheet->setCellValue('A'.($lastRow + 2), 'Generated by: '.$this->data['generated_by']);
+                $sheet->setCellValue('A'.($lastRow + 3), 'Generated at: '.$this->data['generated_at']->format('Y-m-d H:i:s'));
+
                 // Freeze panes
-                $sheet->freezePane('A' . ($headerRow + 1));
-                
+                $sheet->freezePane('A'.($headerRow + 1));
+
                 // Add filters
-                $sheet->setAutoFilter('A' . $headerRow . ':R' . $lastRow);
-                
+                $sheet->setAutoFilter('A'.$headerRow.':R'.$lastRow);
+
                 // Set row height for header
                 $sheet->getRowDimension($headerRow)->setRowHeight(25);
-                
+
                 // Set alignment for all cells
-                $sheet->getStyle('A1:R' . $lastRow)
+                $sheet->getStyle('A1:R'.$lastRow)
                     ->getAlignment()
                     ->setVertical(Alignment::VERTICAL_CENTER);
-                
+
                 // Set wrap text for notes column
-                $sheet->getStyle('R' . ($headerRow + 1) . ':R' . $lastRow)
+                $sheet->getStyle('R'.($headerRow + 1).':R'.$lastRow)
                     ->getAlignment()
                     ->setWrapText(true);
             },

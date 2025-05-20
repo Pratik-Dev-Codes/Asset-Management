@@ -21,7 +21,7 @@ return new class extends Migration
             $table->index('purchase_date');
             $table->index('created_at');
             $table->index('updated_at');
-            
+
             // Add composite indexes for common query patterns
             $table->index(['status', 'category_id']);
             $table->index(['status', 'location_id']);
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->dropIndex(['purchase_date']);
             $table->dropIndex(['created_at']);
             $table->dropIndex(['updated_at']);
-            
+
             // Remove composite indexes
             $table->dropIndex(['status', 'category_id']);
             $table->dropIndex(['status', 'location_id']);
@@ -55,4 +55,4 @@ return new class extends Migration
             $table->dropIndex(['category_id', 'department_id']);
         });
     }
-}; 
+};

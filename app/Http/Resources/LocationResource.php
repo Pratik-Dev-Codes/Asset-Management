@@ -70,19 +70,19 @@ class LocationResource extends JsonResource
         // Include full resource for includes
         if ($request->has('include')) {
             $includes = explode(',', $request->include);
-            
-            if (in_array('parent', $includes) && !$this->relationLoaded('parent')) {
+
+            if (in_array('parent', $includes) && ! $this->relationLoaded('parent')) {
                 $this->loadMissing('parent');
             }
-            
-            if (in_array('children', $includes) && !$this->relationLoaded('children')) {
+
+            if (in_array('children', $includes) && ! $this->relationLoaded('children')) {
                 $this->loadMissing('children');
             }
-            
-            if (in_array('assets', $includes) && !$this->relationLoaded('assets')) {
+
+            if (in_array('assets', $includes) && ! $this->relationLoaded('assets')) {
                 $this->loadMissing('assets');
             }
-            
+
             if ($this->relationLoaded('children')) {
                 $data['relationships']['children'] = LocationResource::collection($this->children);
             }
@@ -93,7 +93,7 @@ class LocationResource extends JsonResource
 
         return $data;
     }
-    
+
     /**
      * Get the HATEOAS links for the resource.
      *
@@ -108,16 +108,16 @@ class LocationResource extends JsonResource
             'assets' => route('api.v1.assets.index', ['location_id' => $this->id]),
         ];
     }
-    
+
     /**
      * Get a formatted address string.
      */
     protected function getFormattedAddress(): ?string
     {
-        if (!$this->address) {
+        if (! $this->address) {
             return null;
         }
-        
+
         $parts = array_filter([
             $this->address,
             $this->city,
@@ -125,7 +125,7 @@ class LocationResource extends JsonResource
             $this->postal_code,
             $this->country,
         ]);
-        
+
         return $parts ? implode(', ', $parts) : null;
     }
 }

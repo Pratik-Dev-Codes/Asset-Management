@@ -28,7 +28,7 @@ class ReportTest extends TestCase
             'type' => 'assets',
             'columns' => ['id', 'name', 'status'],
             'filters' => ['status' => 'active'],
-            'is_public' => false
+            'is_public' => false,
         ]);
 
         $response->assertStatus(302);
@@ -49,7 +49,7 @@ class ReportTest extends TestCase
     public function user_can_view_their_own_report()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->get("/reports/{$report->id}");
         $response->assertStatus(200);
     }
@@ -60,9 +60,9 @@ class ReportTest extends TestCase
         $otherUser = User::factory()->create();
         $report = Report::factory()->create([
             'created_by' => $otherUser->id,
-            'is_public' => false
+            'is_public' => false,
         ]);
-        
+
         $response = $this->get("/reports/{$report->id}");
         $response->assertStatus(403);
     }
@@ -73,9 +73,9 @@ class ReportTest extends TestCase
         $otherUser = User::factory()->create();
         $report = Report::factory()->create([
             'created_by' => $otherUser->id,
-            'is_public' => true
+            'is_public' => true,
         ]);
-        
+
         $response = $this->get("/reports/{$report->id}");
         $response->assertStatus(200);
     }

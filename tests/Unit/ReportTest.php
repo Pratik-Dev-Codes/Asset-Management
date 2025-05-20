@@ -17,12 +17,12 @@ class ReportTest extends TestCase
         $report = Report::factory()->create([
             'name' => 'Test Report',
             'type' => 'assets',
-            'columns' => ['id', 'name']
+            'columns' => ['id', 'name'],
         ]);
 
         $this->assertDatabaseHas('reports', [
             'name' => 'Test Report',
-            'type' => 'assets'
+            'type' => 'assets',
         ]);
     }
 
@@ -30,9 +30,9 @@ class ReportTest extends TestCase
     public function it_requires_name_and_type()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
-        
+
         Report::create([
-            'columns' => ['id']
+            'columns' => ['id'],
         ]);
     }
 
@@ -40,11 +40,11 @@ class ReportTest extends TestCase
     public function it_validates_columns_against_available_columns()
     {
         $this->expectException(\InvalidArgumentException::class);
-        
+
         Report::create([
             'name' => 'Invalid Report',
             'type' => 'assets',
-            'columns' => ['invalid_column']
+            'columns' => ['invalid_column'],
         ]);
     }
 
@@ -53,7 +53,7 @@ class ReportTest extends TestCase
     {
         $user = User::factory()->create();
         $report = Report::factory()->create(['created_by' => $user->id]);
-        
+
         $this->assertTrue($report->isAccessibleBy($user));
     }
 
@@ -62,7 +62,7 @@ class ReportTest extends TestCase
     {
         $report = Report::factory()->create(['is_public' => true]);
         $user = User::factory()->create();
-        
+
         $this->assertTrue($report->isAccessibleBy($user));
     }
 
@@ -71,13 +71,13 @@ class ReportTest extends TestCase
     {
         $report = Report::factory()->create();
         $cacheKey = "report.{$report->id}";
-        
+
         // Prime the cache
         \Illuminate\Support\Facades\Cache::put($cacheKey, $report, now()->addHour());
-        
+
         // Update the report
         $report->update(['name' => 'Updated Name']);
-        
+
         $this->assertFalse(\Illuminate\Support\Facades\Cache::has($cacheKey));
     }
 }

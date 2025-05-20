@@ -5,27 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\Location;
-use App\Models\SparePart;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\SparePart;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class InventoryController extends Controller
 {
     /**
      * Display a listing of spare parts inventory.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.view')) {
+        if (! auth()->user()->can('inventory.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view inventory.');
         }
 
@@ -36,8 +35,8 @@ class InventoryController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('part_number', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('part_number', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -52,7 +51,7 @@ class InventoryController extends Controller
                     break;
                 case 'low_stock':
                     $query->whereColumn('quantity_on_hand', '<=', 'reorder_level')
-                          ->where('quantity_on_hand', '>', 0);
+                        ->where('quantity_on_hand', '>', 0);
                     break;
                 case 'out_of_stock':
                     $query->where('quantity_on_hand', 0);
@@ -74,7 +73,7 @@ class InventoryController extends Controller
             'all' => 'All Items',
             'in_stock' => 'In Stock',
             'low_stock' => 'Low Stock',
-            'out_of_stock' => 'Out of Stock'
+            'out_of_stock' => 'Out of Stock',
         ];
 
         // Calculate inventory statistics
@@ -118,7 +117,7 @@ class InventoryController extends Controller
     public function create()
     {
         // Check permission
-        if (!auth()->user()->can('inventory.create')) {
+        if (! auth()->user()->can('inventory.create')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to create inventory items.');
         }
 
@@ -132,13 +131,12 @@ class InventoryController extends Controller
     /**
      * Store a newly created spare part in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.create')) {
+        if (! auth()->user()->can('inventory.create')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to create inventory items.');
         }
 
@@ -157,7 +155,7 @@ class InventoryController extends Controller
         ]);
 
         // Create the spare part
-        $sparePart = new SparePart();
+        $sparePart = new SparePart;
         $sparePart->name = $request->name;
         $sparePart->part_number = $request->part_number;
         $sparePart->description = $request->description;
@@ -177,13 +175,12 @@ class InventoryController extends Controller
     /**
      * Display the specified spare part.
      *
-     * @param  \App\Models\SparePart  $sparePart
      * @return \Illuminate\Http\Response
      */
     public function show(SparePart $sparePart)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.view')) {
+        if (! auth()->user()->can('inventory.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view inventory items.');
         }
 
@@ -211,7 +208,7 @@ class InventoryController extends Controller
     {
         // This is a simplified example
         // In a real application, you would have a proper transactions model
-        
+
         // Get purchase order items involving this part
         $poItems = PurchaseOrderItem::with(['purchaseOrder', 'purchaseOrder.vendor'])
             ->where('item_type', 'SparePart')
@@ -221,13 +218,13 @@ class InventoryController extends Controller
                 return [
                     'date' => $item->purchaseOrder->order_date,
                     'type' => 'Purchase',
-                    'reference' => 'PO #' . $item->purchaseOrder->po_number,
+                    'reference' => 'PO #'.$item->purchaseOrder->po_number,
                     'quantity' => $item->quantity,
                     'value' => $item->total_price,
-                    'notes' => 'Vendor: ' . ($item->purchaseOrder->vendor->name ?? 'Unknown'),
+                    'notes' => 'Vendor: '.($item->purchaseOrder->vendor->name ?? 'Unknown'),
                 ];
             });
-        
+
         // Get maintenance usages involving this part
         $maintenanceUsages = DB::table('maintenance_log_spare_parts')
             ->join('maintenance_logs', 'maintenance_log_spare_parts.maintenance_log_id', '=', 'maintenance_logs.id')
@@ -248,29 +245,28 @@ class InventoryController extends Controller
                     'reference' => $usage->reference,
                     'quantity' => -1 * $usage->quantity,
                     'value' => $usage->value,
-                    'notes' => 'Used for: ' . $usage->asset_name,
+                    'notes' => 'Used for: '.$usage->asset_name,
                 ];
             });
-        
+
         // Combine and sort by date (descending)
         $transactions = $poItems->concat($maintenanceUsages)
             ->sortByDesc('date')
             ->values()
             ->all();
-        
+
         return $transactions;
     }
 
     /**
      * Show the form for editing the specified spare part.
      *
-     * @param  \App\Models\SparePart  $sparePart
      * @return \Illuminate\Http\Response
      */
     public function edit(SparePart $sparePart)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.edit')) {
+        if (! auth()->user()->can('inventory.edit')) {
             return redirect()->route('inventory.show', $sparePart)->with('error', 'You do not have permission to edit inventory items.');
         }
 
@@ -284,21 +280,19 @@ class InventoryController extends Controller
     /**
      * Update the specified spare part in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\SparePart  $sparePart
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, SparePart $sparePart)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.edit')) {
+        if (! auth()->user()->can('inventory.edit')) {
             return redirect()->route('inventory.show', $sparePart)->with('error', 'You do not have permission to edit inventory items.');
         }
 
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'part_number' => 'required|string|max:100|unique:spare_parts,part_number,' . $sparePart->id,
+            'part_number' => 'required|string|max:100|unique:spare_parts,part_number,'.$sparePart->id,
             'description' => 'nullable|string',
             'asset_type_id' => 'nullable|exists:asset_categories,id',
             'vendor_id' => 'nullable|exists:vendors,id',
@@ -329,13 +323,12 @@ class InventoryController extends Controller
     /**
      * Remove the specified spare part from storage.
      *
-     * @param  \App\Models\SparePart  $sparePart
      * @return \Illuminate\Http\Response
      */
     public function destroy(SparePart $sparePart)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.delete')) {
+        if (! auth()->user()->can('inventory.delete')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to delete inventory items.');
         }
 
@@ -343,7 +336,7 @@ class InventoryController extends Controller
         $usageCount = DB::table('maintenance_log_spare_parts')
             ->where('spare_part_id', $sparePart->id)
             ->count();
-        
+
         if ($usageCount > 0) {
             return redirect()->route('inventory.show', $sparePart)
                 ->with('error', 'Cannot delete spare part that has been used in maintenance logs.');
@@ -351,7 +344,7 @@ class InventoryController extends Controller
 
         // Check if part is in any purchase order items
         $poItemCount = PurchaseOrderItem::where('spare_part_id', $sparePart->id)->count();
-        
+
         if ($poItemCount > 0) {
             return redirect()->route('inventory.show', $sparePart)
                 ->with('error', 'Cannot delete spare part that is referenced in purchase orders.');
@@ -367,14 +360,12 @@ class InventoryController extends Controller
     /**
      * Adjust inventory quantity.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\SparePart  $sparePart
      * @return \Illuminate\Http\Response
      */
     public function adjustQuantity(Request $request, SparePart $sparePart)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.adjust')) {
+        if (! auth()->user()->can('inventory.adjust')) {
             return redirect()->route('inventory.show', $sparePart)->with('error', 'You do not have permission to adjust inventory.');
         }
 
@@ -428,7 +419,8 @@ class InventoryController extends Controller
                 ->with('success', 'Inventory quantity adjusted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error adjusting inventory: ' . $e->getMessage())
+
+            return back()->with('error', 'Error adjusting inventory: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -441,7 +433,7 @@ class InventoryController extends Controller
     public function lowStockReport()
     {
         // Check permission
-        if (!auth()->user()->can('inventory.report.view')) {
+        if (! auth()->user()->can('inventory.report.view')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to view inventory reports.');
         }
 
@@ -471,7 +463,7 @@ class InventoryController extends Controller
     public function generatePurchaseOrders()
     {
         // Check permission
-        if (!auth()->user()->can('purchase_order.create')) {
+        if (! auth()->user()->can('purchase_order.create')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to create purchase orders.');
         }
 
@@ -488,13 +480,13 @@ class InventoryController extends Controller
 
         foreach ($lowStockItems as $vendorId => $items) {
             $vendor = Vendor::find($vendorId);
-            
+
             if ($vendor) {
                 // Generate PO number
-                $poNumber = 'PO-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
-                
+                $poNumber = 'PO-'.date('Ymd').'-'.str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+
                 // Create purchase order
-                $purchaseOrder = new PurchaseOrder();
+                $purchaseOrder = new PurchaseOrder;
                 $purchaseOrder->po_number = $poNumber;
                 $purchaseOrder->vendor_id = $vendorId;
                 $purchaseOrder->order_date = Carbon::now();
@@ -502,32 +494,32 @@ class InventoryController extends Controller
                 $purchaseOrder->order_status = 'Draft';
                 $purchaseOrder->created_by_user_id = Auth::id();
                 $purchaseOrder->save();
-                
+
                 // Add items to purchase order
                 $totalAmount = 0;
                 foreach ($items as $item) {
                     $quantityToOrder = $item->reorder_level - $item->quantity_on_hand;
-                    
+
                     if ($quantityToOrder > 0) {
-                        $poItem = new PurchaseOrderItem();
+                        $poItem = new PurchaseOrderItem;
                         $poItem->purchase_order_id = $purchaseOrder->id;
                         $poItem->item_type = 'SparePart';
                         $poItem->spare_part_id = $item->id;
-                        $poItem->item_description = $item->name . ' (' . $item->part_number . ')';
+                        $poItem->item_description = $item->name.' ('.$item->part_number.')';
                         $poItem->quantity = $quantityToOrder;
                         $poItem->unit_price = $item->unit_price;
                         $poItem->total_price = $quantityToOrder * $item->unit_price;
                         $poItem->received_quantity = 0;
                         $poItem->save();
-                        
+
                         $totalAmount += $poItem->total_price;
                     }
                 }
-                
+
                 // Update purchase order total
                 $purchaseOrder->total_amount = $totalAmount;
                 $purchaseOrder->save();
-                
+
                 $purchaseOrders[] = $purchaseOrder;
             }
         }
@@ -539,13 +531,12 @@ class InventoryController extends Controller
     /**
      * Export inventory to CSV/Excel.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function export(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('inventory.export')) {
+        if (! auth()->user()->can('inventory.export')) {
             return redirect()->route('inventory.index')->with('error', 'You do not have permission to export inventory data.');
         }
 

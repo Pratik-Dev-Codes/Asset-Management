@@ -62,10 +62,6 @@ class ProcessBulkAssetStatusChange implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param array $assetIds
-     * @param string $status
-     * @param string|null $notes
-     * @param User $user
      * @return void
      */
     public function __construct(array $assetIds, string $status, ?string $notes, User $user)
@@ -94,23 +90,23 @@ class ProcessBulkAssetStatusChange implements ShouldQueue
                 ->chunkById(100, function ($assets) {
                     foreach ($assets as $asset) {
                         // Skip if the asset doesn't exist anymore
-                        if (!$asset) {
+                        if (! $asset) {
                             continue;
                         }
 
                         // Store the old status for logging
                         $oldStatus = $asset->status;
-                        
+
                         // Update the status
                         $asset->status = $this->status;
-                        
+
                         // Update status notes if provided
                         if ($this->notes) {
                             $asset->status_notes = $this->notes;
                         }
-                        
+
                         $asset->save();
-                        
+
                         // Log the status change
                         activity()
                             ->performedOn($asset)
@@ -126,13 +122,13 @@ class ProcessBulkAssetStatusChange implements ShouldQueue
                 });
 
         } catch (\Exception $e) {
-            Log::error('Bulk asset status update failed: ' . $e->getMessage(), [
+            Log::error('Bulk asset status update failed: '.$e->getMessage(), [
                 'asset_ids' => $this->assetIds,
                 'status' => $this->status,
                 'user_id' => $this->user->id,
                 'exception' => $e,
             ]);
-            
+
             throw $e; // Re-throw to allow for retries
         }
     }
@@ -140,7 +136,6 @@ class ProcessBulkAssetStatusChange implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $exception
      * @return void
      */
     public function failed(\Throwable $exception)

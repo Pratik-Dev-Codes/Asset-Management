@@ -17,6 +17,7 @@ class DepartmentController extends Controller
     {
         return view('departments.landing');
     }
+
     /**
      * Display a listing of the departments.
      *
@@ -25,7 +26,7 @@ class DepartmentController extends Controller
     public function index()
     {
         // Check permission
-        if (!auth()->user()->can('department.view')) {
+        if (! auth()->user()->can('department.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view departments.');
         }
 
@@ -33,7 +34,7 @@ class DepartmentController extends Controller
             ->withCount('assets')
             ->orderBy('name')
             ->get();
-        
+
         return view('departments.index', compact('departments'));
     }
 
@@ -45,25 +46,24 @@ class DepartmentController extends Controller
     public function create()
     {
         // Check permission
-        if (!auth()->user()->can('department.create')) {
+        if (! auth()->user()->can('department.create')) {
             return redirect()->route('departments.index')->with('error', 'You do not have permission to create departments.');
         }
 
         $locations = Location::orderBy('name')->get();
-        
+
         return view('departments.create', compact('locations'));
     }
 
     /**
      * Store a newly created department in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         // Check permission
-        if (!auth()->user()->can('department.create')) {
+        if (! auth()->user()->can('department.create')) {
             return redirect()->route('departments.index')->with('error', 'You do not have permission to create departments.');
         }
 
@@ -76,13 +76,13 @@ class DepartmentController extends Controller
         ]);
 
         // Create the department
-        $department = new Department();
+        $department = new Department;
         $department->name = $request->name;
         $department->code = $request->code;
         $department->description = $request->description;
         $department->location_id = $request->location_id;
         $department->save();
-        
+
         return redirect()->route('departments.index')
             ->with('success', 'Department created successfully.');
     }
@@ -90,64 +90,60 @@ class DepartmentController extends Controller
     /**
      * Display the specified department.
      *
-     * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
     public function show(Department $department)
     {
         // Check permission
-        if (!auth()->user()->can('department.view')) {
+        if (! auth()->user()->can('department.view')) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view departments.');
         }
 
         // Load the department details
         $department->load('location');
-        
+
         // Get users belonging to the department
         $users = $department->users()->paginate(10);
-        
+
         // Get assets assigned to the department
         $assets = $department->assets()->paginate(10);
-        
+
         return view('departments.show', compact('department', 'users', 'assets'));
     }
 
     /**
      * Show the form for editing the specified department.
      *
-     * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
     public function edit(Department $department)
     {
         // Check permission
-        if (!auth()->user()->can('department.edit')) {
+        if (! auth()->user()->can('department.edit')) {
             return redirect()->route('departments.show', $department)->with('error', 'You do not have permission to edit departments.');
         }
 
         $locations = Location::orderBy('name')->get();
-        
+
         return view('departments.edit', compact('department', 'locations'));
     }
 
     /**
      * Update the specified department in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Department $department)
     {
         // Check permission
-        if (!auth()->user()->can('department.edit')) {
+        if (! auth()->user()->can('department.edit')) {
             return redirect()->route('departments.show', $department)->with('error', 'You do not have permission to edit departments.');
         }
 
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:departments,code,' . $department->id,
+            'code' => 'required|string|max:255|unique:departments,code,'.$department->id,
             'description' => 'nullable|string',
             'location_id' => 'nullable|exists:locations,id',
         ]);
@@ -158,7 +154,7 @@ class DepartmentController extends Controller
         $department->description = $request->description;
         $department->location_id = $request->location_id;
         $department->save();
-        
+
         return redirect()->route('departments.show', $department)
             ->with('success', 'Department updated successfully.');
     }
@@ -166,13 +162,12 @@ class DepartmentController extends Controller
     /**
      * Remove the specified department from storage.
      *
-     * @param  \App\Models\Department  $department
      * @return \Illuminate\Http\Response
      */
     public function destroy(Department $department)
     {
         // Check permission
-        if (!auth()->user()->can('department.delete')) {
+        if (! auth()->user()->can('department.delete')) {
             return redirect()->route('departments.index')->with('error', 'You do not have permission to delete departments.');
         }
 
@@ -187,10 +182,10 @@ class DepartmentController extends Controller
             return redirect()->route('departments.index')
                 ->with('error', 'Cannot delete department that has users assigned to it.');
         }
-        
+
         // Delete the department
         $department->delete();
-        
+
         return redirect()->route('departments.index')
             ->with('success', 'Department deleted successfully.');
     }
@@ -203,7 +198,7 @@ class DepartmentController extends Controller
     public function getDepartments()
     {
         $departments = Department::select('id', 'name', 'code')->orderBy('name')->get();
-        
+
         return response()->json($departments);
     }
 
@@ -219,7 +214,7 @@ class DepartmentController extends Controller
             ->select('id', 'name', 'code')
             ->orderBy('name')
             ->get();
-        
+
         return response()->json($departments);
     }
 }

@@ -2,18 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Asset;
 use App\Models\AssetStatus;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 class DashboardService
 {
     /**
      * Get dashboard overview data.
-     *
-     * @param User $user
-     * @return array
      */
     public function getOverview(User $user): array
     {
@@ -33,30 +30,26 @@ class DashboardService
 
     /**
      * Get dashboard statistics.
-     *
-     * @param User $user
-     * @param array $filters
-     * @return array
      */
     public function getStatistics(User $user, array $filters = []): array
     {
         $query = Asset::query();
 
         // Apply filters if any
-        if (!empty($filters['category_id'])) {
+        if (! empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
-        if (!empty($filters['location_id'])) {
+        if (! empty($filters['location_id'])) {
             $query->where('location_id', $filters['location_id']);
         }
 
         // Get assets by status
         $assetsByStatus = $this->getAssetsByStatus($query);
-        
+
         // Get assets by category
         $assetsByCategory = $this->getAssetsByCategory($query);
-        
+
         // Get recent activities
         $recentActivities = $this->getRecentActivities($user);
 
@@ -68,15 +61,14 @@ class DashboardService
                 'total_value' => $query->sum('purchase_cost'),
                 'total_assets' => $query->count(),
                 'depreciating_assets' => $query->where('depreciate', true)->count(),
-            ]
+            ],
         ];
     }
 
     /**
      * Get assets grouped by status.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return Collection
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     protected function getAssetsByStatus($query): Collection
     {
@@ -93,8 +85,7 @@ class DashboardService
     /**
      * Get assets grouped by category.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return Collection
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
     protected function getAssetsByCategory($query): Collection
     {
@@ -110,9 +101,6 @@ class DashboardService
 
     /**
      * Get recent activities.
-     *
-     * @param User $user
-     * @return array
      */
     protected function getRecentActivities(User $user): array
     {

@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Api;
 
-use Tests\TestCase;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use App\Models\User;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class ApiTestCase extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
     protected $user;
+
     protected $token;
 
     protected function setUp(): void
@@ -26,7 +27,7 @@ class ApiTestCase extends TestCase
     {
         return array_merge([
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ], $headers);
     }
 
@@ -36,7 +37,7 @@ class ApiTestCase extends TestCase
             ->assertJsonStructure([
                 'data' => [],
                 'message',
-                'status'
+                'status',
             ]);
     }
 }

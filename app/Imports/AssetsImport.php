@@ -4,25 +4,25 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Models\Location;
 use App\Models\Department;
+use App\Models\Location;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class AssetsImport implements ToModel, WithHeadingRow, WithValidation
 {
     private $rowCount = 0;
+
     private $skippedCount = 0;
+
     private $skippedRows = [];
-    
+
     /**
-     * @param array $row
-     *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function model(array $row)
@@ -30,10 +30,10 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
         try {
             // Increment the row counter
             $this->rowCount++;
-            
+
             // Find or create related models
             $category = null;
-            if (!empty($row['category'])) {
+            if (! empty($row['category'])) {
                 $category = AssetCategory::firstOrCreate(
                     ['name' => $row['category']],
                     ['description' => 'Imported from Excel']
@@ -41,7 +41,7 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
             }
 
             $location = null;
-            if (!empty($row['location'])) {
+            if (! empty($row['location'])) {
                 $location = Location::firstOrCreate(
                     ['name' => $row['location']],
                     ['description' => 'Imported from Excel']
@@ -49,7 +49,7 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
             }
 
             $department = null;
-            if (!empty($row['department'])) {
+            if (! empty($row['department'])) {
                 $department = Department::firstOrCreate(
                     ['name' => $row['department']],
                     ['description' => 'Imported from Excel']
@@ -57,22 +57,22 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
             }
 
             $assignedTo = null;
-        if (!empty($row['assigned_to_email'])) {
-            $assignedTo = User::firstOrCreate(
-                ['email' => $row['assigned_to_email']],
-                [
-                    'name' => $row['assigned_to_name'] ?? 'Imported User',
-                    'password' => bcrypt(Str::random(16)),
-                ]
-            );
-        }
+            if (! empty($row['assigned_to_email'])) {
+                $assignedTo = User::firstOrCreate(
+                    ['email' => $row['assigned_to_email']],
+                    [
+                        'name' => $row['assigned_to_name'] ?? 'Imported User',
+                        'password' => bcrypt(Str::random(16)),
+                    ]
+                );
+            }
 
-        // Format dates
-        $purchaseDate = !empty($row['purchase_date']) ? 
-            Carbon::parse($row['purchase_date'])->format('Y-m-d') : null;
-            
-        $warrantyExpiryDate = !empty($row['warranty_expiry_date']) ? 
-            Carbon::parse($row['warranty_expiry_date'])->format('Y-m-d') : null;
+            // Format dates
+            $purchaseDate = ! empty($row['purchase_date']) ?
+                Carbon::parse($row['purchase_date'])->format('Y-m-d') : null;
+
+            $warrantyExpiryDate = ! empty($row['warranty_expiry_date']) ?
+                Carbon::parse($row['warranty_expiry_date'])->format('Y-m-d') : null;
 
             return new Asset([
                 'asset_code' => $row['asset_code'] ?? $this->generateAssetCode(),
@@ -93,20 +93,19 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
             ]);
         } catch (\Exception $e) {
             // Log the error and increment the skipped counter
-            \Log::error('Error importing asset row: ' . $e->getMessage());
+            \Log::error('Error importing asset row: '.$e->getMessage());
             $this->skippedCount++;
             $this->skippedRows[] = [
                 'row' => $this->rowCount,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
+
             return null;
         }
     }
 
     /**
      * Get the validation rules for the import.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -126,8 +125,6 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
 
     /**
      * Get the number of rows that were imported.
-     *
-     * @return int
      */
     public function getRowCount(): int
     {
@@ -136,8 +133,6 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
 
     /**
      * Get the number of rows that were skipped.
-     *
-     * @return int
      */
     public function getSkippedCount(): int
     {
@@ -146,8 +141,6 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
 
     /**
      * Get the rows that were skipped during import.
-     *
-     * @return array
      */
     public function getSkippedRows(): array
     {
@@ -157,13 +150,12 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Maatwebsite\Excel\Validators\ValidationException  $e
      * @return void
      */
     public function onFailure(\Maatwebsite\Excel\Validators\ValidationException $e)
     {
         $failures = $e->failures();
-        
+
         foreach ($failures as $failure) {
             $this->skippedCount++;
             $this->skippedRows[] = [
@@ -183,7 +175,7 @@ class AssetsImport implements ToModel, WithHeadingRow, WithValidation
     protected function generateAssetCode()
     {
         do {
-            $code = 'AST-' . strtoupper(Str::random(8));
+            $code = 'AST-'.strtoupper(Str::random(8));
         } while (Asset::where('asset_code', $code)->exists());
 
         return $code;

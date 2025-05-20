@@ -29,8 +29,6 @@ class ReportGenerationFailed extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @param  \App\Models\Report  $report
-     * @param  string  $errorMessage
      * @return void
      */
     public function __construct(Report $report, string $errorMessage)
@@ -60,13 +58,13 @@ class ReportGenerationFailed extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->error()
-            ->subject('Report Generation Failed: ' . $this->report->name)
+            ->subject('Report Generation Failed: '.$this->report->name)
             ->line('We encountered an error while generating your report.')
-            ->line('**Report:** ' . $this->report->name)
+            ->line('**Report:** '.$this->report->name)
             ->when($this->report->description, function ($message) {
-                $message->line('**Description:** ' . $this->report->description);
+                $message->line('**Description:** '.$this->report->description);
             })
-            ->line('**Error:** ' . $this->errorMessage)
+            ->line('**Error:** '.$this->errorMessage)
             ->action('View Report', route('reports.show', $this->report))
             ->line('Our team has been notified about this issue. Please try again later or contact support if the problem persists.');
     }
@@ -84,14 +82,12 @@ class ReportGenerationFailed extends Notification implements ShouldQueue
             'report_id' => $this->report->id,
             'report_name' => $this->report->name,
             'error_message' => $this->errorMessage,
-            'message' => 'Failed to generate report: ' . $this->report->name,
+            'message' => 'Failed to generate report: '.$this->report->name,
         ];
     }
 
     /**
      * Get the notification's database type.
-     *
-     * @return string
      */
     public function databaseType(object $notifiable): string
     {

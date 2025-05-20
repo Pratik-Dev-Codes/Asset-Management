@@ -33,11 +33,11 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
-                
+
             // Web routes
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
-                
+
             // Authentication routes (using Laravel Breeze)
             Route::middleware('web')
                 ->group(base_path('routes/auth.php'));
@@ -61,7 +61,7 @@ class RouteServiceProvider extends ServiceProvider
         // Login rate limiting
         RateLimiter::for('login', function (Request $request) {
             $key = Str::transliterate(Str::lower($request->input('email')).'|'.$request->ip());
-            
+
             return [
                 Limit::perMinute(5)->by($key),
                 Limit::perHour(20)->by($key),

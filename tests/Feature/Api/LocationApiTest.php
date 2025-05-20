@@ -14,14 +14,14 @@ class LocationApiTest extends TestCase
 
     /** @var User */
     protected $user;
-    
+
     /** @var array */
     protected $locationData;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a test user
         $this->user = User::factory()->create([
             'email' => 'test@example.com',
@@ -31,7 +31,7 @@ class LocationApiTest extends TestCase
 
         // Generate test location data
         $this->locationData = [
-            'name' => $this->faker->company . ' Office',
+            'name' => $this->faker->company.' Office',
             'code' => strtoupper($this->faker->unique()->lexify('LOC????')),
             'address' => $this->faker->address,
             'city' => $this->faker->city,
@@ -50,7 +50,7 @@ class LocationApiTest extends TestCase
     public function unauthenticated_users_cannot_access_protected_endpoints()
     {
         $location = Location::factory()->create();
-        
+
         $endpoints = [
             ['method' => 'GET', 'url' => '/api/v1/locations'],
             ['method' => 'POST', 'url' => '/api/v1/locations'],
@@ -83,10 +83,10 @@ class LocationApiTest extends TestCase
                         'is_active',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'links',
-                'meta'
+                'meta',
             ]);
     }
 
@@ -105,7 +105,7 @@ class LocationApiTest extends TestCase
                     'is_active',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('locations', [
@@ -130,7 +130,7 @@ class LocationApiTest extends TestCase
                     'name' => $location->name,
                     'code' => $location->code,
                     'is_active' => $location->is_active,
-                ]
+                ],
             ]);
     }
 
@@ -153,7 +153,7 @@ class LocationApiTest extends TestCase
                     'name' => $updateData['name'],
                     'code' => $updateData['code'],
                     'is_active' => $updateData['is_active'],
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('locations', [
@@ -205,11 +205,11 @@ class LocationApiTest extends TestCase
                         'children' => [
                             '*' => [
                                 'id',
-                                'name'
-                            ]
-                        ]
-                    ]
-                ]
+                                'name',
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 

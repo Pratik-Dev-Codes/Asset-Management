@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * @group Authentication
- * 
+ *
  * APIs for user authentication
  */
 class AuthController extends Controller
@@ -22,7 +22,7 @@ class AuthController extends Controller
      * @bodyParam email string required The email of the user. Example: admin@neepco.com
      * @bodyParam password string required The password of the user. Example: password
      * @bodyParam device_name string The device name. Example: iPhone 13
-     * 
+     *
      * @response 200 {
      *  "user": {
      *    "id": 1,
@@ -34,7 +34,6 @@ class AuthController extends Controller
      *  "access_token": "1|abcdef123456",
      *  "token_type": "Bearer"
      * }
-     * 
      * @response 422 {
      *  "message": "The given data was invalid.",
      *  "errors": {
@@ -42,7 +41,6 @@ class AuthController extends Controller
      *    "password": ["The password field is required."]
      *  }
      * }
-     * 
      * @response 401 {
      *  "message": "The provided credentials are incorrect."
      * }
@@ -55,20 +53,20 @@ class AuthController extends Controller
             'device_name' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         $user = $request->user();
-        
+
         // Revoke all tokens...
         $user->tokens()->delete();
-        
+
         // Create new token
         $token = $user->createToken($request->device_name)->plainTextToken;
-        
+
         return response()->json([
             'user' => new UserResource($user),
             'access_token' => $token,
@@ -80,7 +78,7 @@ class AuthController extends Controller
      * Get the authenticated User
      *
      * @authenticated
-     * 
+     *
      * @response 200 {
      *  "data": {
      *    "id": 1,
@@ -98,23 +96,23 @@ class AuthController extends Controller
 
     /**
      * Logout user (Revoke the token)
-     * 
+     *
      * @authenticated
-     * 
-     * @response 204 
+     *
+     * @response 204
      */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        
+
         return response()->noContent();
     }
 
     /**
      * Refresh the token
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @response 200 {
      *  "access_token": "new_token_here",
      *  "token_type": "Bearer"
@@ -123,13 +121,13 @@ class AuthController extends Controller
     public function refresh(Request $request)
     {
         $user = $request->user();
-        
+
         // Revoke current token
         $request->user()->currentAccessToken()->delete();
-        
+
         // Create new token
         $token = $user->createToken($request->header('User-Agent') ?: 'api-token')->plainTextToken;
-        
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',

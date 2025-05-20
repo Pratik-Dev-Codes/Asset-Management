@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Asset;
-use Milon\Barcode\DNS2D;
-use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Storage;
+use Milon\Barcode\DNS1D;
+use Milon\Barcode\DNS2D;
 
 class BarcodeService
 {
@@ -13,10 +13,10 @@ class BarcodeService
     {
         $asset = Asset::findOrFail($assetId);
         $barcode = DNS1D::getBarcodePNG($asset->asset_tag, $type);
-        
-        $filename = 'barcodes/' . $asset->asset_tag . '.png';
+
+        $filename = 'barcodes/'.$asset->asset_tag.'.png';
         Storage::disk('public')->put($filename, base64_decode($barcode));
-        
+
         return Storage::url($filename);
     }
 
@@ -24,17 +24,17 @@ class BarcodeService
     {
         $asset = Asset::findOrFail($assetId);
         $url = route('assets.show', $asset);
-        
+
         $qrCode = DNS2D::getBarcodePNG(
             $url,
             'QRCODE',
             10,
             10
         );
-        
-        $filename = 'qrcodes/' . $asset->asset_tag . '.png';
+
+        $filename = 'qrcodes/'.$asset->asset_tag.'.png';
         Storage::disk('public')->put($filename, base64_decode($qrCode));
-        
+
         return Storage::url($filename);
     }
 
@@ -42,15 +42,15 @@ class BarcodeService
     {
         $assets = Asset::all();
         $barcodes = [];
-        
+
         foreach ($assets as $asset) {
             $barcodes[$asset->id] = [
                 'barcode' => $this->generateBarcode($asset->id, $type),
                 'qrcode' => $this->generateQrCode($asset->id),
-                'asset' => $asset
+                'asset' => $asset,
             ];
         }
-        
+
         return $barcodes;
     }
 

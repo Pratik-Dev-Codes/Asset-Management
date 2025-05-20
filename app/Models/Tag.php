@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
- * 
- *
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $assets
  * @property-read int|null $assets_count
  * @property-write mixed $name
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Tag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tag newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Tag ofType($type = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Tag query()
+ *
  * @mixin \Eloquent
  */
 class Tag extends Model

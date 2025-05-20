@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class FinalSchema extends Migration
 {
@@ -142,28 +142,28 @@ class FinalSchema extends Migration
             $table->string('serial_number')->nullable();
             $table->string('model_number')->nullable();
             $table->string('manufacturer')->nullable();
-            
+
             // Purchase Information
             $table->date('purchase_date')->nullable();
             $table->decimal('purchase_cost', 10, 2)->nullable();
             $table->foreignId('vendor_id')->nullable()->constrained('vendors');
             $table->string('order_number')->nullable();
-            
+
             // Warranty Information
             $table->date('warranty_expires')->nullable();
             $table->text('warranty_notes')->nullable();
-            
+
             // Status
             $table->enum('status', ['available', 'assigned', 'under_maintenance', 'disposed'])->default('available');
-            
+
             // Additional Fields
             $table->text('notes')->nullable();
             $table->string('image')->nullable();
-            
+
             // Audit Information
             $table->timestamp('last_audit_date')->nullable();
             $table->foreignId('audited_by')->nullable()->constrained('users');
-            
+
             $table->timestamps();
             $table->softDeletes();
         });

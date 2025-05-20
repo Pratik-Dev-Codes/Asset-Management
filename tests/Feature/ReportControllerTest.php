@@ -36,7 +36,7 @@ class ReportControllerTest extends TestCase
             'columns' => ['id', 'name'],
             'filters' => [],
             'sorting' => ['created_at' => 'desc'],
-            'is_public' => false
+            'is_public' => false,
         ]);
 
         $response->assertRedirect(route('reports.show', 1));
@@ -49,7 +49,7 @@ class ReportControllerTest extends TestCase
         $response = $this->post(route('reports.store'), [
             'name' => '',
             'type' => 'invalid_type',
-            'columns' => []
+            'columns' => [],
         ]);
 
         $response->assertSessionHasErrors(['name', 'type', 'columns']);
@@ -59,19 +59,19 @@ class ReportControllerTest extends TestCase
     public function it_can_update_a_report()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->put(route('reports.update', $report->id), [
             'name' => 'Updated Report',
             'type' => $report->type,
             'columns' => $report->columns,
-            'is_public' => true
+            'is_public' => true,
         ]);
 
         $response->assertRedirect(route('reports.show', $report->id));
         $this->assertDatabaseHas('reports', [
             'id' => $report->id,
             'name' => 'Updated Report',
-            'is_public' => true
+            'is_public' => true,
         ]);
     }
 
@@ -79,9 +79,9 @@ class ReportControllerTest extends TestCase
     public function it_can_delete_a_report()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->delete(route('reports.destroy', $report->id));
-        
+
         $response->assertRedirect(route('reports.index'));
         $this->assertDatabaseMissing('reports', ['id' => $report->id]);
     }
@@ -90,9 +90,9 @@ class ReportControllerTest extends TestCase
     public function it_can_export_a_report()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->get(route('reports.export', [$report->id, 'pdf']));
-        
+
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/pdf');
     }

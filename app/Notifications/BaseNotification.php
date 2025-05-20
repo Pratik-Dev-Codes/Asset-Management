@@ -21,7 +21,6 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @param  array  $data
      * @return void
      */
     public function __construct(array $data = [])
@@ -62,15 +61,11 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's subject.
-     *
-     * @return string
      */
     abstract protected function getSubject(): string;
 
     /**
      * Get the notification's level.
-     *
-     * @return string
      */
     protected function getLevel(): string
     {
@@ -79,8 +74,6 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's intro lines.
-     *
-     * @return array
      */
     protected function getIntroLines(): array
     {
@@ -89,20 +82,16 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's outro lines.
-     *
-     * @return array
      */
     protected function getOutroLines(): array
     {
         return [
-            'If you did not expect to receive this notification, please check your application settings.'
+            'If you did not expect to receive this notification, please check your application settings.',
         ];
     }
 
     /**
      * Get the notification's action text.
-     *
-     * @return string|null
      */
     protected function getActionText(): ?string
     {
@@ -111,8 +100,6 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's action URL.
-     *
-     * @return string|null
      */
     protected function getActionUrl(): ?string
     {
@@ -121,12 +108,11 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     /**
      * Get the displayable version of the action URL.
-     *
-     * @return string
      */
     protected function getDisplayableActionUrl(): string
     {
         $url = $this->getActionUrl();
+
         return str_replace(['http://', 'https://'], '', $url);
     }
 }

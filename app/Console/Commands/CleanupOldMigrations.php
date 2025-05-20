@@ -37,7 +37,7 @@ class CleanupOldMigrations extends Command
 
         foreach ($files as $file) {
             $filename = $file->getFilename();
-            if (!in_array($filename, $keepFiles) && $filename !== '.gitignore') {
+            if (! in_array($filename, $keepFiles) && $filename !== '.gitignore') {
                 File::delete($file->getPathname());
                 $this->info("Removed old migration: {$filename}");
                 $removedCount++;

@@ -31,25 +31,25 @@ class ScheduleCleanupReportFiles extends Command
     public function handle()
     {
         $this->info('Scheduling cleanup of expired report files...');
-        
+
         // Get the cleanup schedule configuration
         $scheduleTime = Config::get('reports.cleanup_schedule.time', '00:00');
         $retentionDays = Config::get('reports.cleanup_schedule.retention_days', 7);
-        
+
         // Schedule the cleanup command to run daily
         Schedule::command('reports:cleanup', [
             '--days' => $retentionDays,
         ])->dailyAt($scheduleTime)
-          ->onOneServer()
-          ->before(function () use ($scheduleTime, $retentionDays) {
-              Log::info("Starting scheduled cleanup of report files older than {$retentionDays} days at {$scheduleTime}");
-          })
-          ->after(function () {
-              Log::info("Completed scheduled cleanup of report files");
-          });
-        
+            ->onOneServer()
+            ->before(function () use ($scheduleTime, $retentionDays) {
+                Log::info("Starting scheduled cleanup of report files older than {$retentionDays} days at {$scheduleTime}");
+            })
+            ->after(function () {
+                Log::info('Completed scheduled cleanup of report files');
+            });
+
         $this->info("Cleanup scheduled to run daily at {$scheduleTime} for files older than {$retentionDays} days.");
-        
+
         return 0;
     }
 }

@@ -7,32 +7,25 @@ use Illuminate\Http\Response;
 
 /**
  * Trait ApiResponder
- * @package App\Traits
  */
 trait ApiResponder
 {
     /**
      * Success Response
-     * @param mixed $data
-     * @param string $message
-     * @param int $code
-     * @return JsonResponse
+     *
+     * @param  mixed  $data
      */
     protected function success($data = null, string $message = 'Success', int $code = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ], $code);
     }
 
     /**
      * Error Response
-     * @param string $message
-     * @param int $code
-     * @param array $errors
-     * @return JsonResponse
      */
     protected function error(string $message = 'Error', int $code = Response::HTTP_BAD_REQUEST, array $errors = []): JsonResponse
     {
@@ -41,7 +34,7 @@ trait ApiResponder
             'message' => $message,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -50,8 +43,6 @@ trait ApiResponder
 
     /**
      * Not Found Response
-     * @param string $message
-     * @return JsonResponse
      */
     protected function notFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -60,8 +51,6 @@ trait ApiResponder
 
     /**
      * Unauthorized Response
-     * @param string $message
-     * @return JsonResponse
      */
     protected function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -70,8 +59,6 @@ trait ApiResponder
 
     /**
      * Forbidden Response
-     * @param string $message
-     * @return JsonResponse
      */
     protected function forbidden(string $message = 'Forbidden'): JsonResponse
     {
@@ -80,22 +67,18 @@ trait ApiResponder
 
     /**
      * Validation Error Response
-     * @param array $errors
-     * @param string $message
-     * @return JsonResponse
      */
     protected function validationError(array $errors, string $message = 'Validation Error'): JsonResponse
     {
         return response()->json([
             'success' => false,
             'message' => $message,
-            'errors' => $errors
+            'errors' => $errors,
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
      * No Content Response
-     * @return JsonResponse
      */
     protected function noContent(): JsonResponse
     {

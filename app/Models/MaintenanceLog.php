@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property int $asset_id
  * @property string $maintenance_type
@@ -35,6 +33,7 @@ use Spatie\Activitylog\LogOptions;
  * @property-read mixed $formatted_cost
  * @property-read string $status_badge
  * @property-read \App\Models\User|null $performedBy
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog completed()
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog newQuery()
@@ -57,26 +56,27 @@ use Spatie\Activitylog\LogOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|MaintenanceLog withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class MaintenanceLog extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
-    
+    use HasFactory, LogsActivity, SoftDeletes;
+
     /**
      * The attributes that should be logged for all events.
      *
      * @var array
      */
     protected static $logAttributes = ['*'];
-    
+
     /**
      * The attributes that should be ignored for diff.
      *
      * @var array
      */
     protected static $ignoreChangedAttributes = ['updated_at'];
-    
+
     /**
      * Configure the activity log options.
      */
@@ -88,7 +88,7 @@ class MaintenanceLog extends Model
             ->dontSubmitEmptyLogs()
             ->useLogName('maintenance');
     }
-    
+
     /**
      * Get the description for the event.
      */
@@ -137,7 +137,7 @@ class MaintenanceLog extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
-    
+
     /**
      * Scope a query to only include completed maintenance logs.
      */
@@ -145,7 +145,7 @@ class MaintenanceLog extends Model
     {
         return $query->whereNotNull('completion_datetime');
     }
-    
+
     /**
      * Scope a query to only include pending maintenance logs.
      */
@@ -153,15 +153,15 @@ class MaintenanceLog extends Model
     {
         return $query->whereNull('completion_datetime');
     }
-    
+
     /**
      * Get the formatted cost with currency symbol.
      */
     public function getFormattedCostAttribute()
     {
-        return $this->cost ? '₹' . number_format($this->cost, 2) : 'N/A';
+        return $this->cost ? '₹'.number_format($this->cost, 2) : 'N/A';
     }
-    
+
     /**
      * Get the status of the maintenance.
      */
@@ -169,20 +169,20 @@ class MaintenanceLog extends Model
     {
         return $this->completion_datetime ? 'Completed' : 'Pending';
     }
-    
+
     /**
      * Get the status badge HTML for the maintenance log.
      */
     public function getStatusBadgeAttribute(): string
     {
         $status = $this->status;
-        $class = $status === 'Completed' 
-            ? 'bg-green-100 text-green-800' 
+        $class = $status === 'Completed'
+            ? 'bg-green-100 text-green-800'
             : 'bg-yellow-100 text-yellow-800';
-            
+
         return sprintf(
-            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full %s">%s</span>', 
-            $class, 
+            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full %s">%s</span>',
+            $class,
             $status
         );
     }

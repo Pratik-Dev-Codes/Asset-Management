@@ -24,7 +24,7 @@ class UpdateLocationRequest extends StoreLocationRequest
     public function rules(): array
     {
         $rules = parent::rules();
-        
+
         // Make code optional for updates
         $rules['code'] = [
             'sometimes',
@@ -32,10 +32,10 @@ class UpdateLocationRequest extends StoreLocationRequest
             'max:50',
             Rule::unique('locations', 'code')->ignore($this->location->id),
         ];
-        
+
         // Make name optional for updates
         $rules['name'] = 'sometimes|string|max:255';
-        
+
         return $rules;
     }
 }

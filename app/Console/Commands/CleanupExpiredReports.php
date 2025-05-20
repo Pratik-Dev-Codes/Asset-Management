@@ -32,7 +32,6 @@ class CleanupExpiredReports extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \App\Services\ReportExportService  $reportExportService
      * @return void
      */
     public function __construct(ReportExportService $reportExportService)
@@ -49,27 +48,27 @@ class CleanupExpiredReports extends Command
     public function handle()
     {
         $this->info('Starting cleanup of expired report files...');
-        
+
         try {
             $deletedCount = $this->reportExportService->deleteExpiredFiles();
-            
+
             if ($deletedCount > 0) {
                 $this->info("Successfully deleted {$deletedCount} expired report files.");
                 Log::info("Cleaned up {$deletedCount} expired report files.");
             } else {
                 $this->info('No expired report files to clean up.');
             }
-            
+
             return 0;
-            
+
         } catch (\Exception $e) {
-            $error = "Failed to clean up expired report files: " . $e->getMessage();
+            $error = 'Failed to clean up expired report files: '.$e->getMessage();
             $this->error($error);
             Log::error($error, [
                 'exception' => $e,
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return 1;
         }
     }

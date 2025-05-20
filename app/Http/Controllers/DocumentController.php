@@ -16,6 +16,7 @@ class DocumentController extends Controller
     {
         return view('documents.landing');
     }
+
     /**
      * Display a listing of the resource.
      */

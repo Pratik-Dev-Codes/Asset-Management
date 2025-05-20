@@ -27,14 +27,14 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'roles' => $this->whenLoaded('roles', function () {
-                return $this->roles->map(fn($role) => [
+                return $this->roles->map(fn ($role) => [
                     'id' => $role->id,
                     'name' => $role->name,
                     'display_name' => $role->display_name,
                 ]);
             }),
             'permissions' => $this->whenLoaded('permissions', function () {
-                return $this->getAllPermissions()->map(fn($permission) => [
+                return $this->getAllPermissions()->map(fn ($permission) => [
                     'id' => $permission->id,
                     'name' => $permission->name,
                     'display_name' => $permission->display_name,

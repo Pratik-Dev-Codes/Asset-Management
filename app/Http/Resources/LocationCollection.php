@@ -51,6 +51,6 @@ class LocationCollection extends ResourceCollection
     public function withResponse($request, $response)
     {
         $response->header('X-API-Version', '1.0.0')
-                ->header('X-API-Status', 'active');
+            ->header('X-API-Status', 'active');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -47,7 +47,7 @@ class ApiServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(function () use ($rateLimiting) {
                     Route::middleware(
-                        'throttle:api,' . $rateLimiting['max_attempts'] . ',' . $rateLimiting['decay_minutes']
+                        'throttle:api,'.$rateLimiting['max_attempts'].','.$rateLimiting['decay_minutes']
                     )->group(function () {
                         require base_path('routes/api.php');
                     });

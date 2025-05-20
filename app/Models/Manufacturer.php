@@ -66,23 +66,23 @@ class Manufacturer extends Model
     public function getSupportInfoAttribute()
     {
         $info = [];
-        
+
         if ($this->support_phone) {
-            $info[] = 'Phone: ' . $this->support_phone;
+            $info[] = 'Phone: '.$this->support_phone;
         }
-        
+
         if ($this->support_email) {
-            $info[] = 'Email: ' . $this->support_email;
+            $info[] = 'Email: '.$this->support_email;
         }
-        
+
         if ($this->url) {
-            $info[] = 'Website: ' . $this->url;
+            $info[] = 'Website: '.$this->url;
         }
-        
+
         if ($this->support_url) {
-            $info[] = 'Support: ' . $this->support_url;
+            $info[] = 'Support: '.$this->support_url;
         }
-        
+
         return implode("\n", $info);
     }
 }

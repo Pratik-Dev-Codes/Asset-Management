@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -22,13 +22,12 @@ class NotificationController extends Controller
     /**
      * Get the authenticated user's notifications.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         $notifications = $user->notifications()
             ->orderBy('created_at', 'desc')
             ->paginate($request->input('per_page', 15));
@@ -73,7 +72,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'All notifications marked as read.'
+            'message' => 'All notifications marked as read.',
         ]);
     }
 
@@ -87,7 +86,7 @@ class NotificationController extends Controller
         $count = Auth::user()->unreadNotifications->count();
 
         return response()->json([
-            'count' => $count
+            'count' => $count,
         ]);
     }
 
@@ -104,7 +103,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification deleted successfully.'
+            'message' => 'Notification deleted successfully.',
         ]);
     }
 
@@ -120,7 +119,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'All notifications have been cleared.'
+            'message' => 'All notifications have been cleared.',
         ]);
     }
 
@@ -129,6 +128,7 @@ class NotificationController extends Controller
      *
      * @param  string  $id
      * @return \Illuminate\Notifications\DatabaseNotification
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     protected function findNotification($id)

@@ -36,7 +36,7 @@ class AssetAttachment extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('storage/' . $this->storage_path);
+        return asset('storage/'.$this->storage_path);
     }
 
     public function getFormattedSizeAttribute(): string
@@ -44,6 +44,7 @@ class AssetAttachment extends Model
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = $this->size;
         $factor = floor((strlen($bytes) - 1) / 3);
-        return sprintf("%.2f", $bytes / pow(1024, $factor)) . ' ' . $units[$factor];
+
+        return sprintf('%.2f', $bytes / pow(1024, $factor)).' '.$units[$factor];
     }
 }

@@ -5,8 +5,8 @@ namespace App\Notifications;
 use App\Models\Asset; // Import the Asset model
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class NewAssetNotification extends Notification implements ShouldQueue // Implement ShouldQueue for background processing
 {
@@ -31,12 +31,12 @@ class NewAssetNotification extends Notification implements ShouldQueue // Implem
     public function via($notifiable)
     {
         $channels = ['database'];
-        
+
         // Check if user wants to receive email notifications
         if (isset($notifiable->receive_email_notifications) && $notifiable->receive_email_notifications) {
             $channels[] = 'mail';
         }
-        
+
         return $channels;
     }
 
@@ -48,16 +48,16 @@ class NewAssetNotification extends Notification implements ShouldQueue // Implem
      */
     public function toMail($notifiable)
     {
-        $url = url('/assets/' . $this->asset->id);
-        
+        $url = url('/assets/'.$this->asset->id);
+
         return (new MailMessage)
-                    ->subject('New Asset Added: ' . $this->asset->name)
-                    ->line('A new asset has been added to the system.')
-                    ->line('Asset Name: ' . $this->asset->name)
-                    ->line('Asset Type: ' . $this->asset->type)
-                    ->line('Serial Number: ' . ($this->asset->serial_number ?? 'N/A'))
-                    ->action('View Asset', $url)
-                    ->line('Thank you for using our Asset Management System!');
+            ->subject('New Asset Added: '.$this->asset->name)
+            ->line('A new asset has been added to the system.')
+            ->line('Asset Name: '.$this->asset->name)
+            ->line('Asset Type: '.$this->asset->type)
+            ->line('Serial Number: '.($this->asset->serial_number ?? 'N/A'))
+            ->action('View Asset', $url)
+            ->line('Thank you for using our Asset Management System!');
     }
 
     /**
@@ -73,7 +73,7 @@ class NewAssetNotification extends Notification implements ShouldQueue // Implem
             'asset_name' => $this->asset->name,
             'asset_tag' => $this->asset->asset_tag ?? 'N/A', // Example: use asset_tag or default
             'message' => "A new asset '{$this->asset->name}' has been created.",
-            'action_url' => url('/assets/' . $this->asset->id), // URL to view the asset
+            'action_url' => url('/assets/'.$this->asset->id), // URL to view the asset
         ];
     }
 }

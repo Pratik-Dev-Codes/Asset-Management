@@ -4,29 +4,32 @@ namespace App\Exports;
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Models\Location;
 use App\Models\Department;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class AssetsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithTitle, WithEvents, WithColumnFormatting
+class AssetsExport implements FromCollection, ShouldAutoSize, WithColumnFormatting, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     protected $assets;
+
     protected $filters;
+
     protected $includeImages;
+
     protected $includeDocuments;
 
     public function __construct($assets, array $filters = [], bool $includeImages = false, bool $includeDocuments = false)
@@ -45,9 +48,6 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, ShouldA
         return $this->assets;
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         $headings = [
@@ -88,8 +88,7 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, ShouldA
     }
 
     /**
-     * @param mixed $asset
-     * @return array
+     * @param  mixed  $asset
      */
     public function map($asset): array
     {
@@ -131,52 +130,46 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, ShouldA
         return $row;
     }
 
-    /**
-     * @return string
-     */
     public function title(): string
     {
-        $title = 'Assets Report - ' . now()->format('Y-m-d');
-        
+        $title = 'Assets Report - '.now()->format('Y-m-d');
+
         // Add filter info to title if filters are applied
         $filterParts = [];
-        
-        if (!empty($this->filters['category_id'])) {
-            $categories = AssetCategory::whereIn('id', (array)$this->filters['category_id'])
+
+        if (! empty($this->filters['category_id'])) {
+            $categories = AssetCategory::whereIn('id', (array) $this->filters['category_id'])
                 ->pluck('name')
                 ->implode(', ');
-            $filterParts[] = 'Categories: ' . $categories;
+            $filterParts[] = 'Categories: '.$categories;
         }
-        
-        if (!empty($this->filters['status'])) {
-            $statuses = implode(', ', (array)$this->filters['status']);
-            $filterParts[] = 'Status: ' . $statuses;
+
+        if (! empty($this->filters['status'])) {
+            $statuses = implode(', ', (array) $this->filters['status']);
+            $filterParts[] = 'Status: '.$statuses;
         }
-        
-        if (!empty($this->filters['location_id'])) {
-            $locations = Location::whereIn('id', (array)$this->filters['location_id'])
+
+        if (! empty($this->filters['location_id'])) {
+            $locations = Location::whereIn('id', (array) $this->filters['location_id'])
                 ->pluck('name')
                 ->implode(', ');
-            $filterParts[] = 'Locations: ' . $locations;
+            $filterParts[] = 'Locations: '.$locations;
         }
-        
-        if (!empty($filterParts)) {
-            $title .= ' (' . implode(', ', $filterParts) . ')';
+
+        if (! empty($filterParts)) {
+            $title .= ' ('.implode(', ', $filterParts).')';
         }
-        
+
         return $title;
     }
-    
-    /**
-     * @return array
-     */
+
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 // Set title
                 $event->sheet->setTitle(substr($this->title(), 0, 31)); // Excel sheet title max 31 chars
-                
+
                 // Style the header row
                 $event->sheet->getStyle('A1:'.$event->sheet->getHighestColumn().'1')->applyFromArray([
                     'font' => [
@@ -194,31 +187,28 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, ShouldA
                         ],
                     ],
                 ]);
-                
+
                 // Auto-size all columns
-                foreach(range('A', $event->sheet->getHighestColumn()) as $col) {
+                foreach (range('A', $event->sheet->getHighestColumn()) as $col) {
                     $event->sheet->getColumnDimension($col)->setAutoSize(true);
                 }
-                
+
                 // Set number format for currency and date columns
                 $lastRow = $event->sheet->getHighestRow();
-                $event->sheet->getStyle('N2:O' . $lastRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
-                $event->sheet->getStyle('M2:M' . $lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
-                $event->sheet->getStyle('P2:Q' . $lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
-                $event->sheet->getStyle('V2:W' . $lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd hh:mm');
-                
+                $event->sheet->getStyle('N2:O'.$lastRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD_SIMPLE);
+                $event->sheet->getStyle('M2:M'.$lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
+                $event->sheet->getStyle('P2:Q'.$lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
+                $event->sheet->getStyle('V2:W'.$lastRow)->getNumberFormat()->setFormatCode('yyyy-mm-dd hh:mm');
+
                 // Add filter
                 $event->sheet->setAutoFilter('A1:'.$event->sheet->getHighestColumn().'1');
-                
+
                 // Freeze the first row
                 $event->sheet->freezePane('A2');
             },
         ];
     }
-    
-    /**
-     * @return array
-     */
+
     public function columnFormats(): array
     {
         return [

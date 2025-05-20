@@ -10,11 +10,17 @@ class PurchaseOrder extends Model
     use SoftDeletes;
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_PENDING_APPROVAL = 'pending_approval';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_RECEIVED = 'received';
+
     const STATUS_PARTIALLY_RECEIVED = 'partially_received';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [
@@ -176,11 +182,11 @@ class PurchaseOrder extends Model
 
     public function isFullyReceived()
     {
-        return $this->status === self::STATUS_RECEIVED || 
-               ($this->status === self::STATUS_PARTIALLY_RECEIVED && 
+        return $this->status === self::STATUS_RECEIVED ||
+               ($this->status === self::STATUS_PARTIALLY_RECEIVED &&
                 $this->getReceivedItemsCount() >= $this->getOrderedItemsCount());
     }
-    
+
     /**
      * Update the status of the purchase order based on received items.
      *
@@ -190,7 +196,7 @@ class PurchaseOrder extends Model
     {
         $ordered = $this->getOrderedItemsCount();
         $received = $this->getReceivedItemsCount();
-        
+
         if ($ordered === 0) {
             $status = self::STATUS_DRAFT;
         } elseif ($received === 0) {
@@ -202,7 +208,7 @@ class PurchaseOrder extends Model
         } else {
             $status = self::STATUS_PARTIALLY_RECEIVED;
         }
-        
+
         $this->status = $status;
         $this->save();
     }

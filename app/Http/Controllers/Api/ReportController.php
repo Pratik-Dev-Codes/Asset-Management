@@ -18,9 +18,6 @@ class ReportController extends BaseApiController
 
     /**
      * Get all available reports.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -30,15 +27,12 @@ class ReportController extends BaseApiController
             ['id' => 'maintenance', 'name' => 'Maintenance Report', 'description' => 'Maintenance history and schedules'],
             ['id' => 'depreciation', 'name' => 'Depreciation Report', 'description' => 'Asset depreciation over time'],
         ];
-        
+
         return $this->success($reports, 'Reports retrieved successfully');
     }
 
     /**
      * Generate a new report.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function generate(Request $request): JsonResponse
     {
@@ -50,8 +44,8 @@ class ReportController extends BaseApiController
 
         // Generate a unique report ID
         $reportId = uniqid('report_', true);
-        $filename = "report_{$reportId}." . ($data['format'] ?? 'pdf');
-        
+        $filename = "report_{$reportId}.".($data['format'] ?? 'pdf');
+
         // In a real implementation, this would queue the report generation
         $report = [
             'id' => $reportId,
@@ -68,9 +62,6 @@ class ReportController extends BaseApiController
 
     /**
      * Get report status.
-     *
-     * @param string $reportId
-     * @return JsonResponse
      */
     public function status(string $reportId): JsonResponse
     {
@@ -83,14 +74,13 @@ class ReportController extends BaseApiController
             'created_at' => now()->subMinutes(5)->toDateTimeString(),
             'updated_at' => now()->toDateTimeString(),
         ];
-        
+
         return $this->success($status, 'Report status retrieved successfully');
     }
 
     /**
      * Download a generated report.
      *
-     * @param string $reportId
      * @return mixed
      */
     public function download(string $reportId)
@@ -98,18 +88,15 @@ class ReportController extends BaseApiController
         // In a real implementation, this would return the actual file
         $filename = "report_{$reportId}.pdf";
         $content = "This is a sample report with ID: {$reportId}";
-        
+
         return response($content, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
     /**
      * Get report details.
-     *
-     * @param string $reportId
-     * @return JsonResponse
      */
     public function show(string $reportId): JsonResponse
     {
@@ -124,15 +111,12 @@ class ReportController extends BaseApiController
             'updated_at' => now()->subMinutes(5)->toDateTimeString(),
             'download_url' => "/api/reports/{$reportId}/download",
         ];
-        
+
         return $this->success($report, 'Report retrieved successfully');
     }
 
     /**
      * Delete a report.
-     *
-     * @param string $reportId
-     * @return JsonResponse
      */
     public function destroy(string $reportId): JsonResponse
     {

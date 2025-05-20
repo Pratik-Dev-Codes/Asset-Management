@@ -15,7 +15,7 @@ class MessageController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please login to view messages.');
         }
 
@@ -32,7 +32,7 @@ class MessageController extends Controller
     public function inbox()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please login to view messages.');
         }
 
@@ -48,7 +48,7 @@ class MessageController extends Controller
     public function sent()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please login to view messages.');
         }
 
@@ -69,7 +69,6 @@ class MessageController extends Controller
     /**
      * Store a newly created message in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -81,7 +80,7 @@ class MessageController extends Controller
         ]);
 
         // In a real app, you would store the message in the database
-        
+
         return redirect()->route('messages.sent')
             ->with('success', 'Message sent successfully.');
     }
@@ -95,7 +94,7 @@ class MessageController extends Controller
     public function show($id)
     {
         // In a real app, you would fetch the message from the database
-        
+
         return view('messages.show');
     }
 
@@ -108,7 +107,7 @@ class MessageController extends Controller
     public function markAsRead($id)
     {
         // In a real app, you would mark the message as read in the database
-        
+
         return redirect()->back()
             ->with('success', 'Message marked as read.');
     }
@@ -122,7 +121,7 @@ class MessageController extends Controller
     public function destroy($id)
     {
         // In a real app, you would delete the message from the database
-        
+
         return redirect()->route('messages.inbox')
             ->with('success', 'Message deleted successfully.');
     }

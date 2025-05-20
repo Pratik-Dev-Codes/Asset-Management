@@ -17,27 +17,29 @@ class ReportServiceTest extends TestCase
     use RefreshDatabase;
 
     protected $reportService;
+
     protected $excelMock;
+
     protected $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Fake storage for report files
         Storage::fake('reports');
-        
+
         // Create a test user
         $this->user = User::factory()->create();
-        
+
         // Mock the Excel facade
         $this->excelMock = Mockery::mock('excel');
         $this->app->instance(Excel::class, $this->excelMock);
-        
+
         // Create an instance of the ReportService
         $this->reportService = new ReportService($this->excelMock);
     }
-    
+
     /** @test */
     public function it_generates_an_asset_report()
     {
@@ -52,18 +54,19 @@ class ReportServiceTest extends TestCase
                 'date_to' => now()->format('Y-m-d'),
             ]),
         ]);
-        
+
         // Mock the Excel facade to return a file path
-        $filePath = 'reports/asset_report_' . now()->format('YmdHis') . '.xlsx';
-        
+        $filePath = 'reports/asset_report_'.now()->format('YmdHis').'.xlsx';
+
         $this->excelMock->shouldReceive('download')
             ->once()
             ->andReturnUsing(function ($export, $fileName, $writerType) use ($filePath) {
                 // Simulate file download by creating a fake file
                 Storage::disk('reports')->put($filePath, 'Test Excel Content');
-                return response()->download(storage_path('app/' . $filePath));
+
+                return response()->download(storage_path('app/'.$filePath));
             });
-        
+
         // Generate the report
         $result = $this->reportService->generateReport(
             'asset',
@@ -75,18 +78,18 @@ class ReportServiceTest extends TestCase
             ],
             $report->id
         );
-        
+
         // Assert the result contains the expected file information
         $this->assertIsArray($result);
         $this->assertArrayHasKey('file_path', $result);
         $this->assertArrayHasKey('file_name', $result);
         $this->assertArrayHasKey('file_size', $result);
         $this->assertArrayHasKey('mime_type', $result);
-        
+
         // Assert the file was created
         $this->assertTrue(Storage::disk('reports')->exists($result['file_path']));
     }
-    
+
     /** @test */
     public function it_generates_a_user_report()
     {
@@ -100,18 +103,19 @@ class ReportServiceTest extends TestCase
                 'status' => 'active',
             ]),
         ]);
-        
+
         // Mock the Excel facade to return a file path
-        $filePath = 'reports/user_report_' . now()->format('YmdHis') . '.csv';
-        
+        $filePath = 'reports/user_report_'.now()->format('YmdHis').'.csv';
+
         $this->excelMock->shouldReceive('download')
             ->once()
             ->andReturnUsing(function ($export, $fileName, $writerType) use ($filePath) {
                 // Simulate file download by creating a fake file
                 Storage::disk('reports')->put($filePath, 'Test CSV Content');
-                return response()->download(storage_path('app/' . $filePath));
+
+                return response()->download(storage_path('app/'.$filePath));
             });
-        
+
         // Generate the report
         $result = $this->reportService->generateReport(
             'user',
@@ -122,7 +126,7 @@ class ReportServiceTest extends TestCase
             ],
             $report->id
         );
-        
+
         // Assert the result contains the expected file information
         $this->assertIsArray($result);
         $this->assertArrayHasKey('file_path', $result);
@@ -130,7 +134,7 @@ class ReportServiceTest extends TestCase
         $this->assertStringEndsWith('.csv', $result['file_name']);
         $this->assertEquals('text/csv', $result['mime_type']);
     }
-    
+
     /** @test */
     public function it_generates_a_transaction_report()
     {
@@ -145,18 +149,19 @@ class ReportServiceTest extends TestCase
                 'date_to' => now()->format('Y-m-d'),
             ]),
         ]);
-        
+
         // Mock the Excel facade to return a file path
-        $filePath = 'reports/transaction_report_' . now()->format('YmdHis') . '.pdf';
-        
+        $filePath = 'reports/transaction_report_'.now()->format('YmdHis').'.pdf';
+
         $this->excelMock->shouldReceive('download')
             ->once()
             ->andReturnUsing(function ($export, $fileName, $writerType) use ($filePath) {
                 // Simulate file download by creating a fake file
                 Storage::disk('reports')->put($filePath, 'Test PDF Content');
-                return response()->download(storage_path('app/' . $filePath));
+
+                return response()->download(storage_path('app/'.$filePath));
             });
-        
+
         // Generate the report
         $result = $this->reportService->generateReport(
             'transaction',
@@ -168,7 +173,7 @@ class ReportServiceTest extends TestCase
             ],
             $report->id
         );
-        
+
         // Assert the result contains the expected file information
         $this->assertIsArray($result);
         $this->assertArrayHasKey('file_path', $result);
@@ -176,13 +181,13 @@ class ReportServiceTest extends TestCase
         $this->assertStringEndsWith('.pdf', $result['file_name']);
         $this->assertEquals('application/pdf', $result['mime_type']);
     }
-    
+
     /** @test */
     public function it_throws_an_exception_for_invalid_report_type()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid report type: invalid_type');
-        
+
         $this->reportService->generateReport(
             'invalid_type',
             'xlsx',
@@ -190,13 +195,13 @@ class ReportServiceTest extends TestCase
             1
         );
     }
-    
+
     /** @test */
     public function it_throws_an_exception_for_invalid_export_format()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid export format: invalid_format');
-        
+
         $this->reportService->generateReport(
             'asset',
             'invalid_format',
@@ -204,7 +209,7 @@ class ReportServiceTest extends TestCase
             1
         );
     }
-    
+
     protected function tearDown(): void
     {
         parent::tearDown();

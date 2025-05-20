@@ -15,7 +15,7 @@ class AssetObserver
         Log::info('New asset created', [
             'asset_id' => $asset->id,
             'name' => $asset->name,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
         ]);
     }
 
@@ -26,7 +26,7 @@ class AssetObserver
     {
         // Log changes to sensitive fields
         $changes = [];
-        
+
         // Example of tracking specific field changes
         foreach ($asset->getDirty() as $key => $value) {
             $changes[$key] = [
@@ -34,12 +34,12 @@ class AssetObserver
                 'new' => $value,
             ];
         }
-        
-        if (!empty($changes)) {
+
+        if (! empty($changes)) {
             Log::info('Asset updated', [
                 'asset_id' => $asset->id,
                 'changes' => $changes,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
         }
     }
@@ -52,7 +52,7 @@ class AssetObserver
         Log::warning('Asset deleted', [
             'asset_id' => $asset->id,
             'name' => $asset->name,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
         ]);
     }
 
@@ -64,7 +64,7 @@ class AssetObserver
         Log::info('Asset restored', [
             'asset_id' => $asset->id,
             'name' => $asset->name,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
         ]);
     }
 
@@ -76,7 +76,7 @@ class AssetObserver
         Log::warning('Asset force deleted', [
             'asset_id' => $asset->id,
             'name' => $asset->name,
-            'user_id' => auth()->id()
+            'user_id' => auth()->id(),
         ]);
     }
 }

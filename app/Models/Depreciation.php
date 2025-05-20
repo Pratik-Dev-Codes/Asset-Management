@@ -2,20 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * 
- *
  * @property-read \App\Models\Asset|null $asset
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation query()
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Depreciation withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Depreciation extends Model
@@ -60,7 +60,7 @@ class Depreciation extends Model
         } elseif ($this->method === 'double_declining') {
             return $this->calculateDoubleDecliningDepreciation();
         }
-        
+
         return 0;
     }
 
@@ -69,11 +69,11 @@ class Depreciation extends Model
         if ($this->months <= 0) {
             return 0;
         }
-        
+
         $depreciationPerMonth = $this->purchase_cost / $this->months;
         $monthsElapsed = now()->diffInMonths($this->purchase_date);
         $totalDepreciation = min($depreciationPerMonth * $monthsElapsed, $this->purchase_cost);
-        
+
         return max(0, $totalDepreciation);
     }
 
@@ -82,23 +82,23 @@ class Depreciation extends Model
         if ($this->months <= 0) {
             return 0;
         }
-        
+
         $rate = 2 / $this->months;
         $bookValue = $this->purchase_cost;
         $totalDepreciation = 0;
         $monthsElapsed = now()->diffInMonths($this->purchase_date);
-        
+
         for ($i = 0; $i < $monthsElapsed; $i++) {
             $depreciation = $bookValue * $rate;
             $totalDepreciation += $depreciation;
             $bookValue -= $depreciation;
-            
+
             if ($bookValue <= 0) {
                 $totalDepreciation = $this->purchase_cost;
                 break;
             }
         }
-        
+
         return min($totalDepreciation, $this->purchase_cost);
     }
 }

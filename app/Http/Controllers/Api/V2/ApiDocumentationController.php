@@ -10,28 +10,30 @@ use Illuminate\Http\Request;
  *     title="Asset Management System API",
  *     version="2.0.0",
  *     description="API documentation for the Asset Management System (v2.0)",
+ *
  *     @OA\Contact(
  *         email="support@example.com",
  *         name="API Support"
  *     ),
+ *
  *     @OA\License(
  *         name="MIT",
  *         url="https://opensource.org/licenses/MIT"
  *     )
  * )
- * 
+ *
  * @OA\Server(
  *     url="/api/v2",
  *     description="API v2 Server"
  * )
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT"
  * )
- * 
+ *
  * @OA\Tag(
  *     name="Authentication",
  *     description="API Endpoints for Authentication"
@@ -56,11 +58,14 @@ class ApiDocumentationController extends Controller
      *     path="/api/v2/documentation",
      *     summary="Get API documentation",
      *     tags={"Documentation"},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="API documentation",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -97,8 +102,8 @@ class ApiDocumentationController extends Controller
                     'export' => url('/api/v2/reports'),
                     'status' => url('/api/v2/reports/{report}/status'),
                     'download' => url('/api/v2/reports/{report}/download'),
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

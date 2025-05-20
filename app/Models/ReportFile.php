@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * 
- *
  * @property int $id
  * @property int $report_id
  * @property string $file_name
@@ -27,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property-read string $formatted_file_size
  * @property-read bool $is_expired
  * @property-read \App\Models\Report $report
+ *
  * @method static \Database\Factories\ReportFileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|ReportFile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReportFile newQuery()
@@ -48,6 +47,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|ReportFile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ReportFile withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ReportFile withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class ReportFile extends Model
@@ -133,14 +133,14 @@ class ReportFile extends Model
     {
         $bytes = $this->file_size;
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        
+
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        
+
         $bytes /= (1 << (10 * $pow));
-        
-        return round($bytes, 2) . ' ' . $units[$pow];
+
+        return round($bytes, 2).' '.$units[$pow];
     }
 
     /**
@@ -153,7 +153,7 @@ class ReportFile extends Model
         if (! $this->expires_at) {
             return false;
         }
-        
+
         return $this->expires_at->isPast();
     }
 
@@ -167,7 +167,7 @@ class ReportFile extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 
@@ -192,6 +192,7 @@ class ReportFile extends Model
     public function expiresAfterDays($days = 7)
     {
         $this->expires_at = now()->addDays($days);
+
         return $this;
     }
 }

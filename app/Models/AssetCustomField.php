@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 
- *
  * @property int $id
  * @property string $field_name
  * @property string $field_type
@@ -20,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Asset|null $asset
  * @property-read mixed $display_value
  * @property array $options
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField ofType($type)
@@ -32,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField whereIsRequired($value)
  * @method static \Illuminate\Database\Eloquent\Builder|AssetCustomField whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AssetCustomField extends Model
@@ -94,8 +94,8 @@ class AssetCustomField extends Model
      */
     public function getOptionsAttribute()
     {
-        return is_array($this->field_options) 
-            ? $this->field_options 
+        return is_array($this->field_options)
+            ? $this->field_options
             : json_decode($this->field_options, true) ?? [];
     }
 
@@ -107,8 +107,8 @@ class AssetCustomField extends Model
      */
     public function setOptionsAttribute($value)
     {
-        $this->attributes['field_options'] = is_array($value) 
-            ? json_encode($value) 
+        $this->attributes['field_options'] = is_array($value)
+            ? json_encode($value)
             : $value;
     }
 
@@ -124,29 +124,29 @@ class AssetCustomField extends Model
             case 'radio':
             case 'checkbox':
                 $options = $this->options;
-                $values = is_array($this->field_value) 
-                    ? $this->field_value 
+                $values = is_array($this->field_value)
+                    ? $this->field_value
                     : json_decode($this->field_value, true) ?? [];
-                
+
                 if (empty($values)) {
                     return null;
                 }
-                
-                return is_array($values) 
-                    ? implode(', ', array_map(function($value) use ($options) {
+
+                return is_array($values)
+                    ? implode(', ', array_map(function ($value) use ($options) {
                         return $options[$value] ?? $value;
                     }, $values))
                     : ($options[$values] ?? $values);
-                
+
             case 'boolean':
                 return (bool) $this->field_value ? 'Yes' : 'No';
-                
+
             case 'date':
                 return $this->field_value ? \Carbon\Carbon::parse($this->field_value)->format('Y-m-d') : null;
-                
+
             case 'datetime':
                 return $this->field_value ? \Carbon\Carbon::parse($this->field_value)->format('Y-m-d H:i:s') : null;
-                
+
             default:
                 return $this->field_value;
         }

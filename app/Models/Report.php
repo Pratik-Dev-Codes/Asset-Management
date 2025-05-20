@@ -3,50 +3,41 @@
 namespace App\Models;
 
 use App\Exports\ReportExport;
-use App\Models\User;
 use App\Models\ReportFile;
 use App\Models\Transaction;
-use App\Notifications\{
-    ReportGenerated,
-    ReportGenerationFailed
-};
+use App\Models\User;
+use App\Notifications\ReportGenerated;
+use App\Notifications\ReportGenerationFailed;
 use App\Traits\HasAuthorization;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\{
-    Model,
-    SoftDeletes,
-    Factories\HasFactory,
-    Relations\BelongsTo,
-    Relations\HasMany,
-    Builder,
-    Collection
-};
-use Illuminate\Support\Facades\{
-    Auth,
-    Cache,
-    Config,
-    DB,
-    Event,
-    Log,
-    Mail,
-    Queue,
-    Redis,
-    Storage,
-    Validator
-};
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\{
-    Rule,
-    ValidationException
-};
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel as ExcelFacade;
 use Throwable;
 
 /**
  * Class Report
  *
- * @package App\Models
  * @property int $id
  * @property string $name
  * @property string|null $description
@@ -70,6 +61,7 @@ use Throwable;
  * @property-read int|null $files_count
  * @property-read string|null $download_url
  * @property-read ReportFile|null $latestFile
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Report accessibleBy($userId)
  * @method static \Database\Factories\ReportFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Report newModelQuery()
@@ -92,11 +84,12 @@ use Throwable;
  * @method static \Illuminate\Database\Eloquent\Builder|Report whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Report withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Report withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Report extends Model
 {
-    use HasFactory, SoftDeletes, HasAuthorization;
+    use HasAuthorization, HasFactory, SoftDeletes;
 
     /**
      * Report types and their allowed columns.
@@ -106,16 +99,16 @@ class Report extends Model
     public const TYPES = [
         'asset' => [
             'id', 'name', 'description', 'status', 'purchase_date', 'purchase_cost',
-            'warranty_months', 'depreciation', 'supplier_id', 'location_id', 'assigned_to', 'created_at', 'updated_at'
+            'warranty_months', 'depreciation', 'supplier_id', 'location_id', 'assigned_to', 'created_at', 'updated_at',
         ],
         'user' => [
             'id', 'name', 'email', 'username', 'employee_num', 'manager_id', 'department_id',
-            'location_id', 'phone', 'jobtitle', 'created_at', 'updated_at'
+            'location_id', 'phone', 'jobtitle', 'created_at', 'updated_at',
         ],
         'accessory' => [
             'id', 'name', 'category_id', 'supplier_id', 'location_id', 'purchase_date',
-            'purchase_cost', 'order_number', 'min_amt', 'qty', 'created_at', 'updated_at'
-        ]
+            'purchase_cost', 'order_number', 'min_amt', 'qty', 'created_at', 'updated_at',
+        ],
     ];
 
     /**
@@ -212,19 +205,16 @@ class Report extends Model
 
     /**
      * Check if the report is scheduled.
-     *
-     * @return bool
      */
     public function getIsScheduledAttribute(): bool
     {
-        return !empty($this->schedule_frequency);
+        return ! empty($this->schedule_frequency);
     }
 
     /**
      * Validate the model's attributes.
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @return void
      */
     public function validate(): void
     {
@@ -240,9 +230,9 @@ class Report extends Model
 
         // Validate columns against report type
         $this->validateColumns();
-        
+
         // Validate filters if present
-        if (!empty($this->filters)) {
+        if (! empty($this->filters)) {
             $this->validateFilters();
         }
     }
@@ -251,20 +241,19 @@ class Report extends Model
      * Validate report columns against the allowed columns for the report type.
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @return void
      */
     protected function validateColumns(): void
     {
         $allowedColumns = self::TYPES[$this->type] ?? [];
-        
+
         $invalidColumns = array_diff($this->columns, $allowedColumns);
-        
-        if (!empty($invalidColumns)) {
+
+        if (! empty($invalidColumns)) {
             throw ValidationException::withMessages([
                 'columns' => [
-                    'The following columns are not valid for the selected report type: ' . 
-                    implode(', ', $invalidColumns)
-                ]
+                    'The following columns are not valid for the selected report type: '.
+                    implode(', ', $invalidColumns),
+                ],
             ]);
         }
     }
@@ -273,7 +262,6 @@ class Report extends Model
      * Validate report filters.
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @return void
      */
     protected function validateFilters(): void
     {
@@ -300,54 +288,47 @@ class Report extends Model
 
     /**
      * Generate a cache key for the report.
-     *
-     * @param string $suffix
-     * @return string
      */
     public function getReportCacheKey(string $suffix = ''): string
     {
-        return "report_{$this->id}" . ($suffix ? "_$suffix" : '');
+        return "report_{$this->id}".($suffix ? "_$suffix" : '');
     }
 
     /**
      * Clear all cached data for this report.
-     *
-     * @return bool
      */
     public function clearReportCache(): bool
     {
         try {
             $cacheKey = $this->getReportCacheKey('*');
             $keys = Redis::connection()->keys($cacheKey);
-            
-            if (!empty($keys)) {
+
+            if (! empty($keys)) {
                 Redis::connection()->del($keys);
             }
-            
+
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to clear report cache', [
                 'report_id' => $this->id,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
 
     /**
      * Get the report data with caching.
-     *
-     * @param bool $forceRefresh
-     * @return array
      */
     public function getData(bool $forceRefresh = false): array
     {
         $cacheKey = $this->getCacheKey('data');
-        
+
         if ($forceRefresh) {
             Cache::forget($cacheKey);
         }
-        
+
         return Cache::remember($cacheKey, now()->addHour(), function () {
             try {
                 // Implement your data retrieval logic here
@@ -414,12 +395,11 @@ class Report extends Model
 
     /**
      * Get the URL to download the latest export.
-     *
-     * @return string|null
      */
     public function getDownloadUrlAttribute(): ?string
     {
         $file = $this->latestFile;
+
         return $file ? Storage::url($file->file_path) : null;
     }
 
@@ -443,8 +423,6 @@ class Report extends Model
 
     /**
      * Get the validation rules for the report.
-     *
-     * @return array
      */
     protected function getValidationRules(): array
     {
@@ -467,8 +445,6 @@ class Report extends Model
 
     /**
      * Get the validation error messages.
-     *
-     * @return array
      */
     protected function getValidationMessages(): array
     {
@@ -498,7 +474,6 @@ class Report extends Model
     /**
      * Generate the report data based on the report configuration.
      *
-     * @return array
      * @throws \Exception
      */
     public function generateData(): array
@@ -514,9 +489,9 @@ class Report extends Model
             Log::error('Failed to generate report data', [
                 'report_id' => $this->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             throw $e;
         }
     }
@@ -529,13 +504,13 @@ class Report extends Model
     protected function buildBaseQuery()
     {
         $model = $this->getModelForType();
+
         return $model::query();
     }
 
     /**
      * Get the model class for the report type.
      *
-     * @return string
      * @throws \Exception
      */
     protected function getModelForType(): string
@@ -546,7 +521,7 @@ class Report extends Model
             'transaction' => Transaction::class,
         ];
 
-        if (!isset($models[$this->type])) {
+        if (! isset($models[$this->type])) {
             throw new \Exception("Unsupported report type: {$this->type}");
         }
 
@@ -576,7 +551,6 @@ class Report extends Model
      * Apply a single filter to the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $filter
      * @return \Illuminate\Database\Query\Builder
      */
     protected function applyFilter($query, array $filter)
@@ -585,19 +559,19 @@ class Report extends Model
         $operator = $filter['operator'] ?? '=';
         $value = $filter['value'] ?? null;
 
-        if (!$column || !$this->isValidColumn($column)) {
+        if (! $column || ! $this->isValidColumn($column)) {
             return $query;
         }
 
         switch (strtolower($operator)) {
             case 'in':
-                return $query->whereIn($column, (array)$value);
+                return $query->whereIn($column, (array) $value);
             case 'not_in':
-                return $query->whereNotIn($column, (array)$value);
+                return $query->whereNotIn($column, (array) $value);
             case 'between':
-                return $query->whereBetween($column, (array)$value);
+                return $query->whereBetween($column, (array) $value);
             case 'not_between':
-                return $query->whereNotBetween($column, (array)$value);
+                return $query->whereNotBetween($column, (array) $value);
             case 'null':
                 return $query->whereNull($column);
             case 'not_null':
@@ -645,8 +619,8 @@ class Report extends Model
             return $query;
         }
 
-        $columns = array_filter((array)$this->grouping['columns'], [$this, 'isValidColumn']);
-        
+        $columns = array_filter((array) $this->grouping['columns'], [$this, 'isValidColumn']);
+
         if (empty($columns)) {
             return $query;
         }
@@ -656,37 +630,29 @@ class Report extends Model
 
     /**
      * Check if a column is valid for the current report type.
-     *
-     * @param  string  $column
-     * @return bool
      */
     protected function isValidColumn(string $column): bool
     {
         $model = $this->getModelForType();
         $model = new $model;
-        
-        return in_array($column, $model->getFillable()) || 
+
+        return in_array($column, $model->getFillable()) ||
                in_array($column, $model->getDates()) ||
                $column === $model->getKeyName();
     }
 
     /**
      * Generate a cache key for the report.
-     *
-     * @param  string  $suffix
-     * @return string
      */
     protected function getCacheKey(string $suffix = ''): string
     {
-        return "report_{$this->id}_" . md5(json_encode($this->only([
-            'filters', 'columns', 'sorting', 'grouping'
-        ]))) . ($suffix ? "_{$suffix}" : '');
+        return "report_{$this->id}_".md5(json_encode($this->only([
+            'filters', 'columns', 'sorting', 'grouping',
+        ]))).($suffix ? "_{$suffix}" : '');
     }
 
     /**
      * Clear the cache for this report.
-     *
-     * @return void
      */
     public function clearCache(): void
     {
@@ -696,16 +662,15 @@ class Report extends Model
     /**
      * Export the report to a file.
      *
-     * @param  string  $format
-     * @param  int  $userId
      * @return string The file path of the exported report
+     *
      * @throws \Exception
      */
-    public function export(string $format, int $userId = null): ReportFile
+    public function export(string $format, ?int $userId = null): ReportFile
     {
         $formats = ['xlsx', 'csv', 'pdf'];
-        
-        if (!in_array($format, $formats)) {
+
+        if (! in_array($format, $formats)) {
             throw new \InvalidArgumentException("Unsupported export format: {$format}");
         }
 
@@ -758,31 +723,27 @@ class Report extends Model
                 'report_id' => $this->id,
                 'format' => $format,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             throw new \Exception('Failed to export report. Please try again later.');
         }
     }
 
     /**
      * Generate a file name for the export.
-     *
-     * @param  string  $extension
-     * @return string
      */
     protected function generateFileName(string $extension): string
     {
         $name = Str::slug($this->name);
         $timestamp = now()->format('Y-m-d_His');
+
         return "{$name}_{$timestamp}.{$extension}";
     }
 
     /**
      * Schedule the report to be generated at the specified frequency.
      *
-     * @param  string  $frequency
-     * @param  bool  $isActive
      * @return bool
      */
     public function schedule(string $frequency, bool $isActive = true)
@@ -803,13 +764,13 @@ class Report extends Model
      */
     public function pause()
     {
-        if (!$this->is_scheduled) {
+        if (! $this->is_scheduled) {
             return false;
         }
-        
+
         $this->is_active = false;
         $this->save();
-        
+
         return true;
     }
 
@@ -820,14 +781,14 @@ class Report extends Model
      */
     public function resume()
     {
-        if (!$this->is_scheduled) {
+        if (! $this->is_scheduled) {
             return false;
         }
-        
+
         $this->is_active = true;
         $this->next_run_at = $this->calculateNextRunDate();
         $this->save();
-        
+
         return true;
     }
 
@@ -838,15 +799,15 @@ class Report extends Model
      */
     public function unschedule()
     {
-        if (!$this->is_scheduled) {
+        if (! $this->is_scheduled) {
             return true;
         }
-        
+
         $this->is_scheduled = false;
         $this->is_active = false;
         $this->next_run_at = null;
         $this->save();
-        
+
         return true;
     }
 
@@ -857,14 +818,14 @@ class Report extends Model
      */
     public function getStatusAttribute()
     {
-        if (!$this->is_scheduled) {
+        if (! $this->is_scheduled) {
             return 'not_scheduled';
         }
-        
-        if (!$this->is_active) {
+
+        if (! $this->is_active) {
             return 'paused';
         }
-        
+
         return 'active';
     }
 
@@ -875,22 +836,20 @@ class Report extends Model
      */
     public function getNextRunAttribute()
     {
-        if (!$this->is_scheduled || !$this->is_active) {
+        if (! $this->is_scheduled || ! $this->is_active) {
             return null;
         }
-        
+
         return $this->calculateNextRunDate()->format('Y-m-d H:i:s');
     }
 
     /**
      * Calculate the next run date based on the frequency.
-     *
-     * @return Carbon
      */
     protected function calculateNextRunDate(): Carbon
     {
         $now = now();
-        
+
         switch ($this->schedule_frequency) {
             case 'daily':
                 return $now->addDay();
@@ -922,23 +881,23 @@ class Report extends Model
         foreach ($reports as $report) {
             try {
                 DB::beginTransaction();
-                
+
                 // Export the report (this will also update last_generated_at)
                 $report->export('xlsx', $report->created_by);
-                
+
                 // Schedule the next run
                 $report->next_run_at = $report->calculateNextRunDate();
                 $report->save();
-                
+
                 $count++;
                 DB::commit();
-                
+
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Failed to process scheduled report', [
                     'report_id' => $report->id,
                     'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
+                    'trace' => $e->getTraceAsString(),
                 ]);
             }
         }

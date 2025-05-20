@@ -15,12 +15,13 @@ class ReportExportTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+
     protected $report;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
 
@@ -29,7 +30,7 @@ class ReportExportTest extends TestCase
             'type' => 'assets',
             'columns' => ['id', 'name', 'created_at'],
             'filters' => [],
-            'sorting' => ['created_at' => 'desc']
+            'sorting' => ['created_at' => 'desc'],
         ]);
     }
 
@@ -64,7 +65,7 @@ class ReportExportTest extends TestCase
         $expected = [
             'ID',
             'Name',
-            'Created At'
+            'Created At',
         ];
 
         $this->assertEquals($expected, $headings);
@@ -88,7 +89,7 @@ class ReportExportTest extends TestCase
             'created_by' => $this->user->id,
             'type' => 'assets',
             'columns' => ['id', 'name'],
-            'filters' => ['id' => -1] // This should return no results
+            'filters' => ['id' => -1], // This should return no results
         ]);
 
         $export = new ReportExport($emptyReport);

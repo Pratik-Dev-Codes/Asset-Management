@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getQueueStatus()
  * @method static array getScheduledTasksStatus()
  * @method static array getSystemStatus()
- * 
+ *
  * @see \App\Services\MonitorService
  */
 class Monitor extends Facade

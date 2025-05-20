@@ -8,11 +8,17 @@ class AssetStatus extends Model
 {
     // Status constants
     public const DEPLOYED = 1;
+
     public const READY_TO_DEPLOY = 2;
+
     public const PENDING = 3;
+
     public const ARCHIVED = 4;
+
     public const OUT_FOR_REPAIR = 5;
+
     public const BROKEN = 6;
+
     public const LOST = 7;
 
     /**
@@ -58,8 +64,6 @@ class AssetStatus extends Model
 
     /**
      * Get the default statuses for the application.
-     *
-     * @return array
      */
     public static function getDefaultStatuses(): array
     {

@@ -13,27 +13,18 @@ class ApiResponseService
      * Generate a success response.
      *
      * @param  mixed  $data
-     * @param  string  $message
-     * @param  int  $code
-     * @return \Illuminate\Http\JsonResponse
      */
     public function success($data = null, string $message = 'Success', int $code = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ], $code);
     }
 
     /**
      * Generate an error response.
-     *
-     * @param  string  $message
-     * @param  int  $code
-     * @param  array  $errors
-     * @param  \Throwable|null  $exception
-     * @return \Illuminate\Http\JsonResponse
      */
     public function error(
         string $message = 'Error',
@@ -45,7 +36,7 @@ class ApiResponseService
             Log::error($exception->getMessage(), [
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'trace' => $exception->getTraceAsString()
+                'trace' => $exception->getTraceAsString(),
             ]);
         }
 
@@ -54,8 +45,7 @@ class ApiResponseService
             'message' => $message,
         ];
 
-
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -67,15 +57,11 @@ class ApiResponseService
             ];
         }
 
-
         return response()->json($response, $code);
     }
 
     /**
      * Generate a not found response.
-     *
-     * @param  string  $message
-     * @return \Illuminate\Http\JsonResponse
      */
     public function notFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -84,9 +70,6 @@ class ApiResponseService
 
     /**
      * Generate an unauthorized response.
-     *
-     * @param  string  $message
-     * @return \Illuminate\Http\JsonResponse
      */
     public function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -95,9 +78,6 @@ class ApiResponseService
 
     /**
      * Generate a forbidden response.
-     *
-     * @param  string  $message
-     * @return \Illuminate\Http\JsonResponse
      */
     public function forbidden(string $message = 'Forbidden'): JsonResponse
     {
@@ -106,24 +86,18 @@ class ApiResponseService
 
     /**
      * Generate a validation error response.
-     *
-     * @param  array  $errors
-     * @param  string  $message
-     * @return \Illuminate\Http\JsonResponse
      */
     public function validationError(array $errors, string $message = 'Validation Error'): JsonResponse
     {
         return response()->json([
             'success' => false,
             'message' => $message,
-            'errors' => $errors
+            'errors' => $errors,
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
      * Generate a no content response.
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
     public function noContent(): JsonResponse
     {

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Transaction extends Model
@@ -30,8 +30,6 @@ class Transaction extends Model
 
     /**
      * Get the user who created the transaction.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function creator(): BelongsTo
     {
@@ -40,8 +38,6 @@ class Transaction extends Model
 
     /**
      * Get the user who last updated the transaction.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function updater(): BelongsTo
     {
@@ -52,7 +48,6 @@ class Transaction extends Model
      * Scope a query to only include transactions of a given type.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $type
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeOfType($query, string $type)
@@ -78,13 +73,10 @@ class Transaction extends Model
 
     /**
      * Get the formatted amount with currency symbol.
-     *
-     * @param  string  $currency
-     * @return string
      */
     public function getFormattedAmountAttribute(string $currency = '₹'): string
     {
-        return $currency . number_format($this->amount, 2);
+        return $currency.number_format($this->amount, 2);
     }
 
     /**

@@ -39,56 +39,56 @@ class Kernel extends ConsoleKernel
         if (Config::get('reports.cleanup.enabled', true)) {
             $retentionDays = Config::get('reports.cleanup.retention_days', 7);
             $scheduleTime = Config::get('reports.cleanup_schedule.time', '00:00');
-            
+
             $schedule->command('reports:cleanup', [
                 '--days' => $retentionDays,
             ])
-            ->dailyAt($scheduleTime)
-            ->onOneServer()
-            ->appendOutputTo(storage_path('logs/report-cleanup.log'));
+                ->dailyAt($scheduleTime)
+                ->onOneServer()
+                ->appendOutputTo(storage_path('logs/report-cleanup.log'));
         }
-        
+
         // Schedule the running of scheduled reports
         $schedule->command('reports:run-scheduled')
             ->everyFiveMinutes()
             ->onOneServer()
             ->appendOutputTo(storage_path('logs/scheduled-reports.log'));
-            
+
         // Schedule cache management to run daily at 3 AM
         $schedule->command('cache:manage')
             ->dailyAt('03:00')
             ->onOneServer()
             ->appendOutputTo(storage_path('logs/cache-management.log'));
-            
+
         // Schedule the cleanup of old notifications
         $schedule->command('notifications:prune', [
             '--days' => 30,
             '--force' => true,
         ])
-        ->daily()
-        ->onOneServer()
-        ->appendOutputTo(storage_path('logs/notification-cleanup.log'));
-        
+            ->daily()
+            ->onOneServer()
+            ->appendOutputTo(storage_path('logs/notification-cleanup.log'));
+
         // Schedule queue worker monitoring
         $schedule->command('queue:monitor')
             ->everyFiveMinutes()
             ->onOneServer()
             ->appendOutputTo(storage_path('logs/queue-monitor.log'));
-            
+
         // Schedule memory usage check
         $schedule->command('memory:check')
             ->hourly()
             ->onOneServer()
             ->appendOutputTo(storage_path('logs/memory-usage.log'));
-            
+
         // Schedule log cleanup
         $schedule->command('logs:cleanup', [
             '--days' => 30,
         ])
-        ->dailyAt('02:00')
-        ->onOneServer()
-        ->appendOutputTo(storage_path('logs/log-cleanup.log'));
-        
+            ->dailyAt('02:00')
+            ->onOneServer()
+            ->appendOutputTo(storage_path('logs/log-cleanup.log'));
+
         // Clean up old activity logs weekly
         $schedule->command('activity-logs:cleanup')
             ->weekly()

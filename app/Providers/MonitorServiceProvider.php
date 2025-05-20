@@ -13,7 +13,7 @@ class MonitorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('monitor', function ($app) {
-            return new MonitorService();
+            return new MonitorService;
         });
     }
 

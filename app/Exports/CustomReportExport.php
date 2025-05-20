@@ -3,20 +3,23 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class CustomReportExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithEvents
+class CustomReportExport implements FromCollection, WithEvents, WithHeadings, WithMapping, WithTitle
 {
     protected $data;
+
     protected $columns;
+
     protected $reportType;
+
     protected $headings = [];
 
     public function __construct($data, array $columns, string $reportType)
@@ -88,28 +91,23 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
         }
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return $this->headings;
     }
 
     /**
-     * @param mixed $row
-     *
-     * @return array
+     * @param  mixed  $row
      */
     public function map($row): array
     {
         $mappedRow = [];
-        
+
         // Map the selected columns
         foreach ($this->columns as $column) {
             $mappedRow[] = $row[$column] ?? '';
         }
-        
+
         // Add report type specific data
         if ($this->reportType === 'financial') {
             $mappedRow[] = $row['depreciation'] ?? 0;
@@ -121,34 +119,28 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
             $mappedRow[] = $row['is_warranty_valid'] ?? 'N/A';
             $mappedRow[] = $row['last_inspection'] ?? 'N/A';
         }
-        
+
         return $mappedRow;
     }
 
-    /**
-     * @return string
-     */
     public function title(): string
     {
-        return ucfirst($this->reportType) . ' Report';
+        return ucfirst($this->reportType).' Report';
     }
 
-    /**
-     * @return array
-     */
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet;
-                
+
                 // Set auto size for all columns
                 foreach (range('A', $sheet->getHighestColumn()) as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
-                
+
                 // Style the header row
-                $headerRange = 'A1:' . $sheet->getHighestColumn() . '1';
+                $headerRange = 'A1:'.$sheet->getHighestColumn().'1';
                 $sheet->getStyle($headerRange)->applyFromArray([
                     'font' => [
                         'bold' => true,
@@ -168,9 +160,9 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
                         'vertical' => Alignment::VERTICAL_CENTER,
                     ],
                 ]);
-                
+
                 // Style all cells
-                $dataRange = 'A1:' . $sheet->getHighestColumn() . $sheet->getHighestRow();
+                $dataRange = 'A1:'.$sheet->getHighestColumn().$sheet->getHighestRow();
                 $sheet->getStyle($dataRange)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -182,11 +174,11 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
                         'wrapText' => true,
                     ],
                 ]);
-                
+
                 // Format currency columns
                 $currencyColumns = [];
                 $numericColumns = [];
-                
+
                 foreach ($this->columns as $index => $column) {
                     if (in_array($column, ['purchase_cost', 'current_value', 'depreciation', 'maintenance_costs'])) {
                         $currencyColumns[] = $this->getColumnLetter($index + 1);
@@ -194,24 +186,24 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
                         $numericColumns[] = $this->getColumnLetter($index + 1);
                     }
                 }
-                
+
                 // Apply currency format
                 foreach ($currencyColumns as $col) {
-                    $sheet->getStyle($col . '2:' . $col . $sheet->getHighestRow())
+                    $sheet->getStyle($col.'2:'.$col.$sheet->getHighestRow())
                         ->getNumberFormat()
                         ->setFormatCode('$#,##0.00');
                 }
-                
+
                 // Apply number format
                 foreach ($numericColumns as $col) {
-                    $sheet->getStyle($col . '2:' . $col . $sheet->getHighestRow())
+                    $sheet->getStyle($col.'2:'.$col.$sheet->getHighestRow())
                         ->getNumberFormat()
                         ->setFormatCode('#,##0');
                 }
-                
+
                 // Freeze the first row
                 $sheet->freezePane('A2');
-                
+
                 // Set print settings
                 $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
                 $sheet->getPageSetup()->setFitToWidth(1);
@@ -219,21 +211,19 @@ class CustomReportExport implements FromCollection, WithHeadings, WithMapping, W
             },
         ];
     }
-    
+
     /**
      * Convert column number to letter (e.g., 1 -> A, 27 -> AA)
-     * 
-     * @param int $number
-     * @return string
      */
     protected function getColumnLetter(int $number): string
     {
         $letter = '';
         while ($number > 0) {
             $temp = ($number - 1) % 26;
-            $letter = chr(65 + $temp) . $letter;
+            $letter = chr(65 + $temp).$letter;
             $number = intval(($number - $temp) / 26);
         }
+
         return $letter ?: 'A';
     }
 }

@@ -25,21 +25,21 @@ class StoreReportRequest extends FormRequest
     public function rules()
     {
         $reportId = $this->route('report') ? $this->route('report')->id : null;
-        
+
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('reports', 'name')->ignore($reportId)
+                Rule::unique('reports', 'name')->ignore($reportId),
             ],
             'description' => 'nullable|string|max:1000',
             'type' => [
                 'required',
                 'string',
                 Rule::in([
-                    'asset', 'inventory', 'maintenance', 'depreciation', 'custom'
-                ])
+                    'asset', 'inventory', 'maintenance', 'depreciation', 'custom',
+                ]),
             ],
             'filters' => 'nullable|array',
             'filters.*.field' => 'required_with:filters|string',

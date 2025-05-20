@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Inventory extends Model
 {
@@ -112,8 +112,6 @@ class Inventory extends Model
 
     /**
      * Check if the inventory is low on stock.
-     *
-     * @return bool
      */
     public function getIsLowStockAttribute(): bool
     {
@@ -126,8 +124,6 @@ class Inventory extends Model
 
     /**
      * Get the formatted unit price.
-     *
-     * @return string
      */
     public function getFormattedUnitPriceAttribute(): string
     {
@@ -136,8 +132,6 @@ class Inventory extends Model
 
     /**
      * Get the formatted total value.
-     *
-     * @return string
      */
     public function getFormattedTotalValueAttribute(): string
     {
@@ -153,7 +147,7 @@ class Inventory extends Model
     public function scopeLowStock($query)
     {
         return $query->whereColumn('quantity', '<=', 'reorder_level')
-                    ->whereNotNull('reorder_level');
+            ->whereNotNull('reorder_level');
     }
 
     /**
@@ -202,7 +196,7 @@ class Inventory extends Model
      */
     public function updateQuantity($quantity, $unitPrice = null, $action = 'add')
     {
-        if (!is_null($unitPrice)) {
+        if (! is_null($unitPrice)) {
             $this->unit_price = $unitPrice;
         }
 

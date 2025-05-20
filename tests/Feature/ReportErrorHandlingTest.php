@@ -19,7 +19,7 @@ class ReportErrorHandlingTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
-        
+
         // Mock the logger
         Log::shouldReceive('error')
             ->andReturnNull();
@@ -37,7 +37,7 @@ class ReportErrorHandlingTest extends TestCase
     {
         $otherUser = User::factory()->create();
         $report = Report::factory()->private()->create([
-            'created_by' => $otherUser->id
+            'created_by' => $otherUser->id,
         ]);
 
         $response = $this->get(route('reports.show', $report->id));
@@ -50,7 +50,7 @@ class ReportErrorHandlingTest extends TestCase
         $response = $this->post(route('reports.store'), [
             'name' => 'Invalid Report',
             'type' => 'invalid_type',
-            'columns' => ['id', 'name']
+            'columns' => ['id', 'name'],
         ]);
 
         $response->assertStatus(422);
@@ -66,9 +66,9 @@ class ReportErrorHandlingTest extends TestCase
             ->andThrow(new \Illuminate\Database\QueryException(
                 'test', [], new \Exception)
             );
-        
+
         $this->app->instance(Report::class, $mock);
-        
+
         $response = $this->get(route('reports.show', 1));
         $response->assertStatus(500);
     }
@@ -88,7 +88,7 @@ class ReportErrorHandlingTest extends TestCase
     public function it_handles_validation_errors_on_update()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->put(route('reports.update', $report->id), [
             // Missing required fields
         ]);
@@ -101,9 +101,9 @@ class ReportErrorHandlingTest extends TestCase
     public function it_handles_invalid_export_format()
     {
         $report = Report::factory()->create(['created_by' => $this->user->id]);
-        
+
         $response = $this->get(route('reports.export', [$report->id, 'invalid_format']));
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['format']);
     }
@@ -114,18 +114,18 @@ class ReportErrorHandlingTest extends TestCase
         $report = Report::factory()->create([
             'created_by' => $this->user->id,
             'type' => 'assets',
-            'columns' => ['id', 'name']
+            'columns' => ['id', 'name'],
         ]);
 
         // Mock an exception during export
         $mock = $this->mock(\App\Exports\ReportExport::class);
         $mock->shouldReceive('download')
             ->andThrow(new \Exception('Export failed'));
-        
+
         $this->app->instance(\App\Exports\ReportExport::class, $mock);
-        
+
         $response = $this->get(route('reports.export', [$report->id, 'pdf']));
-        
+
         $response->assertStatus(500);
     }
 }

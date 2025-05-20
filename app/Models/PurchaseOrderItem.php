@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderReceipt;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderItem extends Model
 {
@@ -63,7 +63,7 @@ class PurchaseOrderItem extends Model
         if ($this->item) {
             return $this->item->name ?? $this->item->title ?? 'N/A';
         }
-        
+
         return 'Deleted Item';
     }
 
@@ -72,7 +72,7 @@ class PurchaseOrderItem extends Model
         if ($this->item && method_exists($this->item, 'model_number')) {
             return $this->item->model_number;
         }
-        
+
         return 'N/A';
     }
 
@@ -81,7 +81,7 @@ class PurchaseOrderItem extends Model
         if ($this->item && method_exists($this->item, 'category')) {
             return $this->item->category->name ?? 'N/A';
         }
-        
+
         return 'N/A';
     }
 
@@ -90,7 +90,7 @@ class PurchaseOrderItem extends Model
         if ($this->item && method_exists($this->item, 'manufacturer')) {
             return $this->item->manufacturer->name ?? 'N/A';
         }
-        
+
         return 'N/A';
     }
 
@@ -117,7 +117,7 @@ class PurchaseOrderItem extends Model
         }
 
         $this->increment('received_quantity', $quantity);
-        
+
         // Create a receipt record
         PurchaseOrderReceipt::create([
             'purchase_order_id' => $this->purchase_order_id,

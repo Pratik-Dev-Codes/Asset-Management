@@ -6,8 +6,6 @@ class ScheduledTaskAlert extends BaseNotification
 {
     /**
      * Get the notification's subject.
-     *
-     * @return string
      */
     protected function getSubject(): string
     {
@@ -16,8 +14,6 @@ class ScheduledTaskAlert extends BaseNotification
 
     /**
      * Get the notification's level.
-     *
-     * @return string
      */
     protected function getLevel(): string
     {
@@ -26,8 +22,6 @@ class ScheduledTaskAlert extends BaseNotification
 
     /**
      * Get the notification's intro lines.
-     *
-     * @return array
      */
     protected function getIntroLines(): array
     {
@@ -35,21 +29,19 @@ class ScheduledTaskAlert extends BaseNotification
         $minutesLate = $this->data['minutes_late'];
         $lastRun = $this->data['last_run'];
         $expectedInterval = $this->data['expected_interval'];
-        
+
         return [
             "The scheduled task '{$task}' is currently {$minutesLate} minutes late.",
-            "",
+            '',
             "- Last run: {$lastRun}",
             "- Expected interval: {$expectedInterval}",
-            "",
-            "Please check the task scheduler and logs for any issues.",
+            '',
+            'Please check the task scheduler and logs for any issues.',
         ];
     }
 
     /**
      * Get the notification's action text.
-     *
-     * @return string|null
      */
     protected function getActionText(): ?string
     {
@@ -58,11 +50,9 @@ class ScheduledTaskAlert extends BaseNotification
 
     /**
      * Get the notification's action URL.
-     *
-     * @return string|null
      */
     protected function getActionUrl(): ?string
     {
-        return config('app.url') . '/admin/monitoring/scheduled-tasks';
+        return config('app.url').'/admin/monitoring/scheduled-tasks';
     }
 }

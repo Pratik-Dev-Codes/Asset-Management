@@ -41,20 +41,20 @@ class EnsureUserIsAuthorized
 
         // Get the authenticated user
         $user = $request->user();
-        
+
         // If no user is authenticated, return 401
-        if (!$user) {
+        if (! $user) {
             return response()->json([
-                'message' => 'Unauthenticated.'
+                'message' => 'Unauthenticated.',
             ], 401);
         }
 
         // Check if the user has the required ability
         $authorized = false;
-        
+
         foreach ($models as $model) {
             $modelInstance = $request->route($model);
-            
+
             if ($modelInstance && $user->can($ability, $modelInstance)) {
                 $authorized = true;
                 break;
@@ -66,9 +66,9 @@ class EnsureUserIsAuthorized
             $authorized = true;
         }
 
-        if (!$authorized) {
+        if (! $authorized) {
             return response()->json([
-                'message' => 'This action is unauthorized.'
+                'message' => 'This action is unauthorized.',
             ], 403);
         }
 

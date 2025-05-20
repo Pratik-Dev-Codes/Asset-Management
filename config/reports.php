@@ -10,7 +10,7 @@ return [
     | and management system.
     |
     */
-    
+
     /*
     |--------------------------------------------------------------------------
     | Report Queue
@@ -22,7 +22,7 @@ return [
     |
     */
     'queue' => env('REPORTS_QUEUE', 'reports'),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Report Timeout
@@ -82,7 +82,7 @@ return [
             'time' => env('REPORTS_CLEANUP_TIME', '00:00'),
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Scheduling Settings
@@ -95,7 +95,7 @@ return [
         'enabled' => env('REPORTS_SCHEDULING_ENABLED', true),
         'frequency' => env('REPORTS_SCHEDULING_FREQUENCY', '5'), // in minutes
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Notification Settings
@@ -116,7 +116,7 @@ return [
             'enabled' => env('REPORTS_DATABASE_NOTIFICATIONS', true),
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Queue Settings

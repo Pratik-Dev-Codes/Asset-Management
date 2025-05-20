@@ -57,19 +57,19 @@ class ReportFileTest extends TestCase
     {
         // Not expired file
         $reportFile = ReportFile::factory()->create([
-            'expires_at' => now()->addDay()
+            'expires_at' => now()->addDay(),
         ]);
         $this->assertFalse($reportFile->isExpired());
 
         // Expired file
         $expiredFile = ReportFile::factory()->create([
-            'expires_at' => now()->subDay()
+            'expires_at' => now()->subDay(),
         ]);
         $this->assertTrue($expiredFile->isExpired());
 
         // File with no expiration
         $noExpirationFile = ReportFile::factory()->create([
-            'expires_at' => null
+            'expires_at' => null,
         ]);
         $this->assertFalse($noExpirationFile->isExpired());
     }
@@ -91,7 +91,7 @@ class ReportFileTest extends TestCase
     public function it_can_get_download_url()
     {
         $reportFile = ReportFile::factory()->create([
-            'file_path' => 'reports/test_report.xlsx'
+            'file_path' => 'reports/test_report.xlsx',
         ]);
 
         // The download URL should be a signed URL that points to the file
@@ -109,11 +109,11 @@ class ReportFileTest extends TestCase
                 'status' => 'active',
                 'date_from' => '2023-01-01',
                 'date_to' => '2023-12-31',
-            ]
+            ],
         ];
 
         $reportFile = ReportFile::factory()->create([
-            'metadata' => $metadata
+            'metadata' => $metadata,
         ]);
 
         $this->assertEquals($metadata, $reportFile->metadata);
@@ -125,12 +125,12 @@ class ReportFileTest extends TestCase
     public function it_can_increment_download_count()
     {
         $reportFile = ReportFile::factory()->create(['download_count' => 0]);
-        
+
         $this->assertEquals(0, $reportFile->download_count);
-        
+
         $reportFile->incrementDownloadCount();
         $this->assertEquals(1, $reportFile->fresh()->download_count);
-        
+
         $reportFile->incrementDownloadCount();
         $this->assertEquals(2, $reportFile->fresh()->download_count);
     }
@@ -169,10 +169,10 @@ class ReportFileTest extends TestCase
     public function it_can_scope_by_mime_type()
     {
         $excelFile = ReportFile::factory()->create([
-            'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
         $csvFile = ReportFile::factory()->create([
-            'mime_type' => 'text/csv'
+            'mime_type' => 'text/csv',
         ]);
 
         $excelFiles = ReportFile::byMimeType('excel')->get();
@@ -180,7 +180,7 @@ class ReportFileTest extends TestCase
 
         $this->assertTrue($excelFiles->contains($excelFile));
         $this->assertFalse($excelFiles->contains($csvFile));
-        
+
         $this->assertTrue($csvFiles->contains($csvFile));
         $this->assertFalse($csvFiles->contains($excelFile));
     }
@@ -190,19 +190,19 @@ class ReportFileTest extends TestCase
     {
         // Valid, not expired file
         $validFile = ReportFile::factory()->create([
-            'expires_at' => now()->addDay()
+            'expires_at' => now()->addDay(),
         ]);
         $this->assertTrue($validFile->isDownloadable());
 
         // Expired file
         $expiredFile = ReportFile::factory()->create([
-            'expires_at' => now()->subDay()
+            'expires_at' => now()->subDay(),
         ]);
         $this->assertFalse($expiredFile->isDownloadable());
 
         // File with no expiration
         $noExpirationFile = ReportFile::factory()->create([
-            'expires_at' => null
+            'expires_at' => null,
         ]);
         $this->assertTrue($noExpirationFile->isDownloadable());
     }

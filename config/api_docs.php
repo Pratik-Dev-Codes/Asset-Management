@@ -10,7 +10,6 @@ return [
     |
     */
 
-
     /*
     |--------------------------------------------------------------------------
     | API Versions
@@ -45,7 +44,7 @@ return [
     | The title of your API documentation.
     |
     */
-    'title' => env('APP_NAME', 'Asset Management System') . ' API Documentation',
+    'title' => env('APP_NAME', 'Asset Management System').' API Documentation',
 
     /*
     |--------------------------------------------------------------------------
@@ -131,7 +130,7 @@ return [
     */
     'servers' => [
         [
-            'url' => env('APP_URL', 'http://localhost') . '/api',
+            'url' => env('APP_URL', 'http://localhost').'/api',
             'description' => 'Development server',
         ],
         [

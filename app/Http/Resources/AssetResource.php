@@ -29,7 +29,7 @@ class AssetResource extends JsonResource
             'insurance_end_date' => $this->insurance_end_date?->format('Y-m-d'),
             'insurance_premium' => (float) $this->insurance_premium,
             'insurance_coverage' => $this->insurance_coverage,
-            'image_url' => $this->image_path ? asset('storage/' . $this->image_path) : null,
+            'image_url' => $this->image_path ? asset('storage/'.$this->image_path) : null,
             'notes' => $this->notes,
             'category' => $this->whenLoaded('category'),
             'location' => $this->whenLoaded('location'),

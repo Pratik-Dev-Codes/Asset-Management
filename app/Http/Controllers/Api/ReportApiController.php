@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Services\ReportExporter;
-use Illuminate\Http\Request;
 use App\Models\Asset;
 use App\Models\Category;
+use App\Services\ReportExporter;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReportApiController extends Controller
@@ -23,7 +23,6 @@ class ReportApiController extends Controller
     /**
      * Get assets report data
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function assets(Request $request)
@@ -50,41 +49,41 @@ class ReportApiController extends Controller
                 'assignedTo',
                 'maintenances' => function ($query) {
                     $query->latest()->limit(5);
-                }
-            ]);            
+                },
+            ]);
 
             // Apply filters
             if ($request->filled('date_from')) {
                 $query->where('purchase_date', '>=', $request->date_from);
             }
-            
+
             if ($request->filled('date_to')) {
                 $query->where('purchase_date', '<=', $request->date_to);
             }
-            
+
             if ($request->filled('category_id')) {
                 $query->where('category_id', $request->category_id);
             }
-            
+
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
-            
+
             if ($request->filled('min_price')) {
                 $query->where('purchase_cost', '>=', $request->min_price);
             }
-            
+
             if ($request->filled('max_price')) {
                 $query->where('purchase_cost', '<=', $request->max_price);
             }
-            
+
             if ($request->filled('search')) {
                 $search = $request->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('asset_tag', 'like', "%{$search}%")
-                      ->orWhere('serial', 'like', "%{$search}%")
-                      ->orWhere('model_number', 'like', "%{$search}%");
+                        ->orWhere('asset_tag', 'like', "%{$search}%")
+                        ->orWhere('serial', 'like', "%{$search}%")
+                        ->orWhere('model_number', 'like', "%{$search}%");
                 });
             }
 
@@ -123,14 +122,14 @@ class ReportApiController extends Controller
                     ],
                     'filters' => $filters,
                     'stats' => $stats,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch assets report',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -142,25 +141,25 @@ class ReportApiController extends Controller
     {
         try {
             $validated = $request->validate([
-                'year' => 'nullable|integer|min:2000|max:' . (date('Y') + 5),
+                'year' => 'nullable|integer|min:2000|max:'.(date('Y') + 5),
                 'category_id' => 'nullable|exists:categories,id',
             ]);
 
             $year = $request->input('year', date('Y'));
-            
+
             // Get monthly spending data
             $monthlyData = Asset::select(
                 DB::raw('MONTH(purchase_date) as month'),
                 DB::raw('SUM(purchase_cost) as total_cost'),
                 DB::raw('COUNT(*) as asset_count')
             )
-            ->whereYear('purchase_date', $year)
-            ->when($request->filled('category_id'), function($query) use ($request) {
-                return $query->where('category_id', $request->category_id);
-            })
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+                ->whereYear('purchase_date', $year)
+                ->when($request->filled('category_id'), function ($query) use ($request) {
+                    return $query->where('category_id', $request->category_id);
+                })
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
 
             // Get category breakdown
             $categoryData = Asset::select(
@@ -168,14 +167,14 @@ class ReportApiController extends Controller
                 DB::raw('SUM(assets.purchase_cost) as total_cost'),
                 DB::raw('COUNT(*) as asset_count')
             )
-            ->join('categories', 'assets.category_id', '=', 'categories.id')
-            ->whereYear('assets.purchase_date', $year)
-            ->when($request->filled('category_id'), function($query) use ($request) {
-                return $query->where('assets.category_id', $request->category_id);
-            })
-            ->groupBy('categories.name')
-            ->orderBy('total_cost', 'desc')
-            ->get();
+                ->join('categories', 'assets.category_id', '=', 'categories.id')
+                ->whereYear('assets.purchase_date', $year)
+                ->when($request->filled('category_id'), function ($query) use ($request) {
+                    return $query->where('assets.category_id', $request->category_id);
+                })
+                ->groupBy('categories.name')
+                ->orderBy('total_cost', 'desc')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -187,15 +186,15 @@ class ReportApiController extends Controller
                         'total_spent' => $monthlyData->sum('total_cost'),
                         'total_assets' => $monthlyData->sum('asset_count'),
                         'avg_asset_cost' => $monthlyData->sum('total_cost') / max(1, $monthlyData->sum('asset_count')),
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch financial report',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -220,33 +219,33 @@ class ReportApiController extends Controller
             switch ($type) {
                 case 'expired':
                     $query->where('warranty_expires', '<', $now)
-                          ->whereNotNull('warranty_expires');
+                        ->whereNotNull('warranty_expires');
                     break;
                 case 'expiring_soon':
                     $query->whereBetween('warranty_expires', [
                         $now,
-                        $now->copy()->addDays($days)
+                        $now->copy()->addDays($days),
                     ]);
                     break;
                 case 'compliant':
-                    $query->where(function($q) use ($now) {
+                    $query->where(function ($q) use ($now) {
                         $q->where('warranty_expires', '>', $now)
-                          ->orWhereNull('warranty_expires');
+                            ->orWhereNull('warranty_expires');
                     });
                     break;
             }
 
             $assets = $query->orderBy('warranty_expires', 'asc')
-                          ->paginate($request->input('per_page', 15));
+                ->paginate($request->input('per_page', 15));
 
             // Calculate compliance stats
             $totalAssets = Asset::count();
             $expiredCount = Asset::where('warranty_expires', '<', $now)
-                                ->whereNotNull('warranty_expires')
-                                ->count();
+                ->whereNotNull('warranty_expires')
+                ->count();
             $expiringSoonCount = Asset::whereBetween('warranty_expires', [
                 $now,
-                $now->copy()->addDays($days)
+                $now->copy()->addDays($days),
             ])->count();
             $compliantCount = $totalAssets - $expiredCount - $expiringSoonCount;
 
@@ -265,18 +264,18 @@ class ReportApiController extends Controller
                         'expired_count' => $expiredCount,
                         'expiring_soon_count' => $expiringSoonCount,
                         'compliant_count' => max(0, $compliantCount),
-                        'compliance_percentage' => $totalAssets > 0 
-                            ? round(($compliantCount / $totalAssets) * 100, 2) 
+                        'compliance_percentage' => $totalAssets > 0
+                            ? round(($compliantCount / $totalAssets) * 100, 2)
                             : 0,
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch compliance report',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -313,9 +312,9 @@ class ReportApiController extends Controller
                         'category.name' => 'Category',
                         'assignedTo.name' => 'Assigned To',
                     ];
-                    $filename = 'assets_report_' . date('Y-m-d');
+                    $filename = 'assets_report_'.date('Y-m-d');
                     break;
-                
+
                 case 'financial':
                     $response = $this->financial($request);
                     $data = json_decode($response->content(), true);
@@ -324,9 +323,9 @@ class ReportApiController extends Controller
                         'total_cost' => 'Total Cost',
                         'asset_count' => 'Asset Count',
                     ];
-                    $filename = 'financial_report_' . date('Y-m-d');
+                    $filename = 'financial_report_'.date('Y-m-d');
                     break;
-                
+
                 case 'compliance':
                     $response = $this->compliance($request);
                     $data = json_decode($response->content(), true);
@@ -339,11 +338,11 @@ class ReportApiController extends Controller
                         'category.name' => 'Category',
                         'assignedTo.name' => 'Assigned To',
                     ];
-                    $filename = 'compliance_report_' . date('Y-m-d');
+                    $filename = 'compliance_report_'.date('Y-m-d');
                     break;
             }
 
-            if (empty($data) || !$data['success']) {
+            if (empty($data) || ! $data['success']) {
                 throw new \Exception('Failed to generate export data');
             }
 
@@ -360,13 +359,13 @@ class ReportApiController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Export failed',
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ], 500);
             }
-            
+
             // For non-JSON requests (direct downloads), redirect back with error
             return redirect()->back()
-                ->with('error', 'Failed to generate export: ' . $e->getMessage());
+                ->with('error', 'Failed to generate export: '.$e->getMessage());
         }
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Asset;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -24,7 +24,7 @@ class AssetApiTest extends TestCase
         Asset::factory()->count(15)->create();
 
         $user = User::first();
-        
+
         $response = $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/assets');
 
@@ -37,11 +37,11 @@ class AssetApiTest extends TestCase
                         'description',
                         'status',
                         'created_at',
-                        'updated_at'
-                    ]
+                        'updated_at',
+                    ],
                 ],
                 'links' => [
-                    'first', 'last', 'prev', 'next'
+                    'first', 'last', 'prev', 'next',
                 ],
                 'meta' => [
                     'current_page',
@@ -50,8 +50,8 @@ class AssetApiTest extends TestCase
                     'path',
                     'per_page',
                     'to',
-                    'total'
-                ]
+                    'total',
+                ],
             ]);
     }
 
@@ -66,11 +66,11 @@ class AssetApiTest extends TestCase
     public function it_validates_asset_creation()
     {
         $user = User::first();
-        
+
         $response = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/assets', [
                 'name' => '',
-                'status' => 'invalid_status'
+                'status' => 'invalid_status',
             ]);
 
         $response->assertStatus(422)
@@ -81,14 +81,14 @@ class AssetApiTest extends TestCase
     public function it_creates_an_asset()
     {
         $user = User::first();
-        
+
         $assetData = [
             'name' => 'Test Asset',
             'description' => 'Test Description',
             'status' => 'available',
             'purchase_date' => now()->toDateString(),
             'purchase_cost' => 1000.50,
-            'serial_number' => 'SN12345678'
+            'serial_number' => 'SN12345678',
         ];
 
         $response = $this->actingAs($user, 'sanctum')
@@ -105,13 +105,13 @@ class AssetApiTest extends TestCase
                     'purchase_cost',
                     'serial_number',
                     'created_at',
-                    'updated_at'
-                ]
+                    'updated_at',
+                ],
             ]);
 
         $this->assertDatabaseHas('assets', [
             'name' => 'Test Asset',
-            'serial_number' => 'SN12345678'
+            'serial_number' => 'SN12345678',
         ]);
     }
 }
