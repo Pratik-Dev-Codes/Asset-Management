@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Management System - Project Report</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 8.5in; margin: 0 auto; padding: 20px; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 30px; }
+        h2 { color: #2980b9; margin-top: 25px; }
+        h3 { color: #16a085; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: 600; }
+        ul, ol { padding-left: 25px; }
+        li { margin-bottom: 8px; }
+        .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
+        .date { text-align: right; font-style: italic; color: #666; margin-bottom: 30px; }
+        .section { margin-bottom: 30px; }
+        code { background-color: #f5f5f5; padding: 2px 5px; border-radius: 3px; font-family: 'Courier New', monospace; }
+        .footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="border: none; margin-bottom: 10px;">Asset Management System</h1>
+        <h2 style="color: #2c3e50; margin: 0; padding: 0;">Project Report</h2>
+        <p>Prepared for: NEEPCO (North Eastern Electric Power Corporation Limited)</p>
+        <p class="date">Report generated on: $(Get-Date -Format 'MMMM dd, yyyy')</p>
+    </div>
+
+    <div class="section">
+        <h1>1. Executive Summary</h1>
+        <p>The Asset Management System is a comprehensive solution developed for NEEPCO to efficiently track, manage, and maintain their physical and digital assets. Built on Laravel 10, the system provides a robust platform for asset lifecycle management with advanced tracking and reporting capabilities.</p>
+        <p>This report outlines the system architecture, features, technical implementation, and deployment guidelines for the Asset Management System.</p>
+    </div>
+
+    <div class="section">
+        <h1>2. System Overview</h1>
+        
+        <h2>2.1 Core Features</h2>
+        <ul>
+            <li><strong>Asset Lifecycle Management:</strong> Track assets from procurement to decommissioning with unique identifiers</li>
+            <li><strong>Role-based Access Control:</strong> Granular permissions for different user roles</li>
+            <li><strong>Maintenance Tracking:</strong> Schedule and track maintenance activities</li>
+            <li><strong>Document Management:</strong> Store and manage asset-related documents</li>
+            <li><strong>Real-time Reporting:</strong> Generate comprehensive reports and analytics</li>
+            <li><strong>Barcode/QR Support:</strong> Easy asset identification and tracking</li>
+            <li><strong>Automated Alerts:</strong> Notifications for maintenance schedules and updates</li>
+        </ul>
+
+        <h2>2.2 Technical Stack</h2>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Technologies</th>
+            </tr>
+            <tr>
+                <td>Backend</td>
+                <td>Laravel 10, PHP 8.1+</td>
+            </tr>
+            <tr>
+                <td>Frontend</td>
+                <td>HTML5, CSS3, JavaScript, Vue.js</td>
+            </tr>
+            <tr>
+                <td>Database</td>
+                <td>MySQL 5.7+ / PostgreSQL 10+</td>
+            </tr>
+            <tr>
+                <td>API</td>
+                <td>RESTful API, JWT Authentication</td>
+            </tr>
+            <tr>
+                <td>Testing</td>
+                <td>PHPUnit, Pest, Laravel Dusk</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h1>3. System Architecture</h1>
+        
+        <h2>3.1 System Context</h2>
+        <div class="diagram">
+            <h3>Figure 1: System Context Diagram</h3>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 15px 0;">
+                <p><strong>Key Components:</strong></p>
+                <ul>
+                    <li><strong>Admin:</strong> Full system access and configuration</li>
+                    <li><strong>User:</strong> Standard access for asset viewing and basic operations</li>
+                    <li><strong>Manager:</strong> Oversight and approval workflows</li>
+                    <li><strong>Technician:</strong> Maintenance and technical operations</li>
+                    <li><strong>Vendor:</strong> External system integration</li>
+                    <li><strong>Auditor:</strong> Compliance and reporting access</li>
+                </ul>
+                <p><em>Note: Refer to docs/diagrams/00-context.puml for the complete context diagram.</em></p>
+            </div>
+        </div>
+
+        <h2>3.2 Process Flow</h2>
+        <div class="diagram">
+            <h3>Figure 2: Main Process Flow</h3>
+            <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border: 1px solid #bbf7d0; margin: 15px 0;">
+                <p><strong>Key Processes:</strong></p>
+                <ol>
+                    <li>User Authentication & Authorization</li>
+                    <li>Asset Registration & Classification</li>
+                    <li>Maintenance Scheduling & Tracking</li>
+                    <li>Reporting & Analytics Generation</li>
+                    <li>Notification & Alert Management</li>
+                </ol>
+                <p><em>Detailed in: docs/diagrams/01-main-processes.puml</em></p>
+            </div>
+        </div>
+        
+        <h2>3.3 Database Schema</h2>
+        <p>The system utilizes a relational database with the following key tables and relationships:</p>
+        
+        <table>
+            <tr>
+                <th>Table Name</th>
+                <th>Description</th>
+                <th>Key Fields</th>
+            </tr>
+            <tr>
+                <td>users</td>
+                <td>Manages system users and authentication</td>
+                <td>id, name, email, password, role_id</td>
+            </tr>
+            <tr>
+                <td>assets</td>
+                <td>Core asset information</td>
+                <td>id, asset_tag, name, model_id, status_id, assigned_to</td>
+            </tr>
+            <tr>
+                <td>asset_models</td>
+                <td>Asset model definitions</td>
+                <td>id, name, manufacturer_id, category_id</td>
+            </tr>
+            <tr>
+                <td>asset_statuses</td>
+                <td>Asset lifecycle states</td>
+                <td>id, name, type</td>
+            </tr>
+            <tr>
+                <td>maintenance_records</td>
+                <td>Maintenance history</td>
+                <td>id, asset_id, maintenance_type, notes, cost, completed_at</td>
+            </tr>
+        </table>
+
+        <h2>3.4 System Architecture</h2>
+        <div class="diagram">
+            <h3>Figure 3: Three-Tier Architecture</h3>
+            <div style="background: #eff6ff; padding: 20px; border-radius: 8px; border: 1px solid #bfdbfe; margin: 15px 0;">
+                <p><strong>Presentation Layer:</strong></p>
+                <ul>
+                    <li>Responsive web interface built with Vue.js</li>
+                    <li>Mobile-responsive design using Bootstrap 5</li>
+                    <li>Interactive dashboards with Chart.js</li>
+                </ul>
+                
+                <p><strong>Application Layer:</strong></p>
+                <ul>
+                    <li>Laravel 10 PHP framework</li>
+                    <li>RESTful API endpoints</li>
+                    <li>Business logic and validation</li>
+                    <li>Authentication & Authorization (JWT)</li>
+                </ul>
+                
+                <p><strong>Data Layer:</strong></p>
+                <ul>
+                    <li>MySQL/PostgreSQL database</li>
+                    <li>Redis for caching and queues</li>
+                    <li>File storage for documents and assets</li>
+                </ul>
+                
+                <p><em>Technical details available in: docs/ARCHITECTURE.md</em></p>
+            </div>
+        </div>
+        <ol>
+            <li><strong>Presentation Layer:</strong> Responsive web interface built with Vue.js</li>
+            <li><strong>Application Layer:</strong> Laravel backend with RESTful API</li>
+            <li><strong>Data Layer:</strong> Relational database with proper indexing and relationships</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h1>4. Technical Implementation Details</h1>
+        
+        <h2>4.1 API Endpoints</h2>
+        <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #4f46e5; margin: 15px 0;">
+            <h4>Core API Endpoints:</h4>
+            <ul>
+                <li><code>GET /api/assets</code> - List all assets</li>
+                <li><code>POST /api/assets</code> - Create new asset</li>
+                <li><code>GET /api/assets/{id}</code> - Get asset details</li>
+                <li><code>PUT /api/assets/{id}</code> - Update asset</li>
+                <li><code>DELETE /api/assets/{id}</code> - Delete asset</li>
+                <li><code>GET /api/assets/{id}/maintenance</code> - Get maintenance history</li>
+            </ul>
+            <p><em>Complete API documentation: <code>docs/api-docs.yaml</code></em></p>
+        </div>
+        
+        <h2>4.2 Database Schema Details</h2>
+        <div style="background: #f0fdf4; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981; margin: 15px 0;">
+            <h4>Key Database Relationships:</h4>
+            <ul>
+                <li>Assets belong to Asset Models (many-to-one)</li>
+                <li>Assets have many Maintenance Records (one-to-many)</li>
+                <li>Users can be assigned many Assets (one-to-many)</li>
+                <li>Asset Models belong to Categories (many-to-one)</li>
+                <li>Assets have one Status at a time (one-to-one)</li>
+            </ul>
+            <p><em>Database schema: <code>database/schema.sql</code></em></p>
+        </div>
+        
+        <h2>4.3 Security Implementation</h2>
+        <ul>
+            <li><strong>Authentication:</strong> JWT-based authentication system</li>
+            <li><strong>Authorization:</strong> Role-based access control (RBAC)</li>
+            <li><strong>Data Protection:</strong> Encryption of sensitive data</li>
+            <li><strong>Input Validation:</strong> Server-side validation of all user inputs</li>
+            <li><strong>CSRF Protection:</strong> Built-in Laravel CSRF protection</li>
+            <li><strong>XSS Prevention:</strong> Output encoding and content security policies</li>
+            <li><strong>API Security:</strong> Rate limiting and request validation</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h1>5. Deployment Guide</h1>
+        
+        <h2>5.1 Server Requirements</h2>
+        <ul>
+            <li>Web Server: Apache/Nginx</li>
+            <li>PHP: 8.1+ with required extensions</li>
+            <li>Database: MySQL 5.7+ or PostgreSQL 10+</li>
+            <li>Node.js & NPM</li>
+            <li>Composer</li>
+        </ul>
+
+        <h2>5.2 Installation Steps</h2>
+        <ol>
+            <li>Clone the repository</li>
+            <li>Install PHP dependencies: <code>composer install</code></li>
+            <li>Install NPM dependencies: <code>npm install</code></li>
+            <li>Copy <code>.env.example</code> to <code>.env</code> and configure</li>
+            <li>Generate application key: <code>php artisan key:generate</code></li>
+            <li>Run database migrations: <code>php artisan migrate --seed</code></li>
+            <li>Build frontend assets: <code>npm run dev</code> or <code>npm run prod</code></li>
+            <li>Set up scheduled tasks and queues</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h1>6. Maintenance and Support</h1>
+        <h2>6.1 Regular Maintenance</h2>
+        <ul>
+            <li>Daily database backups</li>
+            <li>Regular security updates</li>
+            <li>Performance monitoring</li>
+        </ul>
+
+        <h2>6.2 Support Channels</h2>
+        <ul>
+            <li>Email support: support@example.com</li>
+            <li>Documentation: Included in the <code>docs</code> directory</li>
+            <li>Issue tracking: GitHub Issues</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h1>7. Future Enhancements</h1>
+        <ul>
+            <li>Mobile application for field operations</li>
+            <li>Barcode/QR code scanning functionality</li>
+            <li>Advanced analytics dashboard</li>
+            <li>Integration with IoT devices</li>
+            <li>Multi-language support</li>
+            <li>AI-powered predictive maintenance</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>© $(Get-Date -Format 'yyyy') NEEPCO - Asset Management System</p>
+        <p>This document is confidential and intended solely for the use of the individual or entity to whom it is addressed.</p>
+    </div>
+</body>
+</html>
