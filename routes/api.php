@@ -5,7 +5,7 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\MonitoringController;
 use App\Http\Controllers\API\NotificationController;
-use App\Http\Controllers\API\ReportController;
+use App\Http\Controllers\API\ReportApiController as ReportController;
 use App\Http\Controllers\API\SystemSettingController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\UserProfileController;
