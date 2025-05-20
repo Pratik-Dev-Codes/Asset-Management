@@ -1,0 +1,489 @@
+openapi: 3.0.0
+info:
+  title: Asset Management System API
+  description: |
+    This is the API documentation for the Asset Management System.
+    Use this API to interact with assets, categories, and other resources.
+  version: 1.0.0
+  contact:
+    email: support@assetmanagement.com
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+  - url: https://api.assetmanagement.com/v1
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Assets
+    description: Manage assets
+  - name: Categories
+    description: Manage asset categories
+  - name: Reports
+    description: Generate and manage reports
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Authentication]
+      summary: Authenticate user and get token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+  
+  /api/assets:
+    get:
+      tags: [Assets]
+      summary: Get a list of assets
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search term to filter assets
+        - in: query
+          name: category_id
+          schema:
+            type: integer
+          description: Filter by category ID
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [available, in_use, maintenance, retired]
+          description: Filter by status
+        - in: query
+          name: sort_by
+          schema:
+            type: string
+            enum: [name, purchase_date, price, created_at]
+          description: Field to sort by
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+          description: Sort order
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 15
+            maximum: 100
+          description: Items per page
+      responses:
+        '200':
+          description: A list of assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+    
+    post:
+      tags: [Assets]
+      summary: Create a new asset
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetInput'
+      responses:
+        '201':
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+  
+  /api/assets/{id}:
+    get:
+      tags: [Assets]
+      summary: Get a specific asset
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Asset ID
+      responses:
+        '200':
+          description: Asset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+    
+    put:
+      tags: [Assets]
+      summary: Update an asset
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Asset ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetInput'
+      responses:
+        '200':
+          description: Asset updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+    
+    delete:
+      tags: [Assets]
+      summary: Delete an asset
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Asset ID
+      responses:
+        '204':
+          description: Asset deleted successfully
+
+  /api/assets/bulk:
+    post:
+      tags: [Assets]
+      summary: Perform bulk operations on assets
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [delete, update_status, assign, export]
+                  description: The action to perform
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: Array of asset IDs to perform the action on
+                data:
+                  type: object
+                  description: Additional data needed for the action
+              required:
+                - action
+                - ids
+      responses:
+        '200':
+          description: Bulk operation completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  affected:
+                    type: integer
+                    description: Number of assets affected
+
+  /api/categories:
+    get:
+      tags: [Categories]
+      summary: Get a list of categories
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+  /api/reports/assets:
+    get:
+      tags: [Reports]
+      summary: Generate an asset report
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [pdf, csv, excel]
+            default: pdf
+          description: Report format
+        - in: query
+          name: category_id
+          schema:
+            type: integer
+          description: Filter by category ID
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [all, available, in_use, maintenance, retired]
+            default: all
+          description: Filter by status
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Dell XPS 15"
+        description:
+          type: string
+          example: "High-performance laptop for developers"
+        serial_number:
+          type: string
+          example: "DXPS157891"
+        purchase_date:
+          type: string
+          format: date
+          example: "2023-01-15"
+        purchase_cost:
+          type: number
+          format: float
+          example: 1499.99
+        status:
+          type: string
+          enum: [available, in_use, maintenance, retired]
+          example: "in_use"
+        category_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T10:00:00Z"
+        category:
+          $ref: '#/components/schemas/Category'
+    
+    AssetInput:
+      type: object
+      required:
+        - name
+        - category_id
+        - status
+      properties:
+        name:
+          type: string
+          example: "Dell XPS 15"
+        description:
+          type: string
+          example: "High-performance laptop for developers"
+        serial_number:
+          type: string
+          example: "DXPS157891"
+        purchase_date:
+          type: string
+          format: date
+          example: "2023-01-15"
+        purchase_cost:
+          type: number
+          format: float
+          example: 1499.99
+        status:
+          type: string
+          enum: [available, in_use, maintenance, retired]
+          example: "in_use"
+        category_id:
+          type: integer
+          example: 1
+        notes:
+          type: string
+          example: "Assigned to John Doe"
+    
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Laptops"
+        description:
+          type: string
+          example: "Portable computers"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+    
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        from:
+          type: integer
+          example: 1
+        last_page:
+          type: integer
+          example: 5
+        per_page:
+          type: integer
+          example: 15
+        to:
+          type: integer
+          example: 15
+        total:
+          type: integer
+          example: 75
+        path:
+          type: string
+          example: "http://localhost:8000/api/assets"
+        first_page_url:
+          type: string
+          example: "http://localhost:8000/api/assets?page=1"
+        last_page_url:
+          type: string
+          example: "http://localhost:8000/api/assets?page=5"
+        prev_page_url:
+          type: string
+          nullable: true
+          example: "http://localhost:8000/api/assets?page=1"
+        next_page_url:
+          type: string
+          nullable: true
+          example: "http://localhost:8000/api/assets?page=3"
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Unauthenticated."
+    
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "The given data was invalid."
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  name: ["The name field is required."]
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Resource not found"
+
+security:
+  - bearerAuth: []

@@ -1,0 +1,67 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, tokenizer, xml, ctype, json, bcmath, gd, fileinfo, openssl
+        coverage: none
+    
+    - name: Install Dependencies
+      run: |
+        composer install --prefer-dist --no-progress --no-suggest
+        npm ci
+    
+    - name: Build assets
+      run: |
+        npm run build
+    
+    - name: Setup environment
+      run: |
+        cp .env.staging .env
+        php artisan key:generate
+    
+    - name: Database setup
+      run: |
+        php artisan migrate --force
+        php artisan db:seed --force
+    
+    - name: Cache configuration
+      run: |
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+    
+    - name: Restart queue
+      run: |
+        php artisan queue:restart
+    
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /var/www/asset-management
+          git pull origin develop
+          composer install --no-dev
+          npm run prod
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan queue:restart

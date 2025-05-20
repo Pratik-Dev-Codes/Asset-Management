@@ -1,0 +1,417 @@
+I. Functional Requirements (Scalable Design):
+A. Asset Management (Scalable):
+•	A1. Asset Creation (Scalable & Media-Rich): 
+o	Ability to add new assets with details (as per asset type): 
+	Asset Type (Categorization with potential for sub-types)
+	General Information: 
+	Asset Name (text, with indexing for search)
+	Serial Number/Identification Code (unique, indexed, with validation)
+	Make (text, linked to a searchable/filterable list of makes)
+	Model (text, linked to a searchable/filterable list of models per make)
+	Asset Image: Ability to upload one or more images of the asset (with support for various formats, size limits, and potential for thumbnail generation).
+	Description (rich text editor for detailed information).
+	Acquisition Date (indexed date field).
+	Purchase Cost (numeric field with currency, indexed for reporting).
+	Supplier/Vendor (linked to a scalable Vendor Management module with contact details, history, etc.).
+	Purchase Order Number (indexed text field, linked to Procurement Details).
+	Location (hierarchical structure with indexing and geospatial capabilities for potential mapping in the future).
+	Condition (controlled vocabulary with potential for adding new conditions).
+	Asset Status (controlled vocabulary with potential for workflow automation based on status changes).
+	Assigned User/Department (linked to a scalable User Management module with profile information).
+	Tags/Keywords (for flexible categorization and searching).
+	QR Code/Barcode Generation & Linking (for easy identification and tracking).
+	Warranty Information (repeatable entries for multiple warranties if needed): 
+	Warranty Provider (text, linked to a list of providers).
+	Warranty Start Date (date).
+	Warranty End Date (date).
+	Warranty Details/Terms (file upload - PDF, DOCX).
+	Depreciation Details (configurable depreciation rules per asset type): 
+	Depreciation Method (dropdown with options, extensible).
+	Salvage Value (numeric).
+	Useful Life (numeric, with unit - years, months).
+	Depreciation Start Date (date).
+	Depreciation Frequency (e.g., monthly, yearly).
+	Insurance Details (repeatable entries for multiple insurance policies): 
+	Insurer Company (text, linked to a list of insurers).
+	Policy Number (text).
+	Coverage Details (file upload).
+	Start Date (date).
+	End Date (date).
+	Premium Amount (numeric with currency).
+	Specific Attributes (schema-less or EAV - Entity-Attribute-Value model - for flexible, type-specific data without altering the core database structure frequently). 
+	Ability to define custom fields based on the selected Asset Type (e.g., Power Rating for Machinery, Registration Number for Vehicles).
+	Support for various data types for custom fields (text, number, date, dropdown, file upload).
+•	A2. Asset Viewing (Scalable & Rich): 
+o	Detailed view of all asset information, including images, attached documents, and linked records (maintenance history, assignments).
+o	Customizable list views with options to select displayed columns and sort order.
+o	Advanced filtering and search capabilities across all relevant fields (including tags and custom attributes).
+o	Pagination for handling large lists of assets efficiently.
+o	Export options (CSV, Excel, PDF) with customizable column selection.
+o	Printable asset details with or without images.
+•	A3. Asset Editing (Scalable & Auditable): 
+o	Form-based editing of asset details with appropriate validation rules.
+o	Audit Logging: Comprehensive tracking of all changes made to asset records, including user, timestamp, and previous/new values (stored in a separate, indexed audit log table for performance).
+o	Versioning of asset data (optional, for restoring previous states).
+•	A4. Asset Deletion/Disposal (Scalable & Traceable): 
+o	Soft delete functionality (marking as "disposed" rather than permanent deletion) to maintain data integrity and historical records.
+o	Detailed disposal information: disposal date, method, responsible user, disposal value, attachments (e.g., disposal certificate).
+o	Separate archive for fully disposed assets with options for permanent deletion (with appropriate administrative privileges and considerations for data retention policies).
+•	A5. Asset Allocation/Assignment (Scalable & Historical): 
+o	Ability to assign assets to users, departments, or locations with start and end dates for tracking history.
+o	Scalable mechanism for managing current and historical assignments (potentially a separate "Asset Assignment" table with foreign keys).
+o	Notifications to users upon asset assignment or reassignment.
+•	A6. Asset Location Management (Scalable & Geospatial): 
+o	Hierarchical location structure (Site -> Building -> Floor -> Room) with the ability to add new levels if needed.
+o	Option to associate geographical coordinates (latitude/longitude) with locations for potential mapping and proximity-based queries in the future.
+o	Search and filtering of assets by location.
+o	Bulk location updates for assets.
+•	A7. Asset Status Updates (Scalable & Workflow-Driven): 
+o	Clearly defined and extensible set of asset statuses.
+o	Ability to add notes and timestamps for each status update.
+o	Potential for triggering automated workflows based on status changes (e.g., notification to maintenance when status changes to "Faulty").
+•	A8. Bulk Asset Operations (Scalable & Efficient): 
+o	Ability to select multiple assets and perform actions like updating location, status, assignment, or exporting data in bulk (using background jobs for large datasets).
+o	Import/export functionality for asset data (CSV, Excel) with robust validation and error handling.
+B. Maintenance Management (Scalable):
+•	B1. Maintenance Request Submission (Scalable & Media-Rich): 
+o	User-friendly form for submitting maintenance requests.
+o	Ability to associate one or more assets with a request.
+o	Detailed description of the issue (rich text editor).
+o	Priority levels with potential for defining service level agreements (SLAs).
+o	Attachments: Ability to upload multiple files (images, documents, videos) to illustrate the issue.
+o	Automatic timestamp and user identification.
+o	Notifications to relevant personnel upon submission.
+•	B2. Maintenance Request Tracking (Scalable & Collaborative): 
+o	Clear visual representation of request statuses (e.g., Kanban board).
+o	Filtering and sorting of requests based on various criteria (status, priority, asset, requester, date).
+o	Ability to assign requests to specific maintenance personnel or teams (linked to User Management).
+o	Communication log within each request for updates and discussions.
+o	Automated status updates and notifications.
+•	B3. Maintenance Scheduling (Scalable & Recurring): 
+o	Calendar view for visualizing scheduled maintenance.
+o	Ability to schedule one-time and recurring maintenance tasks (with flexible recurrence patterns).
+o	Assignment of maintenance personnel and resources.
+o	Reminders and notifications for upcoming maintenance.
+o	Integration with asset availability (prevent scheduling maintenance for assets marked as "Disposed").
+•	B4. Maintenance Log Recording (Scalable & Detailed): 
+o	Detailed form for recording completed maintenance work.
+o	Association with the specific maintenance request (if applicable).
+o	Maintenance type (Preventive, Corrective) with sub-types.
+o	Date and time of maintenance.
+o	Maintenance performed by (linked users).
+o	Detailed description of work performed (rich text editor).
+o	Parts Replaced (linked to a scalable Inventory Management module - future enhancement).
+o	Cost of maintenance (labor, parts, external services) with currency tracking.
+o	Downtime tracking.
+o	Asset status update after maintenance.
+o	Attachments: Ability to upload service reports, invoices, etc.
+•	B5. Maintenance History Viewing (Scalable & Analytical): 
+o	Comprehensive history of all maintenance activities for each asset.
+o	Filtering and searching of logs by date, type, personnel, cost, etc.
+o	Potential for generating basic maintenance analytics (e.g., average repair time, cost per asset type).
+•	B6. Maintenance Reminders and Notifications (Scalable & Configurable): 
+o	Configurable rules for automated reminders for scheduled preventive maintenance (based on date, usage - if tracking is implemented).
+o	Notifications for overdue maintenance tasks, status updates on requests, and assigned tasks.
+o	User-specific notification preferences.
+C. User Management (Scalable & Profile-Rich):
+•	C1. User Registration (Admin-Controlled with Potential for Self-Registration): 
+o	Admin interface for creating new user accounts with detailed information: 
+	Profile Picture: Ability to upload a user profile image (with resizing and storage optimization).
+	Full Name (indexed for search).
+	Username (unique, indexed).
+	Email Address (unique, indexed).
+	Password (securely hashed and salted).
+	Department/Division (linked to a scalable Department Management module).
+	Contact Information (phone number, address).
+	Roles and Permissions (assigned through a flexible role-based access control system).
+	Active/Inactive status.
+o	Optional self-registration with admin approval workflow.
+•	C2. User Roles and Permissions Management (Scalable & Granular): 
+o	Ability to define and manage roles with a hierarchical structure (if needed).
+o	Granular control over permissions for each module and functionality (Create, Read, Update, Delete, Export, etc.).
+o	Assigning multiple roles to a single user.
+•	C3. User Profile Management (Scalable & Customizable): 
+o	Ability for users to view and edit their profile information (excluding sensitive fields like roles, managed by admins).
+o	Customizable user preferences (e.g., notification settings, default view).
+•	C4. Password Management (Secure & User-Friendly): 
+o	Strong password policies (minimum length, complexity requirements).
+o	Secure password hashing (e.g., bcrypt).
+o	"Forgot Password" functionality with secure token generation and email verification.
+o	Password reset history (optional, for security auditing).
+•	C5. User Activity Logging (Scalable & Comprehensive): 
+o	Detailed logging of user logins, logouts, and all significant actions performed within the system (e.g., asset creation, editing, status updates, maintenance scheduling).
+o	Storage of logs in a separate, indexed table for efficient querying and analysis.
+o	Filtering and searching of activity logs by user, action, timestamp, etc.
+D. Reporting and Analytics (Scalable & Customizable):
+•	D1. Asset Lists (Scalable & Flexible): 
+o	Dynamically generated reports with user-selectable columns.
+o	Advanced filtering and sorting options across all asset attributes (including custom fields).
+o	Grouping and aggregation of data (e.g., count of assets by status per location).
+o	Export to various formats (CSV, Excel, PDF) with layout customization.
+•	D2. Asset Value Reports (Scalable & Configurable): 
+o	Reports calculating current asset value based on selected depreciation methods and periods.
+o	Filtering by asset type, department, location, acquisition date, etc.
+o	Graphical representations of asset value trends (potential future enhancement).
+•	D3. Maintenance Schedules Reports (Scalable & Actionable): 
+o	Reports on upcoming, overdue, and completed maintenance schedules.
+o	Filtering by asset, maintenance personnel, date range, status.
+o	Grouping by asset or personnel.
+•	D4. Depreciation Reports (Scalable & Auditable): 
+o	Detailed reports on depreciation calculations for selected assets and periods.
+o	Audit trail of depreciation adjustments (if any).
+•	D5. Asset Utilization Reports (Scalable & Insightful - Requires Tracking): 
+o	Reports on asset usage (requires implementing a mechanism for tracking asset usage - e.g., check-in/check-out system or integration with operational data).
+o	Metrics like usage frequency, downtime, and idle time.
+•	D6. Maintenance History Reports (Scalable & Analytical): 
+o	Detailed reports on maintenance activities, costs, and downtime.
+o	Analysis of maintenance trends by asset type, failure type, cost, etc.
+o	Potential for generating KPIs related to maintenance efficiency.
+•	D7. Customizable Reports (Scalable & User-Driven): 
+o	User-friendly interface for creating custom reports by selecting data fields, filters, sorting, and grouping options.
+o	Saving and sharing custom report templates.
+o	Potential for integrating with business intelligence (BI) tools in the future.
+E. Procurement Management (Scalable):
+•	E1. Purchase Order Recording (Scalable & Integrated): 
+o	Comprehensive form for recording purchase order details.
+o	Linking to a scalable Vendor Management module.
+o	Support for multiple order items (linking to assets being procured or a product catalog if implemented later).
+o	Tracking of order status with potential for workflow automation.
+o	Attachment of PO documents and related files.
+o	Integration with asset creation upon receipt of goods.
+ 
+ 
+I. Functional Requirements (What the system should do):
+A. Asset Management:
+•	A1. Asset Creation: 
+o	Ability to add new assets to the system with the following details (as applicable to the asset type): 
+	Asset Type (dropdown: Machinery, Equipment, Vehicles, Land, Buildings, IT Assets (dropdown: PC, Laptop, Printer, Server, etc. <add option available>) Consumables (dropdown: pen, pencil, paper, etc.<add option available>), etc. <add option available>)
+	General Information: 
+	Asset Name (text)
+	Serial Number/Identification Code (unique, text)
+	Make (text)
+	Model (text)
+	Description (text area)
+	Acquisition Date (date picker)
+	Purchase Cost (number, currency)
+	Supplier/Vendor (text, linked to a vendor management module if implemented later)
+	Purchase Order Number (text, linked to procurement details)
+	Location (dropdown/searchable list, linked to a location management module)
+	Condition (dropdown: Excellent, Good, Fair, Poor)
+	Asset Status (dropdown: Working, Faulty, Beyond Repair, E-waste, Disposed)
+	Assigned User/Department (optional, linked to user management)
+	Warranty Information: 
+	Warranty Start Date (date picker)
+	Warranty End Date (date picker)
+	Warranty Provider (text)
+	Warranty Details/Terms (text area/file upload)
+	Depreciation Details (if applicable): 
+	Depreciation Method (dropdown: Straight-line, Declining Balance, etc.)
+	Salvage Value (number, currency)
+	Useful Life (in years)
+	Depreciation Start Date (date picker)
+	Insurance Details (if applicable): 
+	Insurance Provider (text, linked to insurer company details)
+	Policy Number (text)
+	Coverage Details (text area/file upload)
+	Start Date (date picker)
+	End Date (date picker)
+	Premium Amount (number, currency)
+	Specific Attributes (dynamic fields based on Asset Type): 
+	Machinery/Equipment: Power rating, capacity, manufacturing date, etc.
+	Vehicles: Registration number, chassis number, engine number, fuel type, mileage, etc.
+	Land: Area, survey number, cadastral number (if applicable), legal boundaries (file upload), etc.
+	Buildings: Area, number of floors, construction date, building type, etc.
+	IT Assets (PC/Laptop): Operating System, RAM, storage capacity, processor, etc.
+	IT Assets (Printer): Type (Laser, Inkjet), PPM, connectivity, etc.
+	IT Assets (Server): CPU cores, RAM, storage capacity, RAID level, etc.
+•	A2. Asset Viewing: 
+o	Ability to view detailed information for each asset.
+o	Option to view a summary list of all assets or filtered lists based on various criteria (e.g., asset type, status, location, department).
+o	Printable asset details page.
+•	A3. Asset Editing: 
+o	Ability to modify existing asset information with appropriate user permissions.
+o	Audit trail of changes made to asset records (who changed what and when).
+•	A4. Asset Deletion/Disposal: 
+o	Ability to mark assets as disposed with details like disposal date, method of disposal, and disposal value (if any).
+o	Option to archive deleted/disposed assets for historical records.
+•	A5. Asset Allocation/Assignment: 
+o	Ability to assign assets to specific users, departments, or locations.
+o	Tracking the history of asset assignments.
+•	A6. Asset Location Management: 
+o	Ability to define and manage a hierarchical structure of locations (e.g., Site -> Building -> Floor -> Room).
+o	Ability to move assets between locations with date and time tracking.
+•	A7. Asset Status Updates: 
+o	Ability to update the status of an asset (Working, Faulty, etc.) with notes and timestamps.
+•	A8. Bulk Asset Operations: 
+o	Ability to perform bulk actions like assigning location, updating status, or exporting data for multiple assets.
+B. Maintenance Management:
+•	B1. Maintenance Request Submission: 
+o	Ability for authorized users to submit maintenance requests for faulty assets, including: 
+	Affected Asset (linked to asset records)
+	Description of the issue (text area)
+	Priority (dropdown: High, Medium, Low)
+	Request Date (automatic timestamp)
+	Requested By (automatic user identification)
+	Supporting documents/images (file upload)
+•	B2. Maintenance Request Tracking: 
+o	Ability to track the status of maintenance requests (e.g., Open, Assigned, In Progress, On Hold, Completed, Rejected).
+o	Notifications for status updates on submitted requests.
+•	B3. Maintenance Scheduling: 
+o	Ability for authorized users (e.g., maintenance staff, managers) to schedule maintenance activities (preventive and corrective).
+o	Scheduling details: 
+	Asset(s) to be maintained
+	Maintenance Type (dropdown: Preventive, Corrective)
+	Scheduled Date and Time
+	Assigned Maintenance Personnel (linked to user management)
+	Description of work to be done (text area)
+	Attachments (e.g., maintenance manuals)
+	Recurring maintenance schedules (daily, weekly, monthly, yearly).
+•	B4. Maintenance Log Recording: 
+o	Ability to record details of completed maintenance work: 
+	Asset(s) maintained
+	Maintenance Type (Preventive, Corrective)
+	Date and Time of Maintenance
+	Maintenance Performed By (linked to user management)
+	Description of work performed (text area)
+	Parts Replaced (if applicable, linked to inventory management if implemented later)
+	Cost of Maintenance (labor, parts, etc.) (number, currency)
+	Downtime (if any)
+	Status Update of the Asset after Maintenance (Working, Faulty, etc.)
+	Attachments (e.g., service reports)
+•	B5. Maintenance History Viewing: 
+o	Ability to view the complete maintenance history for each asset.
+o	Filtering and searching maintenance logs by date, type, personnel, etc.
+•	B6. Maintenance Reminders and Notifications: 
+o	Automated reminders for scheduled preventive maintenance.
+o	Notifications for overdue maintenance tasks.
+C. User Management:
+•	C1. User Registration: 
+o	Ability for administrators to create new user accounts with roles and permissions.
+•	C2. User Roles and Permissions Management: 
+o	Defining different user roles (Administrator, Manager, Maintenance Staff, General User).
+o	Assigning specific permissions to each role, controlling access to different modules and functionalities (e.g., view assets, add assets, edit assets, schedule maintenance, generate reports).
+•	C3. User Profile Management: 
+o	Ability for users to view and update their profile information (e.g., contact details).
+•	C4. Password Management: 
+o	Secure password storage and retrieval mechanisms.
+o	Password reset functionality.
+•	C5. User Activity Logging: 
+o	Tracking user logins and significant actions performed within the system for audit purposes.
+D. Reporting and Analytics:
+•	D1. Asset Lists: 
+o	Generating reports listing all assets or filtered lists based on various criteria (asset type, status, location, department, etc.).
+o	Customizable columns in the report.
+o	Export options (CSV, Excel, PDF).
+•	D2. Asset Value Reports: 
+o	Generating reports showing the current value of assets based on depreciation schedules.
+o	Reports by asset type, department, or location.
+•	D3. Maintenance Schedules Reports: 
+o	Reports on upcoming and overdue maintenance schedules.
+o	Reports by asset, maintenance personnel, or date range.
+•	D4. Depreciation Reports: 
+o	Detailed reports on asset depreciation over a specified period.
+•	D5. Asset Utilization Reports: 
+o	Reports on how frequently assets are in use (this might require additional tracking mechanisms or integration with other systems).
+•	D6. Maintenance History Reports: 
+o	Reports on completed maintenance activities, costs, and downtime.
+o	Analysis of maintenance trends.
+•	D7. Customizable Reports: 
+o	Ability for authorized users to create custom reports by selecting specific data fields and filters.
+E. Procurement Management (Initial Scope):
+•	E1. Purchase Order Recording: 
+o	Ability to record details of purchase orders for new assets: 
+	Purchase Order Number (unique)
+	Vendor (text, linked to vendor management if implemented later)
+	Order Date (date picker)
+	Order Items (linked to assets being procured)
+	Order Amount (number, currency)
+	Order Status (e.g., Pending, Approved, Ordered, Received)
+	Attachments (e.g., PO document)
+II. Non-Functional Requirements (How the system should behave):
+A. Performance:
+•	NF1. Response Time: The system should respond to user actions (e.g., page loads, data submissions) within an acceptable timeframe (e.g., under 3 seconds for most common operations).
+•	NF2. Scalability: The system should be scalable to handle a growing number of assets, users, and data without significant performance degradation.
+B. Security:
+•	NF3. Authentication: Secure user authentication mechanisms to prevent unauthorized access.
+•	NF4. Authorization: Role-based access control to ensure users can only access and modify data relevant to their roles.
+•	NF5. Data Security: Measures to protect sensitive asset data from unauthorized access, modification, or loss (e.g., encryption, regular backups).
+•	NF6. Audit Logging: Comprehensive logging of user activities and system events for security auditing.
+C. Usability:
+•	NF7. User-Friendly Interface: The system should have an intuitive and easy-to-navigate user interface.
+•	NF8. Accessibility: Adherence to accessibility guidelines (e.g., WCAG) to ensure usability for users with disabilities (if required by NEEPCO's policies).
+•	NF9. Responsive Design: The system should be responsive and work seamlessly across different devices (desktops, tablets, potentially mobile).
+D. Reliability:
+•	NF10. Availability: The system should be highly available with minimal downtime.
+•	NF11. Data Integrity: Mechanisms to ensure the accuracy and consistency of asset data.
+•	NF12. Backup and Recovery: Regular data backups and a clear recovery plan in case of system failures.
+E. Maintainability:
+•	NF13. Code Quality: Well-structured, documented, and maintainable codebase following Laravel best practices.
+•	NF14. Ease of Updates: The system should be designed to allow for easy updates and enhancements.
+F. Integration (Future Considerations):
+•	NF15. Potential for Integration: The system should be designed with potential future integration with other NEEPCO systems (e.g., accounting, ERP, inventory management).
+ 
+II. NON-Functional Requirements (How the system should behave):
+I. Performance & Scalability:
+1.	Response Time:
+o	Requirement: The system must respond to user input (e.g., page loads, form submissions, search queries, report generation) within 3 seconds for 90% of all operations.
+o	Justification: Ensures a smooth and efficient user experience, preventing user frustration and improving productivity for NEEPCO staff managing large asset inventories.
+2.	Concurrency/Throughput:
+o	Requirement: The system must be able to support at least 50 concurrent active users without significant performance degradation (response times exceeding 5 seconds).
+o	Justification: NEEPCO likely has a large workforce. This ensures multiple departments/users can access and update asset data simultaneously without slowdowns.
+3.	Data Volume Scalability:
+o	Requirement: The system must be capable of storing and efficiently querying data for up to 500,000 assets and their associated historical records (maintenance logs, disposal history, etc.) for at least 10 years.
+o	Justification: NEEPCO manages a vast and long-lived asset base. The system must accommodate future growth and provide comprehensive historical data for auditing, planning, and analysis.
+II. Security:
+4.	Authentication:
+o	Requirement: The system must implement robust user authentication using a multi-factor authentication (MFA) mechanism (e.g., OTP via email/SMS) for all administrative and managerial roles. Password policies must enforce complexity (minimum 12 characters, mix of upper/lower, numbers, special chars) and regular expiry.
+o	Justification: Protecting sensitive asset data from unauthorized access is paramount for NEEPCO. MFA adds a critical layer of security beyond just passwords.
+5.	Authorization (Role-Based Access Control - RBAC):
+o	Requirement: The system must enforce a granular, role-based access control (RBAC) model, ensuring users can only view, create, modify, or delete data according to their assigned roles and permissions. This includes restrictions at the module level (e.g., only maintenance staff can schedule maintenance) and potentially at the asset type level (e.g., only IT staff can modify IT assets).
+o	Justification: Prevents unauthorized data manipulation, protects against accidental data loss, and ensures compliance with internal NEEPCO policies.
+6.	Data Encryption:
+o	Requirement: All sensitive data (e.g., cost, purchase details, vendor information) must be encrypted at rest (in the database) and in transit (using HTTPS/SSL for all web traffic).
+o	Justification: Protects against data breaches and eavesdropping, especially important for a government-related entity.
+7.	Audit Trails & Logging:
+o	Requirement: The system must maintain comprehensive, immutable audit trails for all significant data creation, modification, and deletion operations, including the user who performed the action, the timestamp, and the old/new values. All user logins and failed login attempts must also be logged.
+o	Justification: Essential for accountability, troubleshooting, security investigations, and regulatory compliance for NEEPCO.
+III. Reliability & Availability:
+8.	High Availability (Uptime):
+o	Requirement: The system must be designed for high availability with a target uptime of 99.5% (excluding planned maintenance windows).
+o	Justification: Asset management is a critical function for NEEPCO's operations. Downtime can severely impact maintenance scheduling, asset tracking, and operational efficiency.
+9.	Data Integrity:
+o	Requirement: The system must implement robust data validation rules at the point of entry to prevent inconsistent or erroneous data from being stored (e.g., enforcing data types, mandatory fields, valid date ranges, unique serial numbers). Database constraints (foreign keys) must be used to ensure referential integrity.
+o	Justification: Ensures the accuracy and reliability of asset data, which is crucial for decision-making and reporting.
+10.	Backup and Recovery:
+o	Requirement: The system must have a defined and tested data backup strategy (e.g., daily full backups, hourly incremental backups) with a clear recovery point objective (RPO) of less than 4 hours and a recovery time objective (RTO) of less than 8 hours in case of catastrophic data loss.
+o	Justification: Protects against data loss due to hardware failure, software corruption, or cyber-attacks. NEEPCO cannot afford significant data loss or prolonged downtime.
+IV. Usability & Maintainability:
+11.	User-Friendliness (UI/UX):
+o	Requirement: The system must feature an intuitive, consistent, and user-friendly interface, minimizing the learning curve for NEEPCO staff. It should be designed for ease of navigation and efficient data entry.
+o	Justification: Directly impacts user adoption and productivity. A difficult-to-use system will lead to resistance and inefficiency.
+12.	Maintainability & Extensibility:
+o	Requirement: The system's codebase must be modular, well-documented, and adhere to Laravel best practices to facilitate future enhancements, bug fixes, and updates by development teams.
+o	Justification: Ensures the long-term viability and adaptability of the system as NEEPCO's requirements evolve. Reduces technical debt and future development costs.
+13.	Browser Compatibility:
+o	Requirement: The system must be fully functional and render correctly on the latest stable versions of major web browsers (e.g., Chrome, Firefox, Edge) commonly used within NEEPCO, and potentially specific versions of Internet Explorer/Edge Legacy if still in use for legacy systems.
+o	Justification: Ensures all NEEPCO users can access the system regardless of their browser choice.
+14.	Accessibility (WCAG Compliance):
+o	Requirement: The system's user interface should adhere to at least WCAG 2.1 Level AA standards to ensure accessibility for users with disabilities (if relevant to NEEPCO's internal policies or government guidelines).
+o	Justification: Ensures inclusivity and compliance with potential government accessibility mandates.
+V. Environmental & Operational:
+15.	Documentation:
+o	Requirement: Comprehensive technical documentation (architecture, API, deployment guide) and user manuals must be provided.
+o	Justification: Essential for onboarding new developers, troubleshooting, and empowering end-users.
+16.	Portability (for future expansion):
+o	Requirement: The system should be designed using widely adopted, open-source technologies (like Laravel, PHP, MySQL/PostgreSQL) to allow for potential future migration to different infrastructure environments or cloud platforms if NEEPCO's IT strategy evolves.
+o	Justification: Avoids vendor lock-in and provides flexibility for future infrastructure changes.
+ 
+ 
+Asset Types: machinery, equipment, vehicles, land, buildings, IT assets (PC, laptop, printer, server, etc)
+Asset Information: serial number, purchase date, cost, location, condition, maintenance history, warranty information, depreciation schedule, make, model, warranty information.
+Asset status: Working, Faulty, Beyond Repair, Ewaste, Disposed, etc
+Asset Life Cycle tracking: 
+Procurement Details:	Purchase Order – Order details, order no., vendor, order amount, etc
+Insurance Details: start date, end date, insurer company details, etc
+User Roles and Permissions:	administrators, managers, maintenance staff, general users – viewing assets, adding new assets, updating information, scheduling maintenance, generating reports, etc
+Workflow: asset acquisition, allocation, maintenance requests, approvals, disposals, etc
+Reporting Requirements: asset lists, asset value reports, maintenance schedules, depreciation reports, asset utilization, etc.

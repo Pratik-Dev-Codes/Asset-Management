@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notifications</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        #notificationArea {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .notification {
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 4px solid #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .notification.unread {
+            border-left-color: #dc3545;
+            background-color: #fff8f8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Test Notification System</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button id="sendTestBtn" class="btn btn-primary">Send Test Notification</button>
+                            <button id="clearBtn" class="btn btn-outline-secondary">Clear Notifications</button>
+                        </div>
+                        <div id="notificationArea">
+                            <div class="text-center text-muted" id="noNotifications">
+                                No notifications yet. Click "Send Test Notification" to start.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.3/echo.iife.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize Pusher/Laravel Echo
+            window.Echo = new Echo({
+                broadcaster: 'pusher',
+                key: 'your-pusher-key',
+                wsHost: window.location.hostname,
+                wsPort: 6001,
+                forceTLS: false,
+                disableStats: true,
+                enabledTransports: ['ws', 'wss']
+            });
+
+            // Listen for test notifications
+            window.Echo.private('user.' + {{ auth()->id() ?? 1 }})
+                .listen('.notification.created', (data) => {
+                    console.log('Notification received:', data);
+                    addNotification(data);
+                });
+
+            // Send test notification
+            $('#sendTestBtn').click(function() {
+                $.ajax({
+                    url: '/test-notification',
+                    type: 'GET',
+                    success: function(response) {
+                        console.log('Test notification sent:', response);
+                        if (response.status === 'success') {
+                            showAlert('Notification sent successfully!', 'success');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error sending notification:', xhr.responseText);
+                        showAlert('Failed to send notification: ' + (xhr.responseJSON?.message || 'Unknown error'), 'danger');
+                    }
+                });
+            });
+
+            // Clear notifications
+            $('#clearBtn').click(function() {
+                $('#notificationArea').empty().append(
+                    '<div class="text-center text-muted" id="noNotifications">No notifications to display.</div>'
+                );
+            });
+
+            // Helper function to add a notification to the UI
+            function addNotification(data) {
+                $('#noNotifications').remove();
+                const notification = $(`
+                    <div class="notification unread" data-id="${data.id}">
+                        <h5>${data.title || 'New Notification'}</h5>
+                        <p class="mb-1">${data.message || 'You have a new notification.'}</p>
+                        <small class="text-muted">${new Date().toLocaleString()}</small>
+                        ${data.url ? `<a href="${data.url}" class="stretched-link"></a>` : ''}
+                    </div>
+                `);
+                
+                // Mark as read when clicked
+                notification.click(function() {
+                    $(this).removeClass('unread');
+                    // Here you would typically make an API call to mark the notification as read
+                });
+                
+                $('#notificationArea').prepend(notification);
+            }
+
+            // Show alert message
+            function showAlert(message, type = 'info') {
+                const alert = $(`
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+                
+                $('.card-body').prepend(alert);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alert.alert('close');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

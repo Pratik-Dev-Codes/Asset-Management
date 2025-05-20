@@ -1,0 +1,338 @@
+/* File Uploader Styles */
+.file-uploader {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+    border-color: #4a89dc;
+    background-color: rgba(74, 137, 220, 0.05);
+}
+
+.drop-zone .drop-zone-content {
+    pointer-events: none;
+}
+
+.drop-zone i {
+    font-size: 48px;
+    color: #6c757d;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.drop-zone h3 {
+    margin: 0 0 10px;
+    color: #495057;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.drop-zone p {
+    margin: 0 0 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.drop-zone .btn {
+    pointer-events: auto;
+}
+
+/* File List */
+.file-list {
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #fff;
+    transition: background-color 0.2s;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-item:hover {
+    background-color: #f8f9fa;
+}
+
+.file-item.uploading {
+    background-color: #f8f9fa;
+}
+
+.file-item.completed {
+    background-color: #f0f8ff;
+}
+
+.file-item.error {
+    background-color: #fff5f5;
+}
+
+.file-icon {
+    margin-right: 15px;
+    font-size: 24px;
+    color: #6c757d;
+    width: 32px;
+    text-align: center;
+}
+
+.file-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.file-status {
+    font-weight: 500;
+}
+
+.file-status.uploading {
+    color: #17a2b8;
+}
+
+.file-status.completed {
+    color: #28a745;
+}
+
+.file-status.error {
+    color: #dc3545;
+}
+
+.progress-container {
+    margin-top: 8px;
+    height: 4px;
+    background-color: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4a89dc;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+/* Upload Controls */
+.upload-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.upload-controls .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.upload-controls .btn i {
+    font-size: 16px;
+}
+
+.upload-controls .btn-primary {
+    background-color: #4a89dc;
+    border-color: #4a89dc;
+    color: white;
+}
+
+.upload-controls .btn-primary:hover {
+    background-color: #3a6fc7;
+    border-color: #3668b3;
+}
+
+.upload-controls .btn-outline-secondary {
+    background-color: #fff;
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+.upload-controls .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+}
+
+/* Error Message */
+.error-message {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .drop-zone {
+    background-color: #2d333b;
+    border-color: #444c56;
+}
+
+[data-theme="dark"] .drop-zone:hover,
+[data-theme="dark"] .drop-zone.drag-over {
+    border-color: #539bf5;
+    background-color: rgba(65, 132, 228, 0.1);
+}
+
+[data-theme="dark"] .drop-zone i {
+    color: #768390;
+}
+
+[data-theme="dark"] .drop-zone h3 {
+    color: #adbac7;
+}
+
+[data-theme="dark"] .drop-zone p {
+    color: #768390;
+}
+
+[data-theme="dark"] .file-list {
+    border-color: #444c56;
+    background-color: #2d333b;
+}
+
+[data-theme="dark"] .file-item {
+    background-color: #2d333b;
+    border-color: #444c56;
+}
+
+[data-theme="dark"] .file-item:hover {
+    background-color: #373e47;
+}
+
+[data-theme="dark"] .file-item.uploading {
+    background-color: rgba(65, 132, 228, 0.05);
+}
+
+[data-theme="dark"] .file-item.completed {
+    background-color: rgba(46, 160, 67, 0.1);
+}
+
+[data-theme="dark"] .file-item.error {
+    background-color: rgba(248, 81, 73, 0.1);
+}
+
+[data-theme="dark"] .file-name {
+    color: #adbac7;
+}
+
+[data-theme="dark"] .file-meta {
+    color: #768390;
+}
+
+[data-theme="dark"] .progress-container {
+    background-color: #444c56;
+}
+
+[data-theme="dark"] .upload-controls .btn-outline-secondary {
+    background-color: #2d333b;
+    border-color: #444c56;
+    color: #adbac7;
+}
+
+[data-theme="dark"] .upload-controls .btn-outline-secondary:hover {
+    background-color: #373e47;
+    border-color: #768390;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .file-uploader {
+        padding: 15px;
+    }
+    
+    .drop-zone {
+        padding: 30px 15px;
+    }
+    
+    .upload-controls {
+        flex-direction: column;
+    }
+    
+    .upload-controls .btn {
+        width: 100%;
+    }
+    
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .file-icon {
+        margin-bottom: 10px;
+    }
+    
+    .file-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.file-item {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Accessibility */
+.drop-zone:focus {
+    outline: 3px solid #4a89dc;
+    outline-offset: 2px;
+}
+
+.file-item:focus-within {
+    box-shadow: 0 0 0 2px #4a89dc;
+}
+
+/* Print Styles */
+@media print {
+    .file-uploader {
+        display: none;
+    }
+}
