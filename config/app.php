@@ -173,6 +173,7 @@ return [
         App\Providers\NotificationServiceProvider::class,
         App\Providers\CustomBroadcastServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\DocumentationServiceProvider::class,
     ],
 
     /*

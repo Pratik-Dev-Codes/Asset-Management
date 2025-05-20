@@ -1,0 +1,91 @@
+@startuml Context Diagram - Asset Management System
+
+' === Theme & Styling ===
+!theme plain
+skinparam backgroundColor #f8fafc
+skinparam defaultFontName 'Segoe UI', 'Arial', sans-serif
+skinparam defaultFontSize 10
+skinparam roundCorner 12
+skinparam shadowing true
+skinparam shadowingColor #e2e8f0
+skinparam shadowingDelta 3
+skinparam ArrowColor #4f46e5
+skinparam ArrowThickness 1.5
+skinparam ArrowFontStyle normal
+skinparam ArrowFontColor #334155
+skinparam ArrowFontSize 9
+
+' === Title ===
+title
+<size:16><b>Asset Management System</b></size>
+<size:12>Context Diagram - System Overview</size>
+end title
+
+' === Custom Colors ===
+!define PRIMARY #4f46e5
+!define SECONDARY #10b981
+!define ACCENT #f59e0b
+!define DANGER #ef4444
+!define SUCCESS #10b981
+!define WARNING #f59e0b
+!define INFO #3b82f6
+!define LIGHT #f8fafc
+!define DARK #1e293b
+!define BORDER #e2e8f0
+
+' === Actors ===
+actor ":Admin" as admin #4f46e5
+actor ":User" as user #10b981
+actor ":Manager" as manager #8b5cf6
+actor ":Technician" as tech #f59e0b
+actor ":Vendor" as vendor #ef4444
+actor ":Auditor" as auditor #06b6d4
+
+' === System Boundary ===
+rectangle "Asset Management System" #ffffff {
+  (System Core) as system #f1f5f9
+  database "Database" as db #4f46e5 {
+    (User Data)
+    (Asset Data)
+    (Maintenance)
+  }
+}
+
+' === Interactions ===
+admin --> system : "Manage Users & Roles" #4f46e5
+user --> system : "Track & Report Assets" #10b981
+manager --> system : "Approve Requests" #8b5cf6
+tech --> system : "Update Status" #f59e0b
+vendor --> system : "Provide Asset Info" #ef4444
+auditor --> system : "Conduct Audits" #06b6d4
+
+' === Response Flows ===
+system --> admin : "Alerts & Reports" #4f46e5
+system --> user : "Status Updates" #10b981
+system --> manager : "Analytics" #8b5cf6
+system --> tech : "Work Orders" #f59e0b
+system --> vendor : "Order Confirmations" #ef4444
+system --> auditor : "Compliance Reports" #06b6d4
+
+' === Legend ===
+legend bottom center
+  <b>SYSTEM ROLES</b>
+  <color:#4f46e5>Admin</color> | 
+  <color:#10b981>User</color> | 
+  <color:#8b5cf6>Manager</color> | 
+  <color:#f59e0b>Technician</color> | 
+  <color:#ef4444>Vendor</color> | 
+  <color:#06b6d4>Auditor</color>
+end legend
+
+' === Diagram Notes ===
+note bottom of system
+  <b>Core Functionality:</b>
+  • User Authentication
+  • Asset Lifecycle Management
+  • Maintenance Scheduling
+  • Reporting & Analytics
+  • Role-Based Access Control
+end note
+
+@enduml

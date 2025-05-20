@@ -1,0 +1,112 @@
+@startuml Level 2 - Asset Management
+
+' === Theme & Styling ===
+!theme plain
+skinparam backgroundColor #f8fafc
+skinparam defaultFontName 'Segoe UI', 'Arial', sans-serif
+skinparam defaultFontSize 10
+skinparam roundCorner 12
+skinparam shadowing true
+skinparam shadowingColor #e2e8f0
+skinparam shadowingDelta 3
+skinparam ArrowColor #4f46e5
+skinparam ArrowThickness 1.5
+skinparam ArrowFontStyle normal
+skinparam ArrowFontColor #334155
+
+' === Color Palette ===
+!define PRIMARY #4f46e5
+!define SECONDARY #10b981
+!define ACCENT #f59e0b
+!define DANGER #ef4444
+!define SUCCESS #10b981
+!define WARNING #f59e0b
+!define INFO #3b82f6
+!define LIGHT #f8fafc
+!define DARK #1e293b
+!define BORDER #e2e8f0
+
+' === Title ===
+title
+<size:16><b>Asset Management - Detailed Process</b></size>
+<size:12>Level 2 - Asset Lifecycle</size>
+end title
+
+' === Actors ===
+actor ":User" as user #10b981
+actor ":Admin" as admin #4f46e5
+actor ":Manager" as manager #8b5cf6
+actor ":Vendor" as vendor #ef4444
+
+' === Database ===
+database "Database" as db #4f46e5 {
+  (Assets) #e0f2e9
+  (Categories) #e0e7ff
+  (Vendors) #fef3c7
+  (Transactions) #e0f2fe
+}
+
+' === Main Processes ===
+rectangle "Asset Management" #ffffff {
+  [2.1\nAsset\nRegistration] as reg #10b981
+  [2.2\nAsset\nTracking] as track #3b82f6
+  [2.3\nAsset\nTransfer] as transfer #8b5cf6
+  [2.4\nAsset\nDisposal] as dispose #ef4444
+  [2.5\nAsset\nAudit] as audit #06b6d4
+}
+
+' === User Flows ===
+user --> reg : "Register Asset" #10b981
+user --> track : "Update Status" #10b981
+manager --> transfer : "Approve" #8b5cf6
+admin --> dispose : "Process" #4f46e5
+admin --> audit : "Schedule" #4f46e5
+vendor --> reg : "Provide Details" #ef4444
+
+' === Data Flows ===
+reg --> db : "Store Asset" #10b981
+track --> db : "Update Status" #3b82f6
+transfer --> db : "Log Transfer" #8b5cf6
+dispose --> db : "Mark Disposed" #ef4444
+audit --> db : "Record Findings" #06b6d4
+
+' === Process Details ===
+note right of reg #e0f2e9
+  <b>Registration Steps:</b>
+  1. Data Validation
+  2. Generate Asset ID
+  3. Assign Category
+  4. Record Purchase Info
+  5. Generate Barcode
+end note
+
+note bottom of track #e0e7ff
+  <b>Tracking Includes:</b>
+  • Location Updates
+  • Status Changes
+  • Condition Monitoring
+  • Maintenance History
+  • Depreciation
+end note
+
+' === Sub-processes ===
+rectangle "2.3.1 Transfer Process" #ffffff {
+  [2.3.1.1\nInitiate] as t1 #8b5cf6
+  [2.3.1.2\nApprove] as t2 #a78bfa
+  [2.3.1.3\nExecute] as t3 #c4b5fd
+  [2.3.1.4\nConfirm] as t4 #ddd6fe
+  
+  t1 --> t2 --> t3 --> t4
+}
+
+' === Legend ===
+legend bottom center
+  <b>PROCESS STAGES</b>
+  <color:#10b981>Registration</color> | 
+  <color:#3b82f6>Tracking</color> | 
+  <color:#8b5cf6>Transfer</color> | 
+  <color:#ef4444>Disposal</color> | 
+  <color:#06b6d4>Audit</color>
+end legend
+
+@enduml

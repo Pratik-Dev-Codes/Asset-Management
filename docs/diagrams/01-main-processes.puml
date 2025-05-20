@@ -1,0 +1,118 @@
+@startuml Level 1 - Main Processes
+
+' === Theme & Styling ===
+!theme plain
+skinparam backgroundColor #f8fafc
+skinparam defaultFontName 'Segoe UI', 'Arial', sans-serif
+skinparam defaultFontSize 10
+skinparam roundCorner 12
+skinparam shadowing true
+skinparam shadowingColor #e2e8f0
+skinparam shadowingDelta 3
+skinparam ArrowColor #4f46e5
+skinparam ArrowThickness 1.5
+skinparam ArrowFontStyle normal
+skinparam ArrowFontColor #334155
+
+' === Color Palette ===
+!define PRIMARY #4f46e5
+!define SECONDARY #10b981
+!define ACCENT #f59e0b
+!define DANGER #ef4444
+!define SUCCESS #10b981
+!define WARNING #f59e0b
+!define INFO #3b82f6
+!define LIGHT #f8fafc
+!define DARK #1e293b
+!define BORDER #e2e8f0
+
+' === Title ===
+title
+<size:16><b>Asset Management System - Main Processes</b></size>
+<size:12>Level 1 - High Level Overview</size>
+end title
+
+' === Actors ===
+actor ":User" as user #10b981
+actor ":Admin" as admin #4f46e5
+actor ":Manager" as manager #8b5cf6
+actor ":Auditor" as auditor #06b6d4
+
+' === Database ===
+database "Database" as db #4f46e5 {
+  (User Data) #e0e7ff
+  (Asset Data) #d1fae5
+  (Maintenance) #fef3c7
+  (Transactions) #e0f2fe
+}
+
+' === Main Processes ===
+rectangle "Asset Management System" #ffffff {
+  [1.1\nUser\nManagement] as um #4f46e5
+  [1.2\nAsset\nManagement] as am #10b981
+  [1.3\nMaintenance] as mm #f59e0b
+  [1.4\nReporting] as rep #8b5cf6
+  [1.5\nSystem Config] as sc #06b6d4
+  [1.6\nAudit Logs] as al #ef4444
+}
+
+' === User Flows ===
+user --> um : "Login/Register" #10b981
+user --> am : "Manage Assets" #10b981
+user --> mm : "Report Issues" #10b981
+user --> rep : "Generate Reports" #10b981
+
+admin --> um : "Manage Users" #4f46e5
+admin --> sc : "Configure System" #4f46e5
+
+manager --> am : "Approve Requests" #8b5cf6
+manager --> rep : "View Analytics" #8b5cf6
+
+auditor --> al : "Review Logs" #06b6d4
+auditor --> rep : "Audit Reports" #06b6d4
+
+' === Data Flows ===
+um <--> db : "User Data" #4f46e5
+am <--> db : "Asset Data" #10b981
+mm <--> db : "Maintenance" #f59e0b
+rep <--> db : "All Data" #8b5cf6
+sc <--> db : "Settings" #06b6d4
+al <--> db : "Audit Trails" #ef4444
+
+' === Process Details ===
+note right of um #e0e9ff
+  <b>User Management</b>
+  • Authentication
+  • Role Management
+  • Access Control
+  • Profile Settings
+end note
+
+note bottom of am #e0f2e9
+  <b>Asset Management</b>
+  • Registration
+  • Tracking
+  • Transfers
+  • Depreciation
+end note
+
+note bottom of mm #fef3c7
+  <b>Maintenance</b>
+  • Work Orders
+  • Scheduling
+  • Technician Assignment
+  • Parts Tracking
+end note
+
+' === Legend ===
+legend right
+  <b>PROCESS TYPES</b>
+  <color:#4f46e5>User Management</color>
+  <color:#10b981>Asset Management</color>
+  <color:#f59e0b>Maintenance</color>
+  <color:#8b5cf6>Reporting</color>
+  <color:#06b6d4>Configuration</color>
+  <color:#ef4444>Audit</color>
+end legend
+
+@enduml

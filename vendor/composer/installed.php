@@ -3,7 +3,7 @@
         'name' => 'neepco/asset-management-system',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '74dadf41e2333705f5f3f5882370add98ebff904',
+        'reference' => '17ce8df30831a5faabe72f298f0d86147f15571f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -700,7 +700,7 @@
         'neepco/asset-management-system' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '74dadf41e2333705f5f3f5882370add98ebff904',
+            'reference' => '17ce8df30831a5faabe72f298f0d86147f15571f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

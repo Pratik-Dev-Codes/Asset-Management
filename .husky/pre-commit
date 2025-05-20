@@ -1,0 +1,20 @@
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Check if any .puml files are staged or modified
+if git diff --cached --name-only | grep -q '\.puml$' || \
+   git diff --name-only | grep -q '\.puml$'; then
+  echo "Detected changes in .puml files. Generating diagrams..."
+  
+  # Generate diagrams
+  if command -v plantuml &> /dev/null; then
+    plantuml -tpng -o docs/diagrams/png docs/diagrams/*.puml
+    plantuml -tsvg -o docs/diagrams/svg docs/diagrams/*.puml
+    
+    # Add generated images to the commit
+    git add docs/diagrams/png/*.png docs/diagrams/svg/*.svg
+  else
+    echo "Warning: PlantUML not found. Please install it to generate diagrams."
+    echo "Visit https://plantuml.com/ for installation instructions."
+  fi
+fi

@@ -1,0 +1,115 @@
+@startuml Level 3 - Asset Registration
+
+' === Theme & Styling ===
+!theme plain
+skinparam backgroundColor #f8fafc
+skinparam defaultFontName 'Segoe UI', 'Arial', sans-serif
+skinparam defaultFontSize 10
+skinparam roundCorner 12
+skinparam shadowing true
+skinparam shadowingColor #e2e8f0
+skinparam shadowingDelta 3
+skinparam ArrowColor #10b981
+skinparam ArrowThickness 1.5
+skinparam ArrowFontStyle normal
+skinparam ArrowFontColor #334155
+
+' === Color Palette ===
+!define PRIMARY #4f46e5
+!define SECONDARY #10b981
+!define ACCENT #f59e0b
+!define DANGER #ef4444
+!define SUCCESS #10b981
+!define WARNING #f59e0b
+!define INFO #3b82f6
+!define LIGHT #f8fafc
+!define DARK #1e293b
+!define BORDER #e2e8f0
+
+' === Title ===
+title
+<size:16><b>Asset Registration Process</b></size>
+<size:12>Level 3 - Detailed Workflow</size>
+end title
+
+' === Actors ===
+actor ":User" as user #10b981
+participant "Web Interface" as ui #3b82f6
+participant "API" as api #8b5cf6
+participant "Validation" as val #f59e0b
+participant "Asset Service" as svc #10b981
+database "Database" as db #4f46e5
+
+' === Process Flow ===
+== Asset Registration ==
+
+user -> ui: "1. Fill Asset Form" #10b981
+activate user
+activate ui
+
+ui -> api: "2. Submit Form Data" #3b82f6
+activate api
+
+api -> val: "3. Validate Input" #f59e0b
+activate val
+
+alt "Data Valid"
+    val -> svc: "4. Process Asset" #10b981
+    activate svc
+    
+    svc -> db: "5. Check Duplicate" #4f46e5
+    db --> svc: "6. Return Status" #4f46e5
+    
+    alt "No Duplicate"
+        svc -> svc: "7. Generate Asset Tag" #10b981
+        svc -> db: "8. Create Asset Record" #4f46e5
+        db --> svc: "9. Return Asset ID" #4f46e5
+        svc -> svc: "10. Generate Barcode" #10b981
+        svc -> db: "11. Update with Barcode" #4f46e5
+        svc --> api: "12. Success Response" #10b981
+    else "Duplicate Found"
+        svc --> api: "Error: Duplicate Asset" #ef4444
+    end
+    
+    deactivate svc
+else "Validation Failed"
+    val --> api: "Error: Invalid Data" #ef4444
+end
+
+api --> ui: "13. Show Result" #3b82f6
+deactivate api
+
+ui --> user: "14. Display Status" #10b981
+deactivate ui
+deactivate user
+
+' === Notes ===
+note right of val #fef3c7
+  <b>Validation Rules:</b>
+  • Required fields
+  • Data formats
+  • Business rules
+  • Category validation
+  • Vendor verification
+end note
+
+note left of svc #e0f2e9
+  <b>Asset Creation:</b>
+  • Generate unique ID
+  • Create audit trail
+  • Apply default values
+  • Set initial status
+  • Link to category
+end note
+
+' === Legend ===
+legend bottom center
+  <b>PROCESS STEPS</b>
+  <color:#10b981>User Action</color> | 
+  <color:#3b82f6>UI Process</color> | 
+  <color:#8b5cf6>API Call</color> | 
+  <color:#f59e0b>Validation</color> | 
+  <color:#4f46e5>Database</color>
+end legend
+
+@enduml

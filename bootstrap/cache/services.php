@@ -46,6 +46,7 @@
     42 => 'App\\Providers\\NotificationServiceProvider',
     43 => 'App\\Providers\\CustomBroadcastServiceProvider',
     44 => 'App\\Providers\\RepositoryServiceProvider',
+    45 => 'App\\Providers\\DocumentationServiceProvider',
   ),
   'eager' => 
   array (
@@ -81,6 +82,7 @@
     29 => 'App\\Providers\\NotificationServiceProvider',
     30 => 'App\\Providers\\CustomBroadcastServiceProvider',
     31 => 'App\\Providers\\RepositoryServiceProvider',
+    32 => 'App\\Providers\\DocumentationServiceProvider',
   ),
   'deferred' => 
   array (

@@ -1,0 +1,53 @@
+name: Update Diagrams
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'app/**'
+      - 'routes/**'
+      - 'database/migrations/**'
+      - 'docs/diagrams/**'
+  workflow_dispatch:
+
+jobs:
+  update-diagrams:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, fileinfo
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz
+        
+    - name: Install PlantUML
+      run: |
+        sudo apt-get install -y default-jre
+        wget -O plantuml.jar https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar
+        
+    - name: Generate Diagrams
+      run: |
+        java -jar plantuml.jar -v
+        java -jar plantuml.jar -tpng -o docs/diagrams/png docs/diagrams/*.puml
+        java -jar plantuml.jar -tsvg -o docs/diagrams/svg docs/diagrams/*.puml
+        
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add docs/diagrams/png/
+        git add docs/diagrams/svg/
+        git diff --quiet && git diff --staged --quiet || \
+          (git commit -m "docs: update auto-generated diagrams [skip ci]" && \
+           git push)

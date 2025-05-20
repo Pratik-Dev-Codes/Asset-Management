@@ -19,6 +19,96 @@ North Eastern Electric Power Corporation Limited (NEEPCO) is a Miniratna Categor
 - 📄 Document attachment support
 - 📈 Reporting and analytics
 
+## System Architecture
+
+The system architecture is documented through a series of diagrams that illustrate the different layers and components of the application. These diagrams are automatically generated and kept in sync with your codebase.
+
+### Architecture Diagrams
+
+1. **Context Diagram**
+   - Overview of system boundaries and external actors
+   - Location: `docs/diagrams/00-context.puml`
+   - Auto-generated: `00-context-auto.puml`
+
+2. **Main Processes**
+   - High-level view of system processes
+   - Location: `docs/diagrams/01-main-processes.puml`
+
+3. **Asset Management**
+   - Detailed asset lifecycle management
+   - Location: `docs/diagrams/02-asset-management.puml`
+
+4. **Asset Registration**
+   - Step-by-step registration workflow
+   - Location: `docs/diagrams/03-asset-registration.puml`
+
+5. **Auto-generated Class Diagram**
+   - Generated from your models
+   - Location: `docs/diagrams/04-class-diagram-auto.puml`
+
+6. **Auto-generated Sequence Diagrams**
+   - Key workflows and processes
+   - Location: `docs/diagrams/05-sequence-*.puml`
+
+## Automated Diagram Generation
+
+### 1. Using Artisan Command
+
+Generate all documentation and diagrams with a single command:
+
+```bash
+php artisan docs:generate
+```
+
+This will:
+- Generate context diagram
+- Create class diagrams from your models
+- Generate sequence diagrams for key workflows
+- Save all diagrams in both PNG and SVG formats
+
+### 2. Pre-commit Hook
+
+A Git pre-commit hook automatically generates diagrams when you commit changes to `.puml` files.
+
+### 3. CI/CD Integration
+
+GitHub Actions automatically updates diagrams when changes are pushed to `main` or `develop` branches.
+
+### 4. Development Setup
+
+For new developers, run the setup script:
+
+```powershell
+# Windows (PowerShell as Administrator)
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\scripts\setup-dev.ps1
+```
+
+```bash
+# Linux/macOS
+chmod +x ./scripts/setup-dev.sh
+./scripts/setup-dev.sh
+```
+
+This will install all required dependencies:
+- Java Runtime Environment (JRE)
+- Graphviz
+- PlantUML
+- Node.js and Husky for Git hooks
+
+## Manual Generation (if needed)
+
+```bash
+# Generate all diagrams
+php artisan docs:generate
+
+# Or use the provided scripts
+./docs/generate_diagrams.ps1  # Windows PowerShell
+./docs/generate_diagrams.bat  # Windows CMD
+```
+
+> **Note**: Requires [PlantUML](https://plantuml.com/) and [Graphviz](https://graphviz.org/) to be installed.
+
 ## Prerequisites
 
 - PHP 8.1 or higher
