@@ -279,15 +279,41 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
-  Made with ❤️ by Pratik Adhikary • 
-  [![GitHub stars](https://img.shields.io/github/stars/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers)
-  [![GitHub forks](https://img.shields.io/github/forks/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/network/members)
+<div align="center" style="margin-top: 40px; padding: 20px 0; border-top: 1px solid #eaecef;">
+  <p style="margin: 0 0 10px 0; color: #6a737d; font-size: 14px;">
+    Made with ❤️ by Pratik Adhikary
+  </p>
+  <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+    <a href="https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: #24292e;">
+      <img src="https://img.icons8.com/fluent/24/000000/star.png" width="18" style="margin-right: 5px;" alt="Stars">
+      <span id="github-stars">Stars</span>
+    </a>
+    <span style="color: #e1e4e8;">•</span>
+    <a href="https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/network/members" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none; color: #24292e;">
+      <img src="https://img.icons8.com/fluent/24/000000/code-fork.png" width="18" style="margin-right: 5px;" alt="Forks">
+      <span id="github-forks">Forks</span>
+    </a>
+  </div>
+  <p style="margin: 15px 0 0 0; font-size: 12px; color: #6a737d;">
+    <a href="#top" style="color: #0366d6; text-decoration: none;">⬆️ Back to Top</a>
+  </p>
 </div>
-# Windows (PowerShell as Administrator)
-Set-ExecutionPolicy Bypass -Scope Process -Force
-.\scripts\setup-dev.ps1
-```
+
+<!-- GitHub Stats API Script -->
+<script>
+  // Fetch GitHub repository stats
+  fetch('https://api.github.com/repos/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD')
+    .then(response => response.json())
+    .then(data => {
+      if (data.stargazers_count !== undefined) {
+        document.getElementById('github-stars').textContent = data.stargazers_count.toLocaleString();
+      }
+      if (data.forks_count !== undefined) {
+        document.getElementById('github-forks').textContent = data.forks_count.toLocaleString();
+      }
+    })
+    .catch(error => console.error('Error fetching GitHub stats:', error));
+</script>
 
 ```bash
 # Linux/macOS
