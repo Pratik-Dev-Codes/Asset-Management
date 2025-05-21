@@ -182,3 +182,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%208-silver)](https://phpstan.org/)
 [![PHP_CodeSniffer](https://img.shields.io/badge/code%20style-PSR--12-6B46C1.svg)](https://www.php-fig.org/psr/psr-12/)
+
+## About the Developer
+
+**Pratik Adhikary**  
+Email: [pratikadhikary.work@gmail.com](mailto:pratikadhikary.work@gmail.com)  
+
+### Academic Background
+- Pursuing Master's in Computer Application (MCA) - Final Semester  
+  **Royal Global University, Assam**  
+  (Expected Graduation: 2025)
+
+### Project Information
+This Asset Management System is developed as a final project for the Master's in Computer Application (MCA) program at Royal Global University, Assam. The project demonstrates comprehensive implementation of web application development using modern technologies and best practices.
+
+### Connect with Me
+- GitHub: [@Pratik-Dev-Codes](https://github.com/Pratik-Dev-Codes)
+- LinkedIn: [Pratik Adhikary](https://linkedin.com/in/pratik-adhikary) (if available)
+- Portfolio: [Your Portfolio URL] (if available)
