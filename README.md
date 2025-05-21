@@ -6,15 +6,19 @@
 [![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?logo=php&logoColor=white)](https://php.net/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
-[![GitHub stars](https://img.shields.io/github/stars/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![GitHub stars](https://img.shields.io/github/stars/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social&logo=github)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social&logo=github)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/network/members)
 
 A modern, comprehensive asset management solution built for **North Eastern Electric Power Corporation Limited (NEEPCO)** to efficiently track, manage, and maintain organizational assets.
 
-[🚀 Live Demo](#) • 
-[📚 Documentation](#-documentation) • 
-[💡 Features](#-key-features) • 
-[🛠️ Installation](#-installation) • 
-[📦 Tech Stack](#-tech-stack)
+<div align="center">
+  <a href="#-key-features" style="margin: 0 10px;">✨ Features</a> •
+  <a href="#-installation" style="margin: 0 10px;">🚀 Installation</a> •
+  <a href="#-tech-stack" style="margin: 0 10px;">💻 Tech Stack</a> •
+  <a href="#-documentation" style="margin: 0 10px;">📚 Documentation</a> •
+  <a href="#-contributing" style="margin: 0 10px;">🤝 Contributing</a>
+</div>
 
 </div>
 
@@ -25,7 +29,16 @@ Welcome to the **Asset Management System for NEEPCO**, a robust web application 
 ### 🎓 Academic Context
 *Developed as a Final Year Project for Master's in Computer Application (MCA) at Royal Global University, Assam (2025)*
 
-## 🎯 Key Features
+## 📋 Table of Contents
+- [✨ Key Features](#-key-features)
+- [🚀 Quick Start](#-quick-start)
+- [💻 Tech Stack](#-tech-stack)
+- [📚 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [👨‍💻 About the Developer](#-about-the-developer)
+
+## ✨ Key Features
 
 ### 🏷️ Comprehensive Asset Management
 - **Asset Tracking** - Monitor assets with unique identifiers, QR codes, and barcodes for easy scanning and management
@@ -77,6 +90,8 @@ Welcome to the **Asset Management System for NEEPCO**, a robust web application 
 - **Digital Signatures** - Capture approvals and verifications in the field
 
 ## 🚀 Quick Start
+
+Get started with the Asset Management System in minutes with these simple steps:
 
 ### Prerequisites
 - PHP 8.1+
@@ -142,32 +157,33 @@ Welcome to the **Asset Management System for NEEPCO**, a robust web application 
      - Email: admin@neepco.com
      - Password: password
 
-## 🛠 Tech Stack
+## 💻 Tech Stack
 
-### Backend
+### 🖥️ Backend
 - **PHP 8.1+** - Core programming language
 - **Laravel 10** - PHP framework
-- **MySQL** - Relational database
+- **MySQL 8.0+** - Relational database
 - **Laravel Sanctum** - API authentication
 - **Laravel Excel** - Data import/export
 - **Laravel Telescope** - Debugging assistant
 
-### Frontend
+### 🎨 Frontend
 - **Vue.js 3** - Progressive JavaScript framework
 - **Inertia.js** - Server-side routing
 - **Tailwind CSS** - Utility-first CSS framework
 - **Alpine.js** - Minimal framework for JavaScript behavior
 - **Chart.js** - Data visualization
 
-### Development Tools
+### 🔧 Development Tools
 - **Docker** - Containerization
 - **PHPStan** - Static analysis
 - **PHP_CodeSniffer** - Code style checking
 - **Git** - Version control
+- **GitHub Actions** - CI/CD Pipeline
 
 ## 📚 Documentation
 
-### System Architecture
+### 📐 System Architecture
 
 #### High-Level Overview
 ```mermaid
@@ -180,39 +196,53 @@ graph TD
     D --> C
 ```
 
-#### Core Components
+#### 🧩 Core Components
 1. **Asset Management** - Central module for asset CRUD operations
 2. **Maintenance Module** - Scheduling and tracking maintenance
 3. **Reporting Engine** - Custom report generation
 4. **User Management** - Role-based access control
 5. **API Layer** - RESTful endpoints for mobile/third-party integration
 
+### 📖 API Documentation
+Explore our comprehensive [API Documentation](docs/API.md) for detailed information about available endpoints, request/response formats, and authentication methods.
+
 ## 🚀 Future Enhancements
 
-### Planned Features
-- [ ] Mobile Application (React Native)
-- [ ] IoT Integration for real-time monitoring
-- [ ] Predictive Maintenance using ML
-- [ ] Barcode/QR Code scanning app
-- [ ] Multi-location support
-- [ ] Advanced analytics with Power BI integration
+### 🛠️ Planned Features
+- [ ] 📱 Mobile Application (React Native)
+- [ ] 🌐 IoT Integration for real-time monitoring
+- [ ] 🤖 Predictive Maintenance using ML
+- [ ] 🔍 Barcode/QR Code scanning app
+- [ ] 🌍 Multi-location support
+- [ ] 📈 Advanced analytics with Power BI integration
 
-### Technical Improvements
-- [ ] Implement API versioning
-- [ ] Add comprehensive test coverage
-- [ ] Optimize database queries
-- [ ] Implement GraphQL API
-- [ ] Add dark mode support
+### ⚙️ Technical Improvements
+- [ ] 🔄 Implement API versioning
+- [ ] ✅ Add comprehensive test coverage
+- [ ] ⚡ Optimize database queries
+- [ ] 🎯 Implement GraphQL API
+- [�] 🌙 Add dark mode support
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### 🛠️ How to Contribute
+
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. 💾 Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. 📤 Push to the branch (`git push origin feature/AmazingFeature`)
+5. 🔄 Open a Pull Request
+
+### 📝 Code Style
+- Follow [PSR-12](https://www.php-fig.org/psr/psr-12/) coding standard
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
+
+### 🐛 Reporting Issues
+Found a bug? Please [open an issue](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/issues/new) with detailed information about the problem.
 
 ## 📄 License
 
@@ -355,23 +385,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   ### Pratik Adhikary
   *MCA Final Year Student at Royal Global University, Assam (2025)*
   
-  [![Email](https://img.shields.io/badge/Email-pratikadhikary.work@gmail.com-blue?style=flat&logo=gmail)](mailto:pratikadhikary.work@gmail.com)
-  [![GitHub](https://img.shields.io/badge/GitHub-Pratik--Dev--Codes-181717?style=flat&logo=github)](https://github.com/Pratik-Dev-Codes)
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat&logo=linkedin)](https://linkedin.com/in/pratik-adhikary)
+  <div style="margin: 15px 0;">
+    <a href="mailto:pratikadhikary.work@gmail.com" style="margin: 0 10px;">
+      <img src="https://img.icons8.com/color/48/000000/gmail.png" width="32" alt="Email">
+    </a>
+    <a href="https://github.com/Pratik-Dev-Codes" target="_blank" style="margin: 0 10px;">
+      <img src="https://img.icons8.com/color/48/000000/github--v1.png" width="32" alt="GitHub">
+    </a>
+    <a href="https://linkedin.com/in/pratik-adhikary" target="_blank" style="margin: 0 10px;">
+      <img src="https://img.icons8.com/color/48/000000/linkedin.png" width="32" alt="LinkedIn">
+    </a>
+  </div>
   
-  "*This project represents my journey in mastering modern web development technologies and best practices during my Master's program.*"
+  > *"This project represents my journey in mastering modern web development technologies and best practices during my Master's program."*
 </div>
-
-## 🙏 Acknowledgments
-
-- Royal Global University, Assam for their guidance and support
-- Laravel and Vue.js communities for amazing open-source tools
-- NEEPCO for the opportunity to solve real-world challenges
 
 ---
 
 <div align="center">
-  Made with ❤️ by Pratik Adhikary • 
-  [![GitHub stars](https://img.shields.io/github/stars/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers)
-  [![GitHub forks](https://img.shields.io/github/forks/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social)](https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/network/members)
+  <p>Made with ❤️ by Pratik Adhikary</p>
+  <div style="margin-top: 10px;">
+    <a href="https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/stargazers" target="_blank" style="margin: 0 5px;">
+      <img src="https://img.shields.io/github/stars/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social" alt="GitHub stars">
+    </a>
+    <a href="https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD/network/members" target="_blank" style="margin: 0 5px;">
+      <img src="https://img.shields.io/github/forks/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD?style=social" alt="GitHub forks">
+    </a>
+  </div>
+  <p style="margin-top: 15px;">
+    <a href="#top" style="text-decoration: none; color: #0366d6;">⬆️ Back to Top</a>
+  </p>
 </div>
