@@ -12,12 +12,12 @@
 
 A modern, comprehensive asset management solution built for **North Eastern Electric Power Corporation Limited (NEEPCO)** to efficiently track, manage, and maintain organizational assets.
 
-<div align="center">
-  <a href="#-key-features" style="margin: 0 10px;">✨ Features</a> •
-  <a href="#-installation" style="margin: 0 10px;">🚀 Installation</a> •
-  <a href="#-tech-stack" style="margin: 0 10px;">💻 Tech Stack</a> •
-  <a href="#-documentation" style="margin: 0 10px;">📚 Documentation</a> •
-  <a href="#-contributing" style="margin: 0 10px;">🤝 Contributing</a>
+<div align="center" style="margin: 1.5rem 0;">
+  <a href="#-key-features" class="nav-link">✨ Features</a> •
+  <a href="#-quick-start" class="nav-link">🚀 Quick Start</a> •
+  <a href="#-tech-stack" class="nav-link">💻 Tech Stack</a> •
+  <a href="#-documentation" class="nav-link">📚 Documentation</a> •
+  <a href="#-contributing" class="nav-link">🤝 Contributing</a>
 </div>
 
 </div>
@@ -38,56 +38,71 @@ Welcome to the **Asset Management System for NEEPCO**, a robust web application 
 - [📄 License](#-license)
 - [👨‍💻 About the Developer](#-about-the-developer)
 
+<style>
+  .nav-link {
+    margin: 0 10px;
+    color: #0366d6;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .nav-link:hover {
+    text-decoration: underline;
+  }
+  .feature-card {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-left: 4px solid #0366d6;
+  }
+  .feature-card h3 {
+    margin-top: 0;
+    color: #24292e;
+  }
+</style>
+
 ## ✨ Key Features
 
-### 🏷️ Comprehensive Asset Management
-- **Asset Tracking** - Monitor assets with unique identifiers, QR codes, and barcodes for easy scanning and management
-- **Lifecycle Management** - Track complete asset lifecycle from procurement, assignment, maintenance, to decommissioning and disposal
-- **Bulk Operations** - Import/export assets using Excel/CSV with data validation and error reporting
-- **Asset Categorization** - Organize assets into categories and subcategories with custom fields
-- **Depreciation Tracking** - Automatically calculate and track asset depreciation over time
+<div class="feature-card">
+  <h3>🏷️ Comprehensive Asset Management</h3>
+  <ul>
+    <li><strong>Asset Tracking</strong> - Monitor assets with unique identifiers, QR codes, and barcodes</li>
+    <li><strong>Lifecycle Management</strong> - Track complete asset lifecycle from procurement to decommissioning</li>
+    <li><strong>Bulk Operations</strong> - Import/export assets using Excel/CSV with validation</li>
+    <li><strong>Asset Categorization</strong> - Organize assets with custom fields and hierarchies</li>
+    <li><strong>Depreciation Tracking</strong> - Automate depreciation calculations and reporting</li>
+  </ul>
+</div>
 
-### 🛠️ Maintenance & Work Orders
-- **Preventive Maintenance** - Schedule and track regular maintenance tasks with automated reminders
-- **Corrective Maintenance** - Log and manage unplanned maintenance activities
-- **Work Order System** - Create, assign, and track work orders with priority levels and deadlines
-- **Downtime Tracking** - Monitor and report on asset availability and performance metrics
-- **Maintenance History** - Complete audit trail of all maintenance activities and costs
+<div class="feature-card">
+  <h3>🛠️ Maintenance & Work Orders</h3>
+  <ul>
+    <li><strong>Preventive Maintenance</strong> - Schedule and track regular maintenance with automated reminders</li>
+    <li><strong>Work Order System</strong> - Create, assign, and track work orders with priorities</li>
+    <li><strong>Maintenance History</strong> - Complete audit trail of all activities and costs</li>
+    <li><strong>Downtime Tracking</strong> - Monitor asset availability and performance metrics</li>
+  </ul>
+</div>
 
-### 📊 Advanced Reporting & Analytics
-- **Custom Reports** - Generate detailed reports on asset status, maintenance history, and costs
-- **Analytics Dashboard** - Interactive dashboards with key performance indicators and trends
-- **Export Capabilities** - Export reports in multiple formats (PDF, Excel, CSV) for further analysis
-- **Scheduled Reports** - Automate report generation and distribution via email
-- **Asset Performance Metrics** - Track MTBF, MTTR, and other key maintenance metrics
+<div class="feature-card">
+  <h3>📊 Advanced Reporting & Analytics</h3>
+  <ul>
+    <li><strong>Custom Reports</strong> - Generate detailed reports on assets and maintenance</li>
+    <li><strong>Analytics Dashboard</strong> - Interactive dashboards with KPIs and trends</li>
+    <li><strong>Scheduled Reports</strong> - Automate report generation and distribution</li>
+    <li><strong>Performance Metrics</strong> - Track MTBF, MTTR, and other key indicators</li>
+  </ul>
+</div>
 
-### 🔐 Access Control & Security
-- **Role-Based Access Control** - Define user roles with granular permissions (Admin, Manager, Technician, Viewer)
-- **Multi-factor Authentication** - Enhanced security with 2FA support
-- **Audit Trails** - Comprehensive logging of all system activities and changes
-- **Data Encryption** - Secure sensitive data with industry-standard encryption
-- **IP Whitelisting** - Restrict access to specific IP addresses or ranges
-
-### 🌐 Modern User Interface
-- **Responsive Design** - Fully responsive interface that works on desktops, tablets, and mobile devices
-- **Interactive Dashboards** - Real-time data visualization with charts, graphs, and widgets
-- **Intuitive Navigation** - User-friendly interface with breadcrumbs and quick access menus
-- **Dark/Light Mode** - Toggle between color schemes for comfortable viewing
-- **Keyboard Shortcuts** - Improve productivity with keyboard navigation
-
-### 🔄 Integration Capabilities
-- **RESTful API** - Seamless integration with other business systems
-- **Webhooks** - Real-time notifications for system events
-- **Third-party Integrations** - Connect with popular tools like Slack, Microsoft Teams, and more
-- **Single Sign-On (SSO)** - Support for enterprise authentication systems
-- **Mobile App** - Companion mobile application for on-the-go access
-
-### 📱 Mobile Features
-- **Barcode/QR Scanning** - Use device camera to quickly identify assets
-- **Offline Mode** - Access critical information without internet connection
-- **Push Notifications** - Instant alerts for important updates and tasks
-- **Photo Attachments** - Capture and attach photos to work orders and assets
-- **Digital Signatures** - Capture approvals and verifications in the field
+<div class="feature-card">
+  <h3>🔐 Security & Access Control</h3>
+  <ul>
+    <li><strong>Role-Based Access</strong> - Granular permissions for different user roles</li>
+    <li><strong>Multi-factor Authentication</strong> - Enhanced security with 2FA support</li>
+    <li><strong>Audit Trails</strong> - Comprehensive logging of all system activities</li>
+    <li><strong>Data Encryption</strong> - Industry-standard security for sensitive data</li>
+  </ul>
+</div>
 
 ## 🚀 Quick Start
 
@@ -101,61 +116,47 @@ Get started with the Asset Management System in minutes with these simple steps:
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD.git
-   cd Asset-Management-System-For-NEEPCO-LTD
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD.git
+cd Asset-Management-System-For-NEEPCO-LTD
 
-2. **Install PHP Dependencies**
-   ```bash
-   composer install
-   ```
+# 2. Install PHP dependencies
+composer install
 
-3. **Install JavaScript Dependencies**
-   ```bash
-   npm install
-   ```
+# 3. Install JavaScript dependencies
+npm install
 
-4. **Setup Environment**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+# 4. Setup environment
+cp .env.example .env
+php artisan key:generate
 
-5. **Configure Database**
-   Update `.env` with your database credentials:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=asset_management_system
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+# 5. Configure database (update .env with your credentials)
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=asset_management_system
+# DB_USERNAME=your_username
+# DB_PASSWORD=your_password
 
-6. **Run Migrations & Seeders**
-   ```bash
-   php artisan migrate --seed
-   ```
+# 6. Run migrations & seeders
+php artisan migrate --seed
 
-7. **Compile Assets**
-   ```bash
-   npm run dev
-   # or for production
-   # npm run build
-   ```
+# 7. Compile assets
+npm run dev
+# or for production: npm run build
 
-8. **Start Development Server**
-   ```bash
-   php artisan serve
-   ```
+# 8. Start development server
+php artisan serve
+```
 
-9. **Access the Application**
-   - URL: http://localhost:8000
-   - Admin Login:
-     - Email: admin@neepco.com
-     - Password: password
+### Access the Application
+- **URL**: http://localhost:8000
+- **Admin Credentials**:
+  - Email: admin@neepco.com
+  - Password: password
+
+> 💡 **Note**: For production deployment, make sure to set `APP_ENV=production` and `APP_DEBUG=false` in your `.env` file.
 
 ## 💻 Tech Stack
 
