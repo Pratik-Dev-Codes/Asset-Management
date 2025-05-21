@@ -251,7 +251,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 About the Developer
 
 <div align="center">
-  <img src="https://via.placeholder.com/150" alt="Pratik Adhikary" width="150" style="border-radius: 50%;">
+  <img src="https://github.com/Pratik-Dev-Codes.png" alt="Pratik Adhikary" width="150" style="border-radius: 50%;">
   
   ### Pratik Adhikary
   *MCA Final Year Student at Royal Global University, Assam*
@@ -380,7 +380,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 About the Developer
 
 <div align="center">
-  <img src="https://via.placeholder.com/150" alt="Pratik Adhikary" width="150" style="border-radius: 50%;">
+  <img src="https://github.com/Pratik-Dev-Codes.png" alt="Pratik Adhikary" width="150" style="border-radius: 50%;">
   
   ### Pratik Adhikary
   *MCA Final Year Student at Royal Global University, Assam (2025)*
