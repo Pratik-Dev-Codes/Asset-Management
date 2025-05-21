@@ -256,9 +256,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   ### Pratik Adhikary
   *MCA Final Year Student at Royal Global University, Assam*
   
-  [![Email](https://img.shields.io/badge/Email-pratikadhikary.work@gmail.com-blue?style=flat&logo=gmail)](mailto:pratikadhikary.work@gmail.com)
-  [![GitHub](https://img.shields.io/badge/GitHub-Pratik--Dev--Codes-181717?style=flat&logo=github)](https://github.com/Pratik-Dev-Codes)
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat&logo=linkedin)](https://linkedin.com/in/pratik-adhikary)
+  <div style="margin: 15px 0;">
+    <a href="mailto:pratikadhikary.work@gmail.com" style="margin: 0 10px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/000000/gmail.png" width="32" alt="Email" title="Email">
+    </a>
+    <a href="https://github.com/Pratik-Dev-Codes" target="_blank" style="margin: 0 10px; text-decoration: none;">
+      <img src="https://img.icons8.com/fluent/48/000000/github.png" width="32" alt="GitHub" title="GitHub">
+    </a>
+    <a href="https://linkedin.com/in/pratik-adhikary" target="_blank" style="margin: 0 10px; text-decoration: none;">
+      <img src="https://img.icons8.com/color/48/000000/linkedin.png" width="32" alt="LinkedIn" title="LinkedIn">
+    </a>
+  </div>
   
   "*This project represents my journey in mastering modern web development technologies and best practices during my Master's program.*"
 </div>
