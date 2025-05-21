@@ -5,84 +5,70 @@ namespace App\Policies;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ReportPolicy extends BasePolicy
+class ReportPolicy
 {
+    use HandlesAuthorization;
+
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view any reports.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view reports') ||
-               $user->can('view own reports');
+        return $user->hasPermissionTo('view reports');
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view the report.
      */
-    public function view(User $user, $report): bool
+    public function view(User $user, Report $report): bool
     {
-        // Users can view their own reports
-        if ($user->id === $report->created_by) {
-            return true;
-        }
-
-        // Check if report is public
-        if ($report->is_public) {
-            return true;
-        }
-
-        // Check if user has permission to view all reports
-        return $user->can('view all reports') ||
-               $user->hasRole('admin');
+        return $user->hasPermissionTo('view reports') ||
+            $user->id === $report->created_by ||
+            $report->is_public;
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create reports.
      */
     public function create(User $user): bool
     {
-        return $user->can('create reports') ||
-               $user->hasRole('manager');
+        return $user->hasPermissionTo('create reports');
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the report.
      */
-    public function update(User $user, $report): bool
+    public function update(User $user, Report $report): bool
     {
-        // Users can update their own reports
-        if ($user->id === $report->created_by) {
-            return $user->can('update own reports');
-        }
-
-        // Check if user can update any report
-        return $user->can('update reports') ||
-               $user->can('update any report');
+        return $user->hasPermissionTo('edit reports') ||
+            $user->id === $report->created_by;
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the report.
      */
-    public function delete(User $user, $report): bool
+    public function delete(User $user, Report $report): bool
     {
-        // Users can delete their own reports
-        if ($user->id === $report->created_by) {
-            return $user->can('delete own reports');
-        }
-
-        // Check if user can delete any report
-        return $user->can('delete reports') ||
-               $user->can('delete any report');
+        return $user->hasPermissionTo('delete reports') ||
+            $user->id === $report->created_by;
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can restore the report.
      */
-    public function forceDelete(User $user, $report): bool
+    public function restore(User $user, Report $report): bool
     {
-        // Only super admins can force delete reports
-        return $user->hasRole('super-admin');
+        return $user->hasPermissionTo('restore reports');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the report.
+     */
+    public function forceDelete(User $user, Report $report): bool
+    {
+        return $user->hasPermissionTo('force delete reports');
     }
 
     /**

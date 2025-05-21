@@ -3,7 +3,7 @@ import axios from 'axios';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { Ziggy } from './ziggy';
+import { Ziggy } from 'ziggy-js';
 
 // Set Axios defaults
 window.axios = axios;
@@ -26,6 +26,11 @@ window.createRoot = createRoot;
 
 // Make Ziggy available globally
 window.Ziggy = Ziggy;
+
+// Set the Ziggy route helper
+window.route = (name, params, absolute) => {
+    return route(name, params, absolute, Ziggy);
+};
 
 // Add a response interceptor
 window.axios.interceptors.response.use(

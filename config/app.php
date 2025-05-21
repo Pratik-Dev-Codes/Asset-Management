@@ -162,6 +162,8 @@ return [
          * Package Service Providers...
          */
         Spatie\Permission\PermissionServiceProvider::class,
+        Inertia\ServiceProvider::class,
+        \App\Providers\InertiaServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -170,8 +172,6 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\NotificationServiceProvider::class,
-        App\Providers\CustomBroadcastServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\DocumentationServiceProvider::class,
     ],

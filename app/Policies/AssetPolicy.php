@@ -4,87 +4,67 @@ namespace App\Policies;
 
 use App\Models\Asset;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-class AssetPolicy extends BasePolicy
+class AssetPolicy
 {
+    use HandlesAuthorization;
+
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view any assets.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('viewAny asset') ||
-               $user->can('view own assets');
+        return $user->hasPermissionTo('view assets');
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view the asset.
      */
-    public function view(User $user, $asset): bool
+    public function view(User $user, Asset $asset): bool
     {
-        // Allow users to view their own assets
-        if ($asset->assigned_to === $user->id) {
-            return true;
-        }
-
-        return $user->can('view asset') ||
-               $user->can('view any asset');
+        return $user->hasPermissionTo('view assets') ||
+            $user->id === $asset->assigned_to;
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create assets.
      */
     public function create(User $user): bool
     {
-        return $user->can('create asset');
+        return $user->hasPermissionTo('create assets');
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the asset.
      */
-    public function update(User $user, $asset): bool
+    public function update(User $user, Asset $asset): bool
     {
-        // Allow users to update their own assets
-        if ($asset->assigned_to === $user->id) {
-            return $user->can('update own asset');
-        }
-
-        return $user->can('update asset') ||
-               $user->can('update any asset');
+        return $user->hasPermissionTo('edit assets');
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the asset.
      */
-    public function delete(User $user, $asset): bool
+    public function delete(User $user, Asset $asset): bool
     {
-        // Prevent deletion of critical assets
-        if ($asset->is_critical) {
-            return $user->hasRole('super-admin');
-        }
-
-        // Allow users to delete their own assets
-        if ($asset->assigned_to === $user->id) {
-            return $user->can('delete own asset');
-        }
-
-        return $user->can('delete asset') ||
-               $user->can('delete any asset');
+        return $user->hasPermissionTo('delete assets');
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can restore the asset.
      */
-    public function restore(User $user, $asset): bool
+    public function restore(User $user, Asset $asset): bool
     {
-        return $user->can('restore asset');
+        return $user->hasPermissionTo('restore assets');
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can permanently delete the asset.
      */
-    public function forceDelete(User $user, $asset): bool
+    public function forceDelete(User $user, Asset $asset): bool
     {
-        return $user->hasRole('super-admin');
+        return $user->hasPermissionTo('force delete assets');
     }
 
     /**

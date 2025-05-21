@@ -1,1 +1,96 @@
-node_modules
+/node_modules
+/public/hot
+/public/storage
+/storage/*/public/*
+!/storage/.gitignore
+/vendor
+/.fleet
+/.idea
+/.vscode
+/.vagrant
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.fseventsd
+/.phpunit.result.cache
+.phpunit.result.cache
+.phpunit.cache
+/.phpunit.cache
+.phpunit.cache/*
+.phpunit.cache/.*
+!.gitkeep
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/storage
+public_html/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/public/storage
+public_html/public/hot
+
+# Environment files
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.fseventsd
+
+# IDE specific files
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Local development
+.DS_Store
+Thumbs.db
+
+# Testing
+/coverage
+
+# Laravel 5 & Lumen specific with changed public path
+/public/storage
+/public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+/public_html/storage
+/public_html/hot
+
+# Laravel 5 & Lumen specific with changed public path
+/public_html/public/storage
+/public_html/public/hot
+
+# Environment files
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.fseventsd
+
+# IDE specific files
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Local development
+.DS_Store
+Thumbs.db
+
+# Testing
+/coverage

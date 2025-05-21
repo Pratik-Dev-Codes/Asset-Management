@@ -14,6 +14,8 @@ use App\Policies\ReportPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Location;
+use App\Policies\LocationPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,13 +25,13 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+        Asset::class => AssetPolicy::class,
+        Location::class => LocationPolicy::class,
+        Report::class => ReportPolicy::class,
         // Memory Monitor
         'memory-monitor' => \App\Policies\MemoryMonitorPolicy::class,
     ];
 
-    /**
-     * Register any authentication / authorization services.
-     */
     /**
      * Register any authentication / authorization services.
      */

@@ -8,58 +8,38 @@ use Illuminate\Support\ServiceProvider;
 class BroadcastServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
-     *
-     * @return void
+     * Register any application services.
      */
-    public function register()
+    public function register(): void
     {
-        // Register the broadcast manager
-        $this->app->register(\Illuminate\Broadcasting\BroadcastServiceProvider::class);
-
-        // Register the broadcast manager instance
-        $this->app->singleton(\Illuminate\Broadcasting\BroadcastManager::class, function ($app) {
-            return $app->make(\Illuminate\Broadcasting\BroadcastManager::class);
+        // Disable custom broadcast channel registration
+        $this->app->singleton('custom.broadcast.channels', function ($app) {
+            return [
+                // Channel registrations are disabled
+            ];
         });
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        // Set the broadcast driver from the environment
-        $broadcastDriver = env('BROADCAST_DRIVER', 'log');
-        config(['broadcasting.default' => $broadcastDriver]);
+        // Disable broadcasting routes
+        // Broadcast::routes([
+        //     'middleware' => ['auth:api'],
+        //     'prefix' => 'api/broadcasting',
+        // ]);
 
-        // Log the broadcast driver being used
-        if (function_exists('info')) {
-            info('Broadcast driver set to: '.$broadcastDriver);
-        }
+        // Disable channel loading
+        // require base_path('routes/channels.php');
 
-        // Register broadcast routes with authentication middleware
-        $this->registerBroadcastRoutes();
-
-        // Load the broadcast channels
-        require base_path('routes/channels.php');
-    }
-
-    /**
-     * Register the broadcast routes.
-     *
-     * @return void
-     */
-    protected function registerBroadcastRoutes()
-    {
-        // Only register broadcast routes if we're not running in the console
-        if ($this->app->runningInConsole()) {
-            return;
-        }
-        Broadcast::routes([
-            'middleware' => ['auth:api'],
-            'prefix' => 'api/broadcasting',
-        ]);
+        // Disable custom broadcast channels
+        // $channels = $this->app->make('custom.broadcast.channels');
+        // foreach ($channels as $name => $channel) {
+        //     Broadcast::channel($name.'.{id}', function ($user, $id) use ($channel) {
+        //         return $this->app->make($channel)->authorize($user, $id);
+        //     });
+        // }
     }
 }

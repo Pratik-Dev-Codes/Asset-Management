@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,30 +17,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Create roles and permissions
+        // Create admin user first
         $this->call([
-            ReportSeeder::class,
+            AdminUserSeeder::class,
+        ]);
+        
+        // Uncomment these once the database is stable
+        /*
+        $this->call([
             RoleAndPermissionSeeder::class,
             ReportPermissionsSeeder::class,
+            ReportSeeder::class,
             // ReportTestDataSeeder::class, // Uncomment for testing
         ]);
-
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        // Assign admin role to the admin user
-        $admin->assignRole('admin');
-
+        
         // Create regular users if needed
-        // User::factory(10)->create()->each(function ($user) {
-        //     $user->assignRole('user');
-        // });
+        User::factory(10)->create()->each(function ($user) {
+            $user->assignRole('user');
+        });
+        */
     }
 }
