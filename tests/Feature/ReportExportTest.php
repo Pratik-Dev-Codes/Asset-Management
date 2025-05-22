@@ -5,11 +5,13 @@ namespace Tests\Feature;
 use App\Models\Report;
 use App\Models\ReportFile;
 use App\Models\User;
+use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Illuminate\Support\Facades\DB;
 
 class ReportExportTest extends TestCase
 {
@@ -21,11 +23,22 @@ class ReportExportTest extends TestCase
     {
         parent::setUp();
 
+        // Clear the users table to avoid duplicate entry errors
+        \DB::table('users')->truncate();
+        \DB::table('roles')->truncate();
+        \DB::table('model_has_roles')->truncate();
+
         // Create a test user with admin role
-        $this->user = User::factory()->create([
+        $this->user = User::create([
+            'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
+            'email_verified_at' => now(),
         ]);
+
+        // Create and assign admin role
+        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin']);
+        $this->user->assignRole($adminRole);
 
         $this->actingAs($this->user);
 
@@ -40,11 +53,16 @@ class ReportExportTest extends TestCase
     /** @test */
     public function it_can_export_a_report_to_pdf()
     {
+        // Create test data
+        $assets = Asset::factory()->count(3)->create([
+            'status' => 'active'
+        ]);
+
         $report = Report::factory()->create([
             'created_by' => $this->user->id,
             'type' => 'asset',
             'name' => 'Test PDF Export',
-            'columns' => ['id', 'name', 'created_at'],
+            'columns' => ['id', 'name', 'status', 'created_at'],
             'filters' => [
                 ['field' => 'status', 'operator' => 'equals', 'value' => 'active'],
             ],

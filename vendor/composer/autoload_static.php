@@ -160,6 +160,10 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
             'Laravel\\Breeze\\' => 15,
             'L5Swagger\\' => 10,
         ),
+        'K' => 
+        array (
+            'Kalnoy\\Nestedset\\' => 17,
+        ),
         'I' => 
         array (
             'Inertia\\' => 8,
@@ -553,6 +557,10 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         array (
             0 => __DIR__ . '/..' . '/darkaonline/l5-swagger/src',
         ),
+        'Kalnoy\\Nestedset\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kalnoy/nestedset/src',
+        ),
         'Inertia\\' => 
         array (
             0 => __DIR__ . '/..' . '/inertiajs/inertia-laravel/src',
@@ -743,6 +751,7 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'App\\Console\\Commands\\CleanupLogs' => __DIR__ . '/../..' . '/app/Console/Commands/CleanupLogs.php',
         'App\\Console\\Commands\\CleanupOldMigrations' => __DIR__ . '/../..' . '/app/Console/Commands/CleanupOldMigrations.php',
         'App\\Console\\Commands\\CleanupReportFiles' => __DIR__ . '/../..' . '/app/Console/Commands/CleanupReportFiles.php',
+        'App\\Console\\Commands\\ClearAllCaches' => __DIR__ . '/../..' . '/app/Console/Commands/ClearAllCaches.php',
         'App\\Console\\Commands\\CreateAdminUser' => __DIR__ . '/../..' . '/app/Console/Commands/CreateAdminUser.php',
         'App\\Console\\Commands\\GenerateDocumentationCommand' => __DIR__ . '/../..' . '/app/Console/Commands/GenerateDocumentationCommand.php',
         'App\\Console\\Commands\\GenerateMemoryUsageData' => __DIR__ . '/../..' . '/app/Console/Commands/GenerateMemoryUsageData.php',
@@ -833,6 +842,7 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'App\\Http\\Controllers\\FileUploadController' => __DIR__ . '/../..' . '/app/Http/Controllers/FileUploadController.php',
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\InventoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/InventoryController.php',
+        'App\\Http\\Controllers\\JsAssetController' => __DIR__ . '/../..' . '/app/Http/Controllers/JsAssetController.php',
         'App\\Http\\Controllers\\LocationController' => __DIR__ . '/../..' . '/app/Http/Controllers/LocationController.php',
         'App\\Http\\Controllers\\MaintenanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/MaintenanceController.php',
         'App\\Http\\Controllers\\MaintenanceLogController' => __DIR__ . '/../..' . '/app/Http/Controllers/MaintenanceLogController.php',
@@ -1227,6 +1237,7 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'Database\\Seeders\\ReportSeeder' => __DIR__ . '/../..' . '/database/seeders/ReportSeeder.php',
         'Database\\Seeders\\ReportTestDataSeeder' => __DIR__ . '/../..' . '/database/seeders/ReportTestDataSeeder.php',
         'Database\\Seeders\\RoleAndPermissionSeeder' => __DIR__ . '/../..' . '/database/seeders/RoleAndPermissionSeeder.php',
+        'Database\\Seeders\\UserSeeder' => __DIR__ . '/../..' . '/database/seeders/UserSeeder.php',
         'DateError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
         'DateException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateException.php',
         'DateInvalidOperationException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateInvalidOperationException.php',
@@ -4253,6 +4264,14 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'Inertia\\Testing\\Concerns\\Matching' => __DIR__ . '/..' . '/inertiajs/inertia-laravel/src/Testing/Concerns/Matching.php',
         'Inertia\\Testing\\Concerns\\PageObject' => __DIR__ . '/..' . '/inertiajs/inertia-laravel/src/Testing/Concerns/PageObject.php',
         'Inertia\\Testing\\TestResponseMacros' => __DIR__ . '/..' . '/inertiajs/inertia-laravel/src/Testing/TestResponseMacros.php',
+        'Kalnoy\\Nestedset\\AncestorsRelation' => __DIR__ . '/..' . '/kalnoy/nestedset/src/AncestorsRelation.php',
+        'Kalnoy\\Nestedset\\BaseRelation' => __DIR__ . '/..' . '/kalnoy/nestedset/src/BaseRelation.php',
+        'Kalnoy\\Nestedset\\Collection' => __DIR__ . '/..' . '/kalnoy/nestedset/src/Collection.php',
+        'Kalnoy\\Nestedset\\DescendantsRelation' => __DIR__ . '/..' . '/kalnoy/nestedset/src/DescendantsRelation.php',
+        'Kalnoy\\Nestedset\\NestedSet' => __DIR__ . '/..' . '/kalnoy/nestedset/src/NestedSet.php',
+        'Kalnoy\\Nestedset\\NestedSetServiceProvider' => __DIR__ . '/..' . '/kalnoy/nestedset/src/NestedSetServiceProvider.php',
+        'Kalnoy\\Nestedset\\NodeTrait' => __DIR__ . '/..' . '/kalnoy/nestedset/src/NodeTrait.php',
+        'Kalnoy\\Nestedset\\QueryBuilder' => __DIR__ . '/..' . '/kalnoy/nestedset/src/QueryBuilder.php',
         'L5Swagger\\ConfigFactory' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/ConfigFactory.php',
         'L5Swagger\\Console\\GenerateDocsCommand' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/Console/GenerateDocsCommand.php',
         'L5Swagger\\Exceptions\\L5SwaggerException' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/Exceptions/L5SwaggerException.php',
@@ -9030,6 +9049,7 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'Termwind\\ValueObjects\\Style' => __DIR__ . '/..' . '/nunomaduro/termwind/src/ValueObjects/Style.php',
         'Termwind\\ValueObjects\\Styles' => __DIR__ . '/..' . '/nunomaduro/termwind/src/ValueObjects/Styles.php',
         'Tests\\CreatesApplication' => __DIR__ . '/../..' . '/tests/CreatesApplication.php',
+        'Tests\\Feature\\ApiTest' => __DIR__ . '/../..' . '/tests/Feature/ApiTest.php',
         'Tests\\Feature\\Api\\ApiTestCase' => __DIR__ . '/../..' . '/tests/Feature/Api/ApiTestCase.php',
         'Tests\\Feature\\Api\\AssetApiTest' => __DIR__ . '/../..' . '/tests/Feature/Api/AssetApiTest.php',
         'Tests\\Feature\\Api\\AssetControllerTest' => __DIR__ . '/../..' . '/tests/Feature/Api/AssetControllerTest.php',
@@ -9047,8 +9067,11 @@ class ComposerStaticInitd725e0b07549e4343677d6fae28b1e1b
         'Tests\\Feature\\Commands\\ListScheduledReportsTest' => __DIR__ . '/../..' . '/tests/Feature/Commands/ListScheduledReportsTest.php',
         'Tests\\Feature\\Commands\\PruneOldNotificationsTest' => __DIR__ . '/../..' . '/tests/Feature/Commands/PruneOldNotificationsTest.php',
         'Tests\\Feature\\Commands\\RunScheduledReportsTest' => __DIR__ . '/../..' . '/tests/Feature/Commands/RunScheduledReportsTest.php',
+        'Tests\\Feature\\FullApplicationTest' => __DIR__ . '/../..' . '/tests/Feature/FullApplicationTest.php',
         'Tests\\Feature\\Http\\Controllers\\ReportControllerTest' => __DIR__ . '/../..' . '/tests/Feature/Http/Controllers/ReportControllerTest.php',
         'Tests\\Feature\\Http\\Controllers\\ReportFileControllerTest' => __DIR__ . '/../..' . '/tests/Feature/Http/Controllers/ReportFileControllerTest.php',
+        'Tests\\Feature\\JavaScriptDataNoDbTest' => __DIR__ . '/../..' . '/tests/Feature/JavaScriptDataNoDbTest.php',
+        'Tests\\Feature\\JavaScriptDataTest' => __DIR__ . '/../..' . '/tests/Feature/JavaScriptDataTest.php',
         'Tests\\Feature\\ProfileTest' => __DIR__ . '/../..' . '/tests/Feature/ProfileTest.php',
         'Tests\\Feature\\QueryOptimizationServiceProviderTest' => __DIR__ . '/../..' . '/tests/Feature/QueryOptimizationServiceProviderTest.php',
         'Tests\\Feature\\RateLimitingTest' => __DIR__ . '/../..' . '/tests/Feature/RateLimitingTest.php',

@@ -35,10 +35,28 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->middleware('web');
+
+// Favicon route
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('favicon.ico'));
+})->name('favicon');
 
 // Include memory routes
 require __DIR__.'/memory.php';
+
+// Test route to verify session and authentication
+Route::get('/test-auth', function () {
+    return response()->json([
+        'authenticated' => auth()->check(),
+        'user' => auth()->user(),
+        'session_id' => session()->getId(),
+    ]);
+})->middleware('web');
+
+// Dynamic JavaScript asset
+Route::get('/js/laravel-data.js', [\App\Http\Controllers\JsAssetController::class, 'laravelData'])
+    ->name('laravel.data.js');
 
 // Dashboard Routes
 Route::middleware(['auth', 'verified'])->group(function () {

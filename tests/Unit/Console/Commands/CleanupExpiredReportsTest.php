@@ -14,12 +14,18 @@ class CleanupExpiredReportsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Ensure the reports directory exists in the storage
+        Storage::fake('public');
+        Storage::disk('public')->makeDirectory('reports');
+    }
+
     /** @test */
     public function it_deletes_expired_report_files()
     {
-        // Fake the storage
-        Storage::fake('public');
-
         // Create a test user
         $user = User::factory()->create();
 
@@ -39,7 +45,7 @@ class CleanupExpiredReportsTest extends TestCase
                 'file_type' => 'pdf',
                 'file_size' => 1024,
                 'generated_by' => $user->id,
-                'expires_at' => now()->subDays(1), // Expired yesterday
+                'expires_at' => now()->subDay(), // Expired yesterday
             ]);
 
             // Create the file in storage
@@ -72,16 +78,16 @@ class CleanupExpiredReportsTest extends TestCase
         $this->assertStringContainsString('Starting cleanup of expired report files...', $output);
         $this->assertStringContainsString('Successfully deleted 3 expired report files.', $output);
 
-        // Assert the expired files were deleted from the database
+        // Assert expired files were deleted
         foreach ($expiredFiles as $file) {
+            $this->assertFalse(Storage::disk('public')->exists($file->file_path), "File {$file->file_path} should have been deleted");
             $this->assertDatabaseMissing('report_files', ['id' => $file->id]);
-            Storage::disk('public')->assertMissing($file->file_path);
         }
 
-        // Assert the valid files still exist
+        // Assert valid files still exist
         foreach ($validFiles as $file) {
+            $this->assertTrue(Storage::disk('public')->exists($file->file_path), "File {$file->file_path} should exist");
             $this->assertDatabaseHas('report_files', ['id' => $file->id]);
-            Storage::disk('public')->assertExists($file->file_path);
         }
     }
 

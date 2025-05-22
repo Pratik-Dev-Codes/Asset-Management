@@ -19,6 +19,7 @@
         "darkaonline/l5-swagger": "^8.6",
         "doctrine/dbal": "^3.9",
         "inertiajs/inertia-laravel": "^0.6.3",
+        "kalnoy/nestedset": "^6.0",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/telescope": "*",
@@ -28,7 +29,7 @@
         "simplesoftwareio/simple-qrcode": "*",
         "spatie/laravel-activitylog": "*",
         "spatie/laravel-permission": "^6.18",
-        "tightenco/ziggy": "^2.0",
+        "tightenco/ziggy": "^2.5",
         "zircote/swagger-php": "^4.11"
     },
     "require-dev": {

@@ -19,7 +19,28 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        // All routes are excluded in API-only application
-        '*',
+        'api/*',
+        'sanctum/*',
+        'login',
+        'logout',
+        'register',
+        'password/reset',
+        'password/email',
+        'password/reset/*',
+        'email/verify/*',
+        'email/resend',
+        'forgot-password',
+        'reset-password',
     ];
+    
+    /**
+     * Determine if the request should be considered a "stateful" request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function isReading($request)
+    {
+        return in_array($request->method(), ['HEAD', 'GET', 'OPTIONS']);
+    }
 }

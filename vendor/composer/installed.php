@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
-        'name' => 'neepco/asset-management-system',
+        'name' => 'pratik-dev/neepco-asset-management',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'ed9b03ad0cd95ebbebec4057e5702fc9929ebac2',
+        'reference' => '17ec25a5614fa5d1e436fcce8ba7c330b3aef223',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -514,6 +514,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'kalnoy/nestedset' => array(
+            'pretty_version' => 'v6.0.5',
+            'version' => '6.0.5.0',
+            'reference' => 'fa3f77bb96709eb6b394f66b54eb08f0d8d47d63',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../kalnoy/nestedset',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'kodova/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
@@ -733,15 +742,6 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
-        'neepco/asset-management-system' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'ed9b03ad0cd95ebbebec4057e5702fc9929ebac2',
-            'type' => 'project',
-            'install_path' => __DIR__ . '/../../',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'nesbot/carbon' => array(
             'pretty_version' => '2.73.0',
             'version' => '2.73.0.0',
@@ -903,6 +903,15 @@
             'install_path' => __DIR__ . '/../phpunit/phpunit',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'pratik-dev/neepco-asset-management' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '17ec25a5614fa5d1e436fcce8ba7c330b3aef223',
+            'type' => 'project',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'psr/cache' => array(
             'pretty_version' => '3.0.0',

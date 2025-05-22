@@ -2,11 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,9 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Create admin user first
+        // Create admin user and roles
         $this->call([
-            AdminUserSeeder::class,
+            UserSeeder::class,
         ]);
         
         // Uncomment these once the database is stable

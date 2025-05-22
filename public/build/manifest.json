@@ -1,0 +1,26 @@
+{
+  "_ui-DJm-7Vei.js": {
+    "file": "assets/ui-DJm-7Vei.js",
+    "name": "ui",
+    "imports": [
+      "_vendor-DMVOqt1q.js"
+    ]
+  },
+  "_vendor-DMVOqt1q.js": {
+    "file": "assets/vendor-DMVOqt1q.js",
+    "name": "vendor"
+  },
+  "resources/js/app.jsx": {
+    "file": "assets/app-BnheMTlZ.js",
+    "name": "app",
+    "src": "resources/js/app.jsx",
+    "isEntry": true,
+    "imports": [
+      "_vendor-DMVOqt1q.js",
+      "_ui-DJm-7Vei.js"
+    ],
+    "css": [
+      "assets/app-BIddDL3y.css"
+    ]
+  }
+}

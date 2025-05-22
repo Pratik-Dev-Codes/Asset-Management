@@ -104,7 +104,7 @@ use Kalnoy\Nestedset\NodeTrait;
  */
 class Location extends Model
 {
-    use HasFactory, NodeTrait, SoftDeletes;
+    use HasFactory, SoftDeletes, NodeTrait;
 
     /**
      * The attributes that are mass assignable.

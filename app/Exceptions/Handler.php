@@ -148,15 +148,8 @@ class Handler extends ExceptionHandler
 
         // Handle all other exceptions and HTTP exceptions
         $this->renderable(function (Throwable $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
+            if ($request->is('api/*') || $request->wantsJson() || !$request->isMethod('get')) {
                 $status = 500;
-
-                if ($e instanceof HttpException) {
-                    $status = $e->getStatusCode();
-                } elseif ($e instanceof HttpExceptionInterface) {
-                    $status = $e->getCode();
-                }
-
                 $response = [
                     'status' => 'error',
                     'message' => $e->getMessage() ?: 'An error occurred while processing your request.',
@@ -173,7 +166,19 @@ class Handler extends ExceptionHandler
                 return response()->json($response, $status);
             }
 
-            return redirect()->guest(route('login'));
+            // For web requests, try to redirect to login
+            try {
+                // Check if session is available
+                if (app()->bound('session')) {
+                    return redirect()->guest(route('login'));
+                } else {
+                    // If session is not available, return a simple response
+                    return response('Please log in to continue.', 401);
+                }
+            } catch (\Exception $redirectException) {
+                // If we can't redirect, return a simple response
+                return response('Authentication required. Please log in.', 401);
+            }
         });
 
         // Add debug information in non-production environments for unhandled exceptions

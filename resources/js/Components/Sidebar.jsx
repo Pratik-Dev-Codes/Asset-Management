@@ -1,14 +1,14 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { 
-    XIcon,
+    XMarkIcon as XIcon,
     ChevronDownIcon,
     HomeIcon,
     CubeIcon,
-    ViewListIcon,
+    ListBulletIcon as ViewListIcon,
     PlusCircleIcon,
     TagIcon,
-    TemplateIcon,
+    RectangleGroupIcon as TemplateIcon,
     WrenchScrewdriverIcon,
     CalendarIcon,
     ClockIcon,

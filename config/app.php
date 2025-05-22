@@ -164,6 +164,7 @@ return [
         Spatie\Permission\PermissionServiceProvider::class,
         Inertia\ServiceProvider::class,
         \App\Providers\InertiaServiceProvider::class,
+        Kalnoy\NestedSet\NestedSetServiceProvider::class,
 
         /*
          * Application Service Providers...

@@ -12,6 +12,20 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'XSRF-TOKEN',
+        'laravel_session',
+        'laravel_token',
+        'XSRF-TOKEN',
+        'remember_web_*',
+        'XSRF-TOKEN',
+        'XSRF-TOKEN',
+        'XSRF-TOKEN',
     ];
+    
+    /**
+     * Indicates if cookies should be serialized.
+     *
+     * @var bool
+     */
+    protected static $serialize = true;
 }

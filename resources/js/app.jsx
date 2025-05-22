@@ -4,7 +4,7 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from '@/Components/ui/toast';
 
 // Import layouts
 import AppLayout from './Layouts/AppLayout';
@@ -33,7 +33,7 @@ createInertiaApp({
         createRoot(el).render(
             <>
                 <App {...props} />
-                <Toaster position="bottom-right" />
+                <Toaster />
             </>
         );
     },
