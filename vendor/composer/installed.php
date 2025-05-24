@@ -3,7 +3,7 @@
         'name' => 'pratik-dev/neepco-asset-management',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '17ec25a5614fa5d1e436fcce8ba7c330b3aef223',
+        'reference' => 'a06102bb0972b3a91724abda276d183b3e32bda2',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -907,7 +907,7 @@
         'pratik-dev/neepco-asset-management' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '17ec25a5614fa5d1e436fcce8ba7c330b3aef223',
+            'reference' => 'a06102bb0972b3a91724abda276d183b3e32bda2',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

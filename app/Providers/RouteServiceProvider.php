@@ -29,19 +29,14 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            // API Routes (versioned)
+            // API Routes
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
-
-            // Web routes
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
-
-            // Authentication routes (using Laravel Breeze)
-            Route::middleware('web')
-                ->group(base_path('routes/auth.php'));
         });
+
+        // Set the API as the default guard
+        config(['auth.defaults.guard' => 'api']);
     }
 
     /**

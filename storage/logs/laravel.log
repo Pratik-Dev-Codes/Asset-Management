@@ -11349,3 +11349,12 @@ Did you mean this?
 [2025-05-22 01:56:03] testing.WARNING: Slow query detected {"sql":"alter table `assets` add constraint `assets_created_by_foreign` foreign key (`created_by`) references `users` (`id`)","bindings":[],"time":"178.26ms","connection":"mysql","slow_query":true} 
 [2025-05-22 01:56:03] testing.WARNING: Slow query detected {"sql":"alter table `assets` add constraint `assets_updated_by_foreign` foreign key (`updated_by`) references `users` (`id`) on delete set null","bindings":[],"time":"108.18ms","connection":"mysql","slow_query":true} 
 [2025-05-22 01:56:05] testing.INFO: New user registered {"user_id":1,"email":"admin@example.com","ip_address":"127.0.0.1"} 
+[2025-05-24 14:29:44] development.ERROR: Command "tinker" is not defined. {"command":["artisan","tinker","--execute=Schema::getColumnListing('roles');"]} 
+[2025-05-24 14:29:44] development.ERROR: Command "tinker" is not defined. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"tinker\" is not defined. at C:\\xampp\\htdocs\\Asset-Management-System-For-NEEPCO-LTD\\vendor\\symfony\\console\\Application.php:737)
+[stacktrace]
+#0 C:\\xampp\\htdocs\\Asset-Management-System-For-NEEPCO-LTD\\vendor\\symfony\\console\\Application.php(266): Symfony\\Component\\Console\\Application->find('tinker')
+#1 C:\\xampp\\htdocs\\Asset-Management-System-For-NEEPCO-LTD\\vendor\\symfony\\console\\Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 C:\\xampp\\htdocs\\Asset-Management-System-For-NEEPCO-LTD\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\xampp\\htdocs\\Asset-Management-System-For-NEEPCO-LTD\\artisan(12): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 {main}
+"} 

@@ -21,6 +21,7 @@
     <a href="#key-features">Features</a> •
     <a href="#tech-stack">Tech Stack</a> •
     <a href="#quick-start">Quick Start</a> •
+    <a href="#deployment">Deployment</a> •
     <a href="#api-documentation">API</a> •
     <a href="#contributing">Contributing</a>
   </p>
@@ -202,6 +203,78 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     This project was developed as part of my final year thesis at Royal Global University, Assam.
   </p>
 </div>
+
+## 🚀 Deployment
+
+This project includes a GitHub Actions workflow for automated deployment to staging and production environments.
+
+### Prerequisites
+
+- GitHub repository with the code
+- Server with SSH access
+- PHP 8.1+ with required extensions
+- Node.js and npm
+- MySQL/PostgreSQL database
+
+### GitHub Secrets Setup
+
+Before deploying, set up these secrets in your GitHub repository (Settings > Secrets > Actions):
+
+| Secret Name           | Description                                      |
+|-----------------------|--------------------------------------------------|
+| `STAGING_HOST`       | Staging server IP or domain                     |
+| `STAGING_USERNAME`   | SSH username for the server                     |
+| `STAGING_SSH_KEY`    | Private SSH key for authentication              |
+| `STAGING_SSH_PORT`   | (Optional) SSH port (default: 22)               |
+| `SLACK_WEBHOOK_URL`  | (Optional) For deployment notifications         |
+| `DB_*`               | Database connection variables if not in .env     |
+
+### Deployment Workflow
+
+The deployment process is automated and includes:
+
+1. **Code Checkout**
+2. **Environment Setup**
+   - PHP 8.1 with required extensions
+   - Node.js and npm
+3. **Dependency Installation**
+   - Composer packages
+   - NPM packages (with caching)
+4. **Build Process**
+   - Asset compilation
+   - Version detection
+5. **Deployment**
+   - Secure file transfer
+   - Database migrations
+   - Cache optimization
+   - Queue restart
+6. **Verification**
+   - Health checks
+   - Deployment status updates
+
+### Manual Deployment
+
+To deploy manually:
+
+1. Push to the `develop` branch for staging deployment
+2. Create a release for production deployment
+
+```bash
+git checkout develop
+git add .
+git commit -m "Your commit message"
+git push origin develop
+```
+
+### Monitoring
+
+- **GitHub Actions**: View deployment status in the "Actions" tab
+- **Server Logs**: Check `/var/log/nginx/error.log` for web server errors
+- **Application Logs**: Check `storage/logs/laravel.log`
+
+### Rollback
+
+If a deployment fails, the system will automatically roll back to the previous working version. You can also manually trigger a rollback by reverting the last commit and pushing again.
 
 ## 🙏 Acknowledgments
 

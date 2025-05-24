@@ -1,3 +1,0 @@
-"Asset Tag","Name","Category","Status","Assigned Date","Purchase Date","Purchase Cost","Serial Number","Model","Manufacturer"
-@foreach($assets as $asset)"{{ $asset->asset_tag }}","{{ $asset->name }}","{{ $asset->category ? $asset->category->name : 'N/A' }}","{{ ucfirst($asset->status) }}","{{ $asset->assigned_date ? $asset->assigned_date->format('Y-m-d') : 'N/A' }}","{{ $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : 'N/A' }}","{{ $asset->purchase_cost ?: 'N/A' }}","{{ $asset->serial_number ?? 'N/A' }}","{{ $asset->model_number ?? 'N/A' }}","{{ $asset->manufacturer ? $asset->manufacturer->name : 'N/A' }}"
-@endforeach

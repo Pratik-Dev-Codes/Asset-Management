@@ -156,14 +156,11 @@ return [
         Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
-        Illuminate\View\ViewServiceProvider::class,
 
         /*
          * Package Service Providers...
          */
         Spatie\Permission\PermissionServiceProvider::class,
-        Inertia\ServiceProvider::class,
-        \App\Providers\InertiaServiceProvider::class,
         Kalnoy\NestedSet\NestedSetServiceProvider::class,
 
         /*
@@ -174,7 +171,6 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
-        App\Providers\DocumentationServiceProvider::class,
     ],
 
     /*

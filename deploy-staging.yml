@@ -6,12 +6,23 @@ on:
   pull_request:
     branches: [ develop ]
 
+# Environment variables available to all jobs and steps in this workflow
+env:
+  DEPLOYMENT_ENV: staging
+  APP_VERSION: ${{ github.sha }}
+  DEPLOYMENT_TIMESTAMP: ${{ github.run_id }}
+
 jobs:
   deploy:
+    name: Deploy to Staging
     runs-on: ubuntu-latest
+    environment: staging
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Needed for git describe to work
     
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -20,48 +31,244 @@ jobs:
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, tokenizer, xml, ctype, json, bcmath, gd, fileinfo, openssl
         coverage: none
     
-    - name: Install Dependencies
+    - name: Get version info
+      id: version
       run: |
-        composer install --prefer-dist --no-progress --no-suggest
-        npm ci
+        echo "VERSION=$(git describe --tags --always --dirty)" >> $GITHUB_OUTPUT
+        echo "BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+        echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     
-    - name: Build assets
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+    
+    - name: Cache NPM dependencies
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+      env:
+        APP_ENV: ${{ env.DEPLOYMENT_ENV }}
+    
+    - name: Install NPM dependencies
+      run: npm ci
+      env:
+        NODE_ENV: development
+    
+    - name: Build assets for production
       run: |
-        npm run build
+        npm run prod
+      env:
+        NODE_ENV: production
+    
+    - name: Create deployment artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment-package
+        path: |
+          !.git/
+          !.github/
+          !node_modules/
+          !tests/
+          !.gitignore
+          !.gitattributes
+          !*.md
+          !*.lock
+          !*.sql
+          !*.sqlite
+          !*.sqlite-journal
+          !.editorconfig
+          !.styleci.yml
+          !.php_cs
+          !.php_cs.cache
+          !phpunit.xml
+          !_ide_helper.php
+          !_ide_helper_models.php
+          !_ide_helper_models_meta.php
+          !_ide_helper_properties.json
+          !_ide_helper_relations.php
+          !.phpstorm.meta.php
+        retention-days: 1
+    
+    - name: Verify .env.staging exists
+      id: check-env
+      run: |
+        if [ ! -f .env.staging ]; then
+          echo "::error::.env.staging file is missing"
+          exit 1
+        fi
     
     - name: Setup environment
       run: |
         cp .env.staging .env
         php artisan key:generate
+      env:
+        APP_ENV: ${{ env.DEPLOYMENT_ENV }}
     
-    - name: Database setup
+    - name: Database backup (if needed)
+      if: always()
+      run: |
+        # This is a placeholder. In a real scenario, you'd use mysqldump or similar
+        echo "Creating database backup..."
+        # Example: mysqldump -h ${{ secrets.DB_HOST }} -u ${{ secrets.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_DATABASE }} > backup_$(date +"%Y%m%d_%H%M%S").sql
+    
+    - name: Run database migrations
       run: |
         php artisan migrate --force
-        php artisan db:seed --force
+      env:
+        APP_ENV: ${{ env.DEPLOYMENT_ENV }}
     
-    - name: Cache configuration
+    - name: Run database seeds
+      run: |
+        php artisan db:seed --force
+      env:
+        APP_ENV: ${{ env.DEPLOYMENT_ENV }}
+    
+    - name: Optimize application
       run: |
         php artisan config:cache
         php artisan route:cache
         php artisan view:cache
-    
-    - name: Restart queue
-      run: |
-        php artisan queue:restart
+      env:
+        APP_ENV: ${{ env.DEPLOYMENT_ENV }}
     
     - name: Deploy to server
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USERNAME }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        port: ${{ secrets.STAGING_SSH_PORT || '22' }}
+        script_stop: true
+        script: |
+          set -e
+          
+          # Deployment directory
+          DEPLOY_DIR="/var/www/asset-management"
+          
+          # Create deployment directory if it doesn't exist
+          sudo mkdir -p $DEPLOY_DIR
+          sudo chown -R ${{ secrets.STAGING_USERNAME }}:www-data $DEPLOY_DIR
+          
+          # Change to deployment directory
+          cd $DEPLOY_DIR
+          
+          # Backup current version (for rollback)
+          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          BACKUP_DIR="$DEPLOY_DIR/../backups/$TIMESTAMP"
+          
+          echo "Creating backup in $BACKUP_DIR..."
+          mkdir -p $BACKUP_DIR
+          
+          # Copy current files to backup (exclude node_modules, vendor, etc.)
+          rsync -a --exclude='.git' --exclude='node_modules' --exclude='vendor' \
+                --exclude='.env' --exclude='storage' $DEPLOY_DIR/ $BACKUP_DIR/
+          
+          # Create storage directories if they don't exist
+          mkdir -p storage/framework/{sessions,views,cache}
+          mkdir -p storage/logs
+          
+          # Set proper permissions
+          chmod -R 775 storage bootstrap/cache
+          chown -R ${{ secrets.STAGING_USERNAME }}:www-data .
+          
+          # Pull latest changes
+          git fetch origin develop
+          git reset --hard origin/develop
+          
+          # Install production dependencies
+          composer install --no-dev --optimize-autoloader --no-interaction
+          
+          # Install NPM dependencies and build assets
+          npm ci --production
+          npm run prod
+          
+          # Run database migrations
+          php artisan migrate --force
+          
+          # Clear and cache config/routes/views
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
+          # Restart queue workers
+          php artisan queue:restart
+          
+          # Clear application cache
+          php artisan cache:clear
+          
+          # Set proper permissions
+          chmod -R 775 storage bootstrap/cache
+          chown -R ${{ secrets.STAGING_USERNAME }}:www-data .
+          
+          echo "Deployment completed successfully!"
+    
+    - name: Verify deployment
+      uses: appleboy/ssh-action@v1.0.0
+      if: always()
       with:
         host: ${{ secrets.STAGING_HOST }}
         username: ${{ secrets.STAGING_USERNAME }}
         key: ${{ secrets.STAGING_SSH_KEY }}
         script: |
           cd /var/www/asset-management
-          git pull origin develop
-          composer install --no-dev
-          npm run prod
-          php artisan migrate --force
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          php artisan queue:restart
+          if ! curl -I http://localhost 2>/dev/null | grep -q "200\|301"; then
+            echo "::error::Deployment verification failed"
+            exit 1
+          fi
+    
+    - name: Send Slack notification
+      if: always()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}
+        SLACK_TITLE: "Deployment ${{ job.status == 'success' && 'Succeeded' || 'Failed' }} - ${{ env.DEPLOYMENT_ENV }}"
+        SLACK_MESSAGE: |
+          *Repository*: ${{ github.repository }}
+          *Branch*: ${{ steps.version.outputs.BRANCH }}
+          *Version*: ${{ steps.version.outputs.VERSION }} (${{ steps.version.outputs.COMMIT_SHA }})
+          *Environment*: ${{ env.DEPLOYMENT_ENV }}
+          *Triggered by*: ${{ github.actor }}
+          *Workflow*: ${{ github.workflow }}
+          *Status*: ${{ job.status == 'success' && '✅ Success' : '❌ Failed' }}
+          *Run URL*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
+    - name: Create GitHub release
+      if: github.ref == 'refs/heads/develop' && github.event_name == 'push' && job.status == 'success'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          README.md
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        name: Release v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## Changes
+          - Auto-generated release for ${{ github.sha }}
+          
+          ### Deployment Details
+          - **Environment**: ${{ env.DEPLOYMENT_ENV }}
+          - **Version**: ${{ steps.version.outputs.VERSION }} (${{ steps.version.outputs.COMMIT_SHA }})
+          - **Deployed by**: ${{ github.actor }}
+          - **Deployed at**: ${{ github.event.head_commit.timestamp }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Add a deployment status check
+    - name: Update deployment status
+      if: always()
+      uses: bobheadxi/deployments@v1
+      with:
+        step: finish
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+        env: staging
