@@ -100,3 +100,33 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /.fseventsd
+
+# Sensitive configuration files
+*.txt
+*.key
+*.pem
+*.cer
+*.crt
+*.key
+*.p12
+*.pfx
+*.conf
+*.ini
+*.env.*
+*.json
+*.yml
+*.yaml
+
+# Database files
+*.sql
+*.bak
+*.backup
+*.dump
+*.gz
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.rar
+*.db
+*.sqlite
