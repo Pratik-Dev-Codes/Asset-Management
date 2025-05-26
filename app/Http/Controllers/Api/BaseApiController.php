@@ -29,7 +29,7 @@ class BaseApiController extends Controller
     /**
      * Error response method.
      */
-    protected function error(string $message = 'Error', int $code = 400, array $errors = []): JsonResponse
+    protected function error(string $message = 'Error', int $code = 500, array $errors = [], ?string $errorCode = null): JsonResponse
     {
         $response = [
             'success' => false,

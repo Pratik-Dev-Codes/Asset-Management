@@ -25,7 +25,6 @@ class Kernel extends ConsoleKernel
         Commands\ListScheduledReports::class,
         Commands\RunScheduledReports::class,
         Commands\PruneOldNotifications::class,
-        Commands\TestReportScheduling::class,
         Commands\ManageCache::class,
         Commands\GenerateMemoryUsageData::class,
     ];

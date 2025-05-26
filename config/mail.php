@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'log'), // Use log driver for development, smtp for production
 
     /*
     |--------------------------------------------------------------------------
@@ -39,14 +39,17 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
-            'port' => env('MAIL_PORT', 2525),
+            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'port' => env('MAIL_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+            'timeout' => (int) env('MAIL_TIMEOUT', 30),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'auth_mode' => env('MAIL_AUTH_MODE'),
+            'verify_peer' => (bool) env('MAIL_VERIFY_PEER', true),
+            'verify_peer_name' => (bool) env('MAIL_VERIFY_PEER_NAME', true),
+            'allow_self_signed' => (bool) env('MAIL_ALLOW_SELF_SIGNED', false),
         ],
 
         'ses' => [
@@ -111,8 +114,68 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Global "Reply-To" Address
+    |--------------------------------------------------------------------------
+    |
+    | You may specify a global reply-to address that will be used when no
+    | other reply-to address is specified in the message.
+    |
+    */
+    
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS', 'noreply@example.com'),
+        'name' => env('MAIL_REPLY_TO_NAME', 'No Reply'),
+    ],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Email BCC Address
+    |--------------------------------------------------------------------------
+    |
+    | You may specify a global BCC address that will receive a copy of all
+    | emails sent by your application.
+    |
+    */
+    
+    'bcc' => [
+        'address' => env('MAIL_BCC_ADDRESS'),
+        'name' => env('MAIL_BCC_NAME'),
+    ],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    |
+    | If you are using Markdown based email rendering, you may configure your
+    | theme and component paths here, allowing you to customize the design
+    | of the emails. Or, you may simply stick with the Laravel defaults!
+    |
+    */
+    
+    'markdown' => [
+        'theme' => 'default',
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | If you are using the "log" driver, you may specify the logging channel
+    | if you prefer to keep mail messages separate from other log entries.
+    |
+    */
+    
+    'log_channel' => env('MAIL_LOG_CHANNEL', 'stack'),
 
 ];

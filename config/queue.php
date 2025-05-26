@@ -44,7 +44,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'database'),
+    'default' => env('QUEUE_CONNECTION', 'database'), // Use database for queue in production
 
     /*
     |--------------------------------------------------------------------------
@@ -67,12 +67,18 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_QUEUE_CONNECTION'),
+            'connection' => env('DB_QUEUE_CONNECTION', 'mysql'),
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
-            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
-            'after_commit' => false,
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90), // 1.5 minutes
+            'after_commit' => env('QUEUE_AFTER_COMMIT', true), // Ensure data consistency
             'memory_limit' => env('QUEUE_WORKER_MEMORY_LIMIT', 128), // MB
+            'lock_connection' => env('DB_QUEUE_LOCK_CONNECTION', 'mysql'),
+            'lock_table' => env('DB_QUEUE_LOCK_TABLE', 'job_locks'),
+            'lock_lottery' => [2, 100], // 2% chance of garbage collection
+            'lock_timeout' => 60, // 1 minute lock timeout
+            'batch_table' => env('DB_QUEUE_BATCH_TABLE', 'job_batches'),
+            'failed_table' => env('DB_QUEUE_FAILED_TABLE', 'failed_jobs'),
         ],
 
         'beanstalkd' => [
@@ -118,8 +124,9 @@ return [
     */
 
     'batching' => [
-        'database' => env('DB_CONNECTION', 'sqlite'),
-        'table' => 'job_batches',
+        'database' => env('DB_CONNECTION', 'mysql'),
+        'table' => env('QUEUE_BATCH_TABLE', 'job_batches'),
+        'connection' => env('DB_QUEUE_CONNECTION', 'mysql'),
     ],
 
     /*
@@ -137,8 +144,9 @@ return [
 
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'sqlite'),
-        'table' => 'failed_jobs',
+        'database' => env('DB_CONNECTION', 'mysql'),
+        'table' => env('QUEUE_FAILED_TABLE', 'failed_jobs'),
+        'connection' => env('DB_QUEUE_CONNECTION', 'mysql'),
     ],
 
 ];

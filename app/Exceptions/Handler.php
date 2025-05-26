@@ -2,18 +2,24 @@
 
 namespace App\Exceptions;
 
-use App\Exceptions\ApiExceptionHandler;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -24,7 +30,11 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-        //
+        AuthenticationException::class,
+        AuthorizationException::class,
+        ModelNotFoundException::class,
+        ValidationException::class,
+        HttpException::class,
     ];
 
     /**
@@ -41,22 +51,40 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
+     * @param  \Throwable  $e
      * @return void
      */
     public function report(Throwable $e)
     {
-        parent::report($e);
+        // Don't report these exceptions
+        if ($this->shouldntReport($e)) {
+            return;
+        }
+
+        // Add request context
+        $context = [
+            'url' => request() ? request()->fullUrl() : 'CLI',
+            'method' => request() ? request()->method() : 'CLI',
+            'ip' => request() ? request()->ip() : 'CLI',
+            'user_agent' => request() ? request()->userAgent() : 'CLI',
+        ];
+
+        // Add authenticated user if available
+        if (auth()->check()) {
+            $context['user_id'] = auth()->id();
+        }
+
+        // Log the exception
+        Log::error(
+            $e->getMessage(),
+            array_merge($context, [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ])
+        );
     }
 
-    /**
-     * Determine if the exception should be reported.
-     *
-     * @return bool
-     */
-    public function shouldReport(Throwable $e)
-    {
-        return parent::shouldReport($e);
-    }
+
 
     /**
      * Register the exception handling callbacks for the application.
@@ -65,230 +93,262 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
-            // Add request details for web requests
-            if (app()->runningInConsole()) {
-                $context['command'] = request()->server('argv', []);
-            } else {
-                $context['url'] = request()->fullUrl();
-                $context['method'] = request()->method();
-                $context['ip'] = request()->ip();
-                $context['user_agent'] = request()->userAgent();
-
-                if (auth()->check()) {
-                    $context['user_id'] = auth()->id();
-                }
-            }
-
-            // Log the exception with context
-            if ($this->shouldReport($e)) {
-                Log::error($e->getMessage(), $context);
-            }
-        });
-
-        // Custom exception rendering for API
-        $this->renderable(function (ModelNotFoundException $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The requested resource was not found.',
-                    'errors' => [
-                        'resource' => ['The requested resource does not exist.'],
-                    ],
-                ], 404);
-            }
-        });
-
-        $this->renderable(function (ValidationException $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The given data was invalid.',
-                    'errors' => $e->errors(),
-                ], 422);
-            }
-        });
-
-        $this->renderable(function (AuthenticationException $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthenticated.',
-                    'errors' => [
-                        'authentication' => ['You are not authenticated.'],
-                    ],
-                ], 401);
-            }
-        });
-
-        $this->renderable(function (MethodNotAllowedHttpException $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The specified method for the request is invalid.',
-                    'errors' => [
-                        'method' => ['The requested method is not allowed for this resource.'],
-                    ],
-                ], 405);
-            }
-        });
-
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            if ($this->shouldReturnJson($request, $e)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'The requested resource was not found.',
-                    'errors' => [
-                        'resource' => ['The requested resource does not exist.'],
-                    ],
-                ], 404);
-            }
-        });
-
-        // Handle all other exceptions and HTTP exceptions
+        // Handle API exceptions
         $this->renderable(function (Throwable $e, $request) {
-            if ($request->is('api/*') || $request->wantsJson() || !$request->isMethod('get')) {
-                $status = 500;
-                $response = [
-                    'status' => 'error',
-                    'message' => $e->getMessage() ?: 'An error occurred while processing your request.',
-                ];
-
-                // Add debug info in non-production environments
-                if (config('app.debug')) {
-                    $response['exception'] = get_class($e);
-                    $response['file'] = $e->getFile();
-                    $response['line'] = $e->getLine();
-                    $response['trace'] = $e->getTrace();
-                }
-
-                return response()->json($response, $status);
-            }
-
-            // For web requests, try to redirect to login
-            try {
-                // Check if session is available
-                if (app()->bound('session')) {
-                    return redirect()->guest(route('login'));
-                } else {
-                    // If session is not available, return a simple response
-                    return response('Please log in to continue.', 401);
-                }
-            } catch (\Exception $redirectException) {
-                // If we can't redirect, return a simple response
-                return response('Authentication required. Please log in.', 401);
+            if ($this->isApiRequest($request)) {
+                return $this->handleApiException($e);
             }
         });
-
-        // Add debug information in non-production environments for unhandled exceptions
-        if (config('app.debug')) {
-            $this->renderable(function (Throwable $e, $request) {
-                $response = [
-                    'debug' => [
-                        'message' => $e->getMessage(),
-                        'exception' => get_class($e),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                        'trace' => $e->getTrace(),
-                    ],
-                ];
-
-                return response()->json($response, 500);
-            });
-        }
     }
 
     /**
-     * Render an exception into an HTTP response.
+     * Check if the request is an API request
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Throwable
+     * @return bool
      */
-    public function render($request, Throwable $e)
+    protected function isApiRequest($request): bool
     {
-        if ($request->is('api/*') || $request->wantsJson()) {
-            return $this->handleApiException($request, $e);
-        }
-
-        return parent::render($request, $e);
+        return $request->is('api/*') || $request->expectsJson();
     }
 
     /**
-     * Handle API exceptions.
+     * Handle API exceptions
+     *
+     * @param  \Throwable  $e
+     * @return \Illuminate\Http\JsonResponse
      */
-    private function handleApiException(Request $request, Throwable $exception): JsonResponse
+    protected function handleApiException(Throwable $e): JsonResponse
     {
-        $exception = $this->prepareException($exception);
-
-        if ($exception instanceof AuthenticationException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated.',
-            ], 401);
+        // Handle specific exceptions
+        if ($e instanceof ValidationException) {
+            return $this->handleValidationException($e);
         }
 
-        if ($exception instanceof ValidationException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation Error',
-                'errors' => $exception->errors(),
-            ], 422);
+        if ($e instanceof AuthenticationException) {
+            return $this->handleAuthenticationException($e);
         }
 
-        if ($exception instanceof ModelNotFoundException) {
-            $model = str_replace('App\\Models\\', '', $exception->getModel());
-
-            return response()->json([
-                'success' => false,
-                'message' => "{$model} not found.",
-            ], 404);
+        if ($e instanceof AuthorizationException) {
+            return $this->handleAuthorizationException($e);
         }
 
-        if ($exception instanceof NotFoundHttpException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'The specified URL cannot be found.',
-            ], 404);
+        if ($e instanceof ModelNotFoundException) {
+            return $this->handleModelNotFoundException($e);
         }
 
-        if ($exception instanceof MethodNotAllowedHttpException) {
-            return response()->json([
-                'success' => false,
-                'message' => 'The specified method for the request is invalid.',
-            ], 405);
+        if ($e instanceof NotFoundHttpException) {
+            return $this->handleNotFoundHttpException($e);
         }
 
-        if ($exception instanceof HttpException) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ], $exception->getStatusCode());
+        if ($e instanceof MethodNotAllowedHttpException) {
+            return $this->handleMethodNotAllowedHttpException($e);
         }
 
-        // Default error response
-        $statusCode = 500;
-        $message = 'Whoops, looks like something went wrong.';
-
-        if ($exception instanceof HttpExceptionInterface) {
-            $statusCode = $exception->getCode();
-            $message = $exception->getMessage() ?: $message;
+        if ($e instanceof QueryException) {
+            return $this->handleQueryException($e);
         }
 
+        if ($e instanceof TooManyRequestsHttpException) {
+            return $this->handleTooManyRequestsHttpException($e);
+        }
+
+        if ($e instanceof HttpException) {
+            return $this->handleHttpException($e);
+        }
+
+        // Default exception handler
+        return $this->handleDefaultException($e);
+    }
+
+    /**
+     * Handle validation exception
+     *
+     * @param  \Illuminate\Validation\ValidationException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleValidationException(ValidationException $e): JsonResponse
+    {
+        return response()->json([
+            'status' => 'validation_error',
+            'message' => 'The given data was invalid.',
+            'errors' => $e->errors(),
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * Handle authentication exception
+     *
+     * @param  \Illuminate\Auth\AuthenticationException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleAuthenticationException(AuthenticationException $e): JsonResponse
+    {
+        return response()->json([
+            'status' => 'unauthenticated',
+            'message' => $e->getMessage() ?: 'Unauthenticated.',
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * Handle authorization exception
+     *
+     * @param  \Illuminate\Auth\Access\AuthorizationException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleAuthorizationException(AuthorizationException $e): JsonResponse
+    {
+        return response()->json([
+            'status' => 'unauthorized',
+            'message' => $e->getMessage() ?: 'This action is unauthorized.',
+        ], Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Handle model not found exception
+     *
+     * @param  \Illuminate\Database\Eloquent\ModelNotFoundException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleModelNotFoundException(ModelNotFoundException $e): JsonResponse
+    {
+        $model = class_basename($e->getModel());
+        $model = Str::snake(str_replace('App\\Models\\', '', $model));
+        
+        return response()->json([
+            'status' => 'not_found',
+            'message' => "The requested {$model} was not found.",
+        ], Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Handle not found HTTP exception
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\NotFoundHttpException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleNotFoundHttpException(NotFoundHttpException $e): JsonResponse
+    {
+        return response()->json([
+            'status' => 'not_found',
+            'message' => 'The requested resource was not found.',
+        ], Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Handle method not allowed HTTP exception
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleMethodNotAllowedHttpException(MethodNotAllowedHttpException $e): JsonResponse
+    {
+        return response()->json([
+            'status' => 'method_not_allowed',
+            'message' => 'The specified method for the request is invalid.',
+            'allowed_methods' => $e->getHeaders()['Allow'] ?? [],
+        ], Response::HTTP_METHOD_NOT_ALLOWED);
+    }
+
+    /**
+     * Handle query exception
+     *
+     * @param  \Illuminate\Database\QueryException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleQueryException(QueryException $e): JsonResponse
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+        
+        // Handle specific SQL errors
+        switch ($errorCode) {
+            case 1062: // Duplicate entry
+                return response()->json([
+                    'status' => 'duplicate_entry',
+                    'message' => 'A duplicate entry already exists.',
+                ], Response::HTTP_CONFLICT);
+                
+            case 1451: // Foreign key constraint
+                return response()->json([
+                    'status' => 'constraint_violation',
+                    'message' => 'Cannot delete or update a parent row: a foreign key constraint fails.',
+                ], Response::HTTP_CONFLICT);
+                
+            default:
+                return $this->handleDefaultException($e);
+        }
+    }
+
+    /**
+     * Handle too many requests HTTP exception
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleTooManyRequestsHttpException(TooManyRequestsHttpException $e): JsonResponse
+    {
+        $retryAfter = $e->getHeaders()['Retry-After'] ?? 60;
+        
+        return response()->json([
+            'status' => 'too_many_requests',
+            'message' => 'Too many attempts. Please try again later.',
+            'retry_after' => (int) $retryAfter,
+        ], Response::HTTP_TOO_MANY_REQUESTS);
+    }
+
+    /**
+     * Handle HTTP exception
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpException  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleHttpException(HttpException $e): JsonResponse
+    {
+        $statusCode = $e->getStatusCode();
+        
+        return response()->json([
+            'status' => Str::snake(Response::$statusTexts[$statusCode] ?? 'error'),
+            'message' => $e->getMessage() ?: Response::$statusTexts[$statusCode] ?? 'An error occurred',
+        ], $statusCode);
+    }
+
+    /**
+     * Handle default exception
+     *
+     * @param  \Throwable  $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleDefaultException(Throwable $e): JsonResponse
+    {
+        $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+        
+        // Handle HttpException which has getStatusCode
+        if ($e instanceof HttpException) {
+            $statusCode = $e->getStatusCode();
+        } 
+        // Handle other exceptions with status codes
+        else {
+            $code = $e->getCode();
+            if (is_numeric($code) && $code >= 400 && $code < 600) {
+                $statusCode = (int) $code;
+            }
+        }
+            
+        $response = [
+            'status' => 'error',
+            'message' => $e->getMessage() ?: 'An error occurred while processing your request.',
+        ];
+
+        // Add debug info in non-production environments
         if (config('app.debug')) {
             $response['debug'] = [
-                'exception' => get_class($exception),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'trace' => $exception->getTrace(),
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTrace(),
             ];
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => $message,
-        ], $statusCode);
+        return response()->json($response, $statusCode);
     }
 }

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => env('CACHE_STORE', 'array'), // Default to array for development, use redis in production
 
     /*
     |--------------------------------------------------------------------------
@@ -35,21 +35,34 @@ return [
 
         'array' => [
             'driver' => 'array',
-            'serialize' => false,
+            'serialize' => false, // Faster performance without serialization
+            'store' => 'array',
         ],
 
         'database' => [
             'driver' => 'database',
-            'connection' => env('DB_CACHE_CONNECTION'),
+            'connection' => env('DB_CACHE_CONNECTION', 'mysql'),
             'table' => env('DB_CACHE_TABLE', 'cache'),
-            'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
-            'lock_table' => env('DB_CACHE_LOCK_TABLE'),
+            'lock_connection' => env('DB_CACHE_LOCK_CONNECTION', 'mysql'),
+            'lock_table' => env('DB_CACHE_LOCK_TABLE', 'cache_locks'),
+            'lock_lottery' => [2, 100], // 2% chance of garbage collection
+            'lock_timeout' => 60, // 1 minute lock timeout
         ],
 
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
-            'lock_path' => storage_path('framework/cache/data'),
+            'lock_path' => storage_path('framework/cache/locks'),
+            'permissions' => [
+                'file' => [
+                    'public' => 0664,
+                    'private' => 0664,
+                ],
+                'dir' => [
+                    'public' => 0775,
+                    'private' => 0775,
+                ],
+            ],
         ],
 
         'memcached' => [
@@ -75,6 +88,10 @@ return [
             'driver' => 'redis',
             'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
             'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
+            'lock_lottery' => [2, 100],
+            'lock_timeout' => 60,
+            'block_for' => null,
+            'after_commit' => false,
         ],
 
         'dynamodb' => [

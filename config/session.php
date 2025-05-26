@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'file'),
+    'driver' => env('SESSION_DRIVER', 'array'), // Using array driver for API-only app
 
     /*
     |--------------------------------------------------------------------------
@@ -32,9 +32,11 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => (int) env('SESSION_LIFETIME', 120), // 2 hours
 
-    'expire_on_close' => true,
+    'expire_on_close' => true, // Session expires when the browser is closed
+    'secure' => env('SESSION_SECURE_COOKIE', true),
+    'same_site' => 'lax',
 
     /*
     |--------------------------------------------------------------------------
@@ -129,7 +131,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_').'_api_session'
     ),
 
     /*
@@ -143,7 +145,7 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+    'path' => env('SESSION_PATH', '/api'),
 
     /*
     |--------------------------------------------------------------------------
@@ -183,6 +185,7 @@ return [
     */
 
     'http_only' => env('SESSION_HTTP_ONLY', true),
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
     /*
     |--------------------------------------------------------------------------

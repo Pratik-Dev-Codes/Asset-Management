@@ -14,7 +14,7 @@ return [
     */
 
     'paths' => [
-        resource_path('views'),
+        // No views needed for API-only application
     ],
 
     /*
@@ -32,5 +32,15 @@ return [
         'VIEW_COMPILED_PATH',
         realpath(storage_path('framework/views'))
     ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | API-Only Application
+    |--------------------------------------------------------------------------
+    |
+    | This application is API-only and does not use views. This configuration
+    | is kept for compatibility with packages that may require it.
+    |
+    */
 
 ];
