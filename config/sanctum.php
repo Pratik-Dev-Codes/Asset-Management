@@ -15,11 +15,11 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+    'stateful' => array_filter(array_map('trim', explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort()
-    ))),
+    ))))),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +33,11 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'guard' => ['api'],
+=======
+    'guard' => ['api'], // Use the 'api' guard for authentication
+>>>>>>> main
 
     /*
     |--------------------------------------------------------------------------
@@ -46,7 +50,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => env('SANCTUM_TOKEN_EXPIRATION', null), // Token expiration time in minutes
 
     /*
     |--------------------------------------------------------------------------
@@ -61,7 +65,7 @@ return [
     |
     */
 
-    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', 'sanctum_'), // Prefix for API tokens
 
     /*
     |--------------------------------------------------------------------------
@@ -90,5 +94,36 @@ return [
     */
     
     'routes' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Abilities
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default token abilities that should be assigned
+    | to newly created tokens. These will be used when no abilities are
+    | provided to the createToken method.
+    |
+    */
+
+    'abilities' => [
+        'server:read',
+        'server:update',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Prefix
+    |--------------------------------------------------------------------------
+    |
+    | This value is the prefix that will be used when storing tokens in the
+    | database. This can be useful if you are running multiple applications
+    | that use Sanctum on the same database.
+    |
+    */
+    'database' => [
+        'connection' => env('DB_CONNECTION', 'mysql'),
+        'table' => 'personal_access_tokens',
+    ],
 
 ];

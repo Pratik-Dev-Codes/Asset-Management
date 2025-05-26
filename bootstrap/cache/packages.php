@@ -1,4 +1,11 @@
 <?php return array (
+  'inertiajs/inertia-laravel' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Inertia\\ServiceProvider',
+    ),
+  ),
   'kalnoy/nestedset' => 
   array (
     'providers' => 
@@ -32,6 +39,13 @@
     'providers' => 
     array (
       0 => 'Laravel\\Sanctum\\SanctumServiceProvider',
+    ),
+  ),
+  'laravel/tinker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Tinker\\TinkerServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -82,6 +96,18 @@
     'providers' => 
     array (
       0 => 'Tighten\\Ziggy\\ZiggyServiceProvider',
+    ),
+  ),
+  'tymon/jwt-auth' => 
+  array (
+    'aliases' => 
+    array (
+      'JWTAuth' => 'Tymon\\JWTAuth\\Facades\\JWTAuth',
+      'JWTFactory' => 'Tymon\\JWTAuth\\Facades\\JWTFactory',
+    ),
+    'providers' => 
+    array (
+      0 => 'Tymon\\JWTAuth\\Providers\\LaravelServiceProvider',
     ),
   ),
 );

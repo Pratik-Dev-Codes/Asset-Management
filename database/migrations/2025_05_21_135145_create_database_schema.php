@@ -28,34 +28,51 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('code')->unique();
             $table->text('description')->nullable();
             $table->unsignedBigInteger('manager_id')->nullable();
+            $table->unsignedBigInteger('location_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('manager_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('location_id')->references('id')->on('locations')->onDelete('set null');
         });
 
         // Create locations table
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('code')->unique();
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('country')->default('India');
             $table->string('zip_code')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->string('contact_person')->nullable();
             $table->string('contact_phone')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Create asset_categories table
         Schema::create('asset_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('code')->nullable();
             $table->text('description')->nullable();
+            $table->string('icon')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->integer('eula_id')->nullable();
+            $table->boolean('checkin_email')->default(false);
+            $table->boolean('require_acceptance')->default(false);
+            $table->boolean('use_default_eula')->default(false);
+            $table->boolean('checkin_email_required')->default(false);
+            $table->string('image')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Create suppliers table
@@ -72,11 +89,13 @@ return new class extends Migration
             $table->string('zip_code')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Create assets table
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
+            $table->string('asset_tag')->nullable()->unique();
             $table->string('asset_code')->unique();
             $table->string('name');
             $table->text('description')->nullable();

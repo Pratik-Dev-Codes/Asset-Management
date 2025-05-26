@@ -14,7 +14,11 @@ return [
     */
 
     'defaults' => [
+<<<<<<< HEAD
         'guard' => env('AUTH_GUARD', 'api'),
+=======
+        'guard' => env('AUTH_GUARD', 'api'), // Default guard for API authentication
+>>>>>>> main
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -37,9 +41,11 @@ return [
 
     'guards' => [
         'api' => [
-            'driver' => 'sanctum',
+            'driver' => 'sanctum', // Use Sanctum for API authentication
             'provider' => 'users',
             'hash' => false,
+            'expire' => env('SANCTUM_TOKEN_EXPIRATION', null),
+            'refresh_after' => env('SANCTUM_REFRESH_AFTER', 60 * 24 * 7), // 1 week
         ],
     ],
 
@@ -64,6 +70,8 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            'table' => 'users',
+            'expire' => env('AUTH_TOKEN_EXPIRE', 60 * 24 * 30), // 30 days
         ],
 
         // 'users' => [
@@ -94,9 +102,9 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
-            'throttle' => 60,
+            'table' => 'password_reset_tokens',
+            'expire' => env('AUTH_PASSWORD_RESET_EXPIRE', 60), // 1 hour
+            'throttle' => env('AUTH_PASSWORD_RESET_THROTTLE', 60), // 1 request per minute
         ],
     ],
 
@@ -111,6 +119,6 @@ return [
     |
     */
 
-    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800), // 3 hours
 
 ];

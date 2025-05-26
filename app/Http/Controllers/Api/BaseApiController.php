@@ -45,7 +45,11 @@ class BaseApiController extends Controller
      * @param  \Illuminate\Pagination\AbstractPaginator  $paginator
      * @return array
      */
+<<<<<<< HEAD
     protected function formatPaginatedData(AbstractPaginator $paginator): array
+=======
+    protected function error(string $message = 'Error', int $code = 500, array $errors = [], ?string $errorCode = null): JsonResponse
+>>>>>>> main
     {
         return [
             'data' => $paginator->items(),

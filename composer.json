@@ -1,9 +1,9 @@
 {
-    "name": "pratik-dev/neepco-asset-management",
+    "name": "pratik-dev/neepco-asset-management-api",
     "type": "project",
-    "description": "Asset Management System For NEEPCO LTD - A comprehensive solution for managing organizational assets. Developed as a final project for MCA at Royal Global University, Assam.",
+    "description": "RESTful API for Asset Management System For NEEPCO LTD - A comprehensive solution for managing organizational assets.",
     "homepage": "https://github.com/Pratik-Dev-Codes/Asset-Management-System-For-NEEPCO-LTD",
-    "keywords": ["framework", "laravel", "asset-management", "neepco", "university-project"],
+    "keywords": ["api", "laravel", "asset-management", "rest", "jwt"],
     "license": "MIT",
     "authors": [
         {
@@ -19,16 +19,26 @@
         "doctrine/dbal": "^3.9",
         "kalnoy/nestedset": "^6.0",
         "laravel/framework": "^10.0",
-        "laravel/sanctum": "^3.2",
+        "laravel/sanctum": "^3.3",
         "laravel/telescope": "*",
+<<<<<<< HEAD
         "spatie/laravel-activitylog": "*",
         "spatie/laravel-permission": "^6.18",
+=======
+        "maatwebsite/excel": "^3.1",
+        "milon/barcode": "*",
+        "simplesoftwareio/simple-qrcode": "*",
+        "spatie/laravel-activitylog": "*",
+        "spatie/laravel-permission": "^6.18",
+        "tymon/jwt-auth": "*",
+>>>>>>> main
         "zircote/swagger-php": "^4.11"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "*",
         "laravel/sail": "^1.18",
+        "laravel/tinker": "^2.10",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.5",

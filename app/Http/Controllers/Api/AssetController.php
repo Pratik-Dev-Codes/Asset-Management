@@ -317,5 +317,64 @@ class AssetController extends BaseApiController
         });
     }
 
-    // ... rest of the controller methods ...
+    /**
+     * @OA\Delete(
+     *     path="/api/assets/{asset}",
+     *     summary="Delete an asset",
+     *     description="Delete the specified asset",
+     *     operationId="deleteAsset",
+     *     tags={"Assets"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="asset",
+     *         in="path",
+     *         description="ID of the asset to delete",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Asset deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Asset deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Asset not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Asset not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="You do not have permission to delete assets.")
+     *         )
+     *     )
+     * )
+     */
+    public function destroy(Asset $asset)
+    {
+        try {
+            $this->authorize('delete', $asset);
+            
+            $asset->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Asset deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete asset: '.$e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete asset'
+            ], 500);
+        }
+    }
 }

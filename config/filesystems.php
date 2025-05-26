@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'local'), // Default disk for file storage
 
     /*
     |--------------------------------------------------------------------------
@@ -33,9 +33,20 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
-            'throw' => false,
-            'report' => false,
+            'serve' => false, // Disable serving files directly in API mode
+            'throw' => true, // Throw exceptions for better error handling
+            'report' => true, // Enable reporting for better debugging
+            'visibility' => 'private', // Default to private storage
+            'permissions' => [
+                'file' => [
+                    'public' => 0664,
+                    'private' => 0664,
+                ],
+                'dir' => [
+                    'public' => 0775,
+                    'private' => 0775,
+                ],
+            ],
         ],
 
         'public' => [
@@ -43,8 +54,18 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
+            'throw' => true, // Throw exceptions for better error handling
+            'report' => true, // Enable reporting for better debugging
+            'permissions' => [
+                'file' => [
+                    'public' => 0664,
+                    'private' => 0664,
+                ],
+                'dir' => [
+                    'public' => 0775,
+                    'private' => 0775,
+                ],
+            ],
         ],
 
         's3' => [
@@ -74,7 +95,8 @@ return [
     */
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        // No need for public storage links in API-only application
+        // public_path('storage') => storage_path('app/public'),
     ],
 
 ];
